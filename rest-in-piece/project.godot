@@ -13,7 +13,7 @@ config_version=5
 config/name="Rest in Piece"
 run/main_scene="uid://oeao3d4rv2uh"
 config/features=PackedStringArray("4.7", "Mobile")
-config/icon="res://icon.svg"
+config/icon="res://assets/icons/godot.svg"
 
 [display]
 
