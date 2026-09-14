@@ -17,6 +17,8 @@ config/icon="res://assets/icons/godot.svg"
 
 [display]
 
+window/size/viewport_width=650
+window/size/viewport_height=704
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
 
