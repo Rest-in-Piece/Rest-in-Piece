@@ -1,11 +1,11 @@
 [gd_scene format=4 uid="uid://ctf7ybv4w2hvt"]
 
-[ext_resource type="Texture2D" uid="uid://chy1h8jd6be03" path="res://assets/tetrominoes.png" id="1_v0c6v"]
-[ext_resource type="Script" uid="uid://bmhjollnq5ugp" path="res://tetris.gd" id="2_nx4o8"]
-[ext_resource type="PackedScene" uid="uid://b8dp7yalnfjlr" path="res://scenes/hud.tscn" id="3_nx4o8"]
+[ext_resource type="Texture2D" uid="uid://chy1h8jd6be03" path="res://entities/pieces/tetrominoes.png" id="1_uppkp"]
+[ext_resource type="Script" uid="uid://bmhjollnq5ugp" path="res://core/tetris.gd" id="2_uppkp"]
+[ext_resource type="PackedScene" uid="uid://b8dp7yalnfjlr" path="res://ui/scenes/hud.tscn" id="3_yo8nm"]
 
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_7tjhf"]
-texture = ExtResource("1_v0c6v")
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_uppkp"]
+texture = ExtResource("1_uppkp")
 texture_region_size = Vector2i(32, 32)
 0:0/0 = 0
 1:0/0 = 0
@@ -18,7 +18,7 @@ texture_region_size = Vector2i(32, 32)
 
 [sub_resource type="TileSet" id="TileSet_wvnxi"]
 tile_size = Vector2i(32, 32)
-sources/0 = SubResource("TileSetAtlasSource_7tjhf")
+sources/0 = SubResource("TileSetAtlasSource_uppkp")
 
 [node name="game" type="Node2D" unique_id=380485723]
 
@@ -26,6 +26,7 @@ sources/0 = SubResource("TileSetAtlasSource_7tjhf")
 z_index = -1
 tile_map_data = PackedByteArray("AAAAAAAAAAAHAAAAAAAAAAEAAAAHAAAAAAAAAAIAAAAHAAAAAAAAAAMAAAAHAAAAAAAAAAQAAAAHAAAAAAAAAAUAAAAHAAAAAAAAAAcAAAAHAAAAAAAAAAYAAAAHAAAAAAAAAAgAAAAHAAAAAAAAAAkAAAAHAAAAAAAAAAoAAAAHAAAAAAAAAAwAAAAHAAAAAAAAAAsAAAAHAAAAAAABAAAAAAAHAAAAAAACAAAAAAAHAAAAAAADAAAAAAAHAAAAAAAEAAAAAAAHAAAAAAAGAAAAAAAHAAAAAAAFAAAAAAAHAAAAAAAHAAAAAAAHAAAAAAAIAAAAAAAHAAAAAAAJAAAAAAAHAAAAAAAKAAAAAAAHAAAAAAALAAAAAAAHAAAAAAALAAEAAAAHAAAAAAALAAIAAAAHAAAAAAALAAMAAAAHAAAAAAALAAQAAAAHAAAAAAALAAUAAAAHAAAAAAALAAYAAAAHAAAAAAALAAcAAAAHAAAAAAALAAgAAAAHAAAAAAALAAkAAAAHAAAAAAALAAoAAAAHAAAAAAALAAsAAAAHAAAAAAALAAwAAAAHAAAAAAALAA0AAAAHAAAAAAALAA4AAAAHAAAAAAALAA8AAAAHAAAAAAALABAAAAAHAAAAAAALABEAAAAHAAAAAAALABIAAAAHAAAAAAALABMAAAAHAAAAAAALABQAAAAHAAAAAAALABUAAAAHAAAAAAAKABUAAAAHAAAAAAAJABUAAAAHAAAAAAAIABUAAAAHAAAAAAAHABUAAAAHAAAAAAAGABUAAAAHAAAAAAAFABUAAAAHAAAAAAAEABUAAAAHAAAAAAADABUAAAAHAAAAAAACABUAAAAHAAAAAAABABUAAAAHAAAAAAAAABUAAAAHAAAAAAAAABQAAAAHAAAAAAAAABMAAAAHAAAAAAAAABIAAAAHAAAAAAAAABEAAAAHAAAAAAAAABAAAAAHAAAAAAAAAA4AAAAHAAAAAAAAAA0AAAAHAAAAAAAAAA8AAAAHAAAAAAA=")
 tile_set = SubResource("TileSet_wvnxi")
-script = ExtResource("2_nx4o8")
+script = ExtResource("2_uppkp")
+velocidade = null
 
-[node name="HUD" parent="Tetris" unique_id=1894945411 instance=ExtResource("3_nx4o8")]
+[node name="HUD" parent="Tetris" unique_id=1894945411 instance=ExtResource("3_yo8nm")]

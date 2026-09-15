@@ -1,4 +1,9 @@
+
 extends TileMapLayer
+
+@onready var label_pontuacao: Label = $HUD/Pontuação
+@onready var hud: CanvasLayer = $HUD
+
 
 # peças do tetris
 # aqui instaciamos as peças existentes
@@ -67,13 +72,17 @@ var etapas : Array
 const total_etapas : int = 50
 var pos_inicial := Vector2i(5, 1)
 var pos_atual : Vector2i
-var velocidade : float
+@export var velocidade : float = 1.0
+var aceleracao: float = 0.25
 
 # variaveis das peças no jogo
 var tipo_peca
 var prox_tipo_peca
 var indice_rotacao : int = 0
 var peca_ativa : Array
+
+var pontuacao: int
+@export var recompensa: int = 100
 
 # variaveis pro tileMap
 var tile_id : int = 0
@@ -84,11 +93,11 @@ var prox_peca_atlas : Vector2i
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	novo_jogo()
+	print(label_pontuacao)
 
 func novo_jogo():
-	velocidade = 1.0
 	etapas = [0, 0, 0] #0 esquerda #1 direita #2 baixo
-	$HUD.get_node("Perdeu").hide()
+	hud.get_node("Perdeu").hide()
 	tipo_peca = peca_escolhida()
 	peca_atlas = Vector2i(todas_pecas.find(tipo_peca), 0)
 	prox_tipo_peca = peca_escolhida()
@@ -109,14 +118,16 @@ func peca_escolhida():
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
-	if Input.is_action_pressed("ui_left"):
-		etapas[0] += 10
-	elif Input.is_action_pressed("ui_right"):
-		etapas[1] += 10
-	elif Input.is_action_pressed("ui_down"):
-		etapas[2] += 10
-	elif Input.is_action_just_pressed("ui_up"):
+	if Input.is_action_pressed("mover_esquerda"):
+		etapas[0] += 5
+	if Input.is_action_pressed("mover_direita"):
+		etapas[1] += 5
+	if Input.is_action_pressed("acelerar_queda"):
+		etapas[2] += 5
+	if Input.is_action_just_pressed("rotacionar_peca"):
 		rotacionar_peca()
+	
+	# queda da peça com o passar do tempo
 	etapas[2] += velocidade
 	
 	# mover a peça
@@ -124,15 +135,15 @@ func _process(delta: float) -> void:
 		if etapas[i] >= total_etapas:
 			mover_peca(direcoes[i])
 			etapas[i] = 0
-	
+
 func criar_peca():
 	etapas = [0, 0, 0]
 	pos_atual = pos_inicial
-	peca_ativa = tipo_peca[indice_rotacao]
+	peca_ativa = tipo_peca[0]
 	desenhar_peca(peca_ativa, pos_atual, peca_atlas)
 	#mostra a proxima peça
 	desenhar_peca(prox_tipo_peca[0], Vector2i(15,6), prox_peca_atlas)
-	
+
 func desenhar_peca(peca, posicao, atlas):
 	for bloco in peca:
 		set_cell(posicao + bloco, tile_id, atlas)
@@ -147,6 +158,9 @@ func rotacionar_peca():
 		indice_rotacao = (indice_rotacao + 1) % 4
 		peca_ativa = tipo_peca[indice_rotacao]
 		desenhar_peca(peca_ativa, pos_atual, peca_atlas)
+
+func zerar_rotacao():
+	indice_rotacao = 0
 
 func mover_peca(direcao):
 	if (pode_mover(direcao)):
@@ -163,7 +177,7 @@ func mover_peca(direcao):
 			limpar_painel()
 			criar_peca()
 
-	
+
 func pode_mover(direcao):
 	#verifica se tem espaço para se mover
 	var resposta = true
@@ -171,7 +185,7 @@ func pode_mover(direcao):
 		if not esta_livre(i + pos_atual + direcao):
 			resposta = false
 	return resposta
-	
+
 func pode_rotacionar():
 	var resposta = true
 	var var_indice_rotacao = (indice_rotacao + 1) % 4
@@ -189,24 +203,29 @@ func esta_livre(posicao):
 	# se não pertence à peça atual,
 	# verifica se existe algum tile nessa posição
 	return get_cell_source_id(posicao) == -1
-	
+
 func limpar_painel():
 	for i in range(14, 19):
 		for j in range(5, 9):
 			erase_cell(Vector2i(i, j))
-	
+
 func verificar_linhas():
 	var linha : int = linhas
 	while linha > 0:
 		var cont = 0
 		for i in range(colunas):
-			if not esta_livre(Vector2i(i + 1, linha)):
+			# AQUI
+			if get_cell_source_id(Vector2i(i + 1, linha)) != -1:
 				cont += 1
 		if cont == colunas:
 			deslocar_linhas(linha)
+			pontuacao += recompensa
+			label_pontuacao.text = str("PONTUAÇÃO: " + str(pontuacao))
+			velocidade += aceleracao
+			print("Velocidade: ", velocidade)
 		else:
 			linha -= 1
-			
+
 func deslocar_linhas(linha):
 	var atlas
 	for i in range(linha, 1, -1):

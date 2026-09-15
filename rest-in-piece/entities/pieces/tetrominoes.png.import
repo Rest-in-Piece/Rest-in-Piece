@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://chy1h8jd6be03"
-path="res://.godot/imported/tetrominoes.png-6fefb67b0c83934c1a103a79bfc6806a.ctex"
+path="res://.godot/imported/tetrominoes.png-cfcc20b686c961b4cff01f1fc5f30370.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/tetrominoes.png"
-dest_files=["res://.godot/imported/tetrominoes.png-6fefb67b0c83934c1a103a79bfc6806a.ctex"]
+source_file="res://entities/pieces/tetrominoes.png"
+dest_files=["res://.godot/imported/tetrominoes.png-cfcc20b686c961b4cff01f1fc5f30370.ctex"]
 
 [params]
 
