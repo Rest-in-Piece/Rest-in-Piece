@@ -1,9 +1,7 @@
 
 extends TileMapLayer
 
-@onready var label_pontuacao: Label = $HUD/Pontuação
-@onready var hud: CanvasLayer = $HUD
-
+@export var hud: CanvasLayer
 
 # peças do tetris
 # aqui instaciamos as peças existentes
@@ -93,11 +91,10 @@ var prox_peca_atlas : Vector2i
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	novo_jogo()
-	print(label_pontuacao)
 
 func novo_jogo():
 	etapas = [0, 0, 0] #0 esquerda #1 direita #2 baixo
-	hud.get_node("Perdeu").hide()
+	# hud.get_node("Perdeu").hide()  # eu dei hide pelo editor
 	tipo_peca = peca_escolhida()
 	peca_atlas = Vector2i(todas_pecas.find(tipo_peca), 0)
 	prox_tipo_peca = peca_escolhida()
@@ -142,7 +139,7 @@ func criar_peca():
 	peca_ativa = tipo_peca[0]
 	desenhar_peca(peca_ativa, pos_atual, peca_atlas)
 	#mostra a proxima peça
-	desenhar_peca(prox_tipo_peca[0], Vector2i(15,6), prox_peca_atlas)
+	desenhar_peca(prox_tipo_peca[0], Vector2i(16.5,3), prox_peca_atlas) # AQUI: a posição pra desenhar a peça está estática usando pixels
 
 func desenhar_peca(peca, posicao, atlas):
 	for bloco in peca:
@@ -220,7 +217,7 @@ func verificar_linhas():
 		if cont == colunas:
 			deslocar_linhas(linha)
 			pontuacao += recompensa
-			label_pontuacao.text = str("PONTUAÇÃO: " + str(pontuacao))
+			hud.atualizar_pontuacao(pontuacao)
 			velocidade += aceleracao
 			print("Velocidade: ", velocidade)
 		else:

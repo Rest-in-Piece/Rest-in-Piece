@@ -1,5 +1,8 @@
 [gd_scene format=3 uid="uid://b8dp7yalnfjlr"]
 
+[ext_resource type="Texture2D" uid="uid://cgodqahkv04eo" path="res://ui/backgrounds/Screenshot_1.png" id="1_aydmx"]
+[ext_resource type="Script" uid="uid://d0kbphkox74yp" path="res://ui/scenes/hud.gd" id="1_itb64"]
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8w10v"]
 bg_color = Color(0.6, 0.6, 0.6, 0)
 border_width_left = 5
@@ -16,49 +19,77 @@ bg_color = Color(0.2530101, 0.69875896, 0.468336, 1)
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ibkw7"]
 
 [node name="HUD" type="CanvasLayer" unique_id=1894945411]
+script = ExtResource("1_itb64")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1432215097]
+modulate = Color(1, 1, 1, 0.19215687)
+position = Vector2(958.75, 537.75)
+scale = Vector2(1.7126899, 1.5640466)
+texture = ExtResource("1_aydmx")
 
 [node name="Panel" type="Panel" parent="." unique_id=566553705]
-offset_left = 425.0
-offset_top = 150.0
-offset_right = 625.0
-offset_bottom = 300.0
+offset_left = 1252.0
+offset_top = 135.0
+offset_right = 1611.0
+offset_bottom = 460.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_8w10v")
+
+[node name="Panel2" type="Panel" parent="." unique_id=1214412996]
+offset_left = 319.0
+offset_top = 137.0
+offset_right = 678.0
+offset_bottom = 454.0
+scale = Vector2(0.95045614, 1.2040899)
 theme_override_styles/panel = SubResource("StyleBoxFlat_8w10v")
 
 [node name="Label" type="Label" parent="." unique_id=268498676]
-offset_left = 430.0
-offset_top = 100.0
-offset_right = 610.0
-offset_bottom = 145.0
+offset_left = 1333.0
+offset_top = 150.0
+offset_right = 1522.0
+offset_bottom = 195.0
 theme_override_font_sizes/font_size = 25
-text = "PROXIMA PEÇA:"
+text = "Próxima peça:"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Pontuação" type="Label" parent="." unique_id=776066747]
-offset_left = 430.0
-offset_top = 350.0
-offset_right = 614.0
-offset_bottom = 395.0
+[node name="LabelSuaPontuação" type="Label" parent="." unique_id=776066747]
+offset_left = 398.0
+offset_top = 291.0
+offset_right = 582.0
+offset_bottom = 336.0
 theme_override_font_sizes/font_size = 22
-text = "PONTUAÇÃO: 0"
+text = "Pontuação:"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="LabelPontuação" type="Label" parent="." unique_id=1396543969]
+unique_name_in_owner = true
+offset_left = 469.0
+offset_top = 312.0
+offset_right = 509.0
+offset_bottom = 400.0
+theme_override_font_sizes/font_size = 48
+text = "0"
 horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="Perdeu" type="Label" parent="." unique_id=1367725232]
-offset_left = 72.0
-offset_top = 293.0
-offset_right = 311.0
-offset_bottom = 351.0
+visible = false
+offset_left = 834.0
+offset_top = 564.0
+offset_right = 1073.0
+offset_bottom = 622.0
 theme_override_font_sizes/font_size = 26
 text = "Você Perdeu!"
 horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="Botão novo jogo" type="Button" parent="." unique_id=419492684]
-offset_left = 430.0
-offset_top = 500.0
-offset_right = 610.0
-offset_bottom = 540.0
+visible = false
+offset_left = 865.0
+offset_top = 758.0
+offset_right = 1045.0
+offset_bottom = 798.0
 theme_override_font_sizes/font_size = 25
 theme_override_styles/normal = SubResource("StyleBoxFlat_hkg3b")
 theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_wvnxi")

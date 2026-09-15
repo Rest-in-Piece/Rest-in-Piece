@@ -15,6 +15,10 @@ run/main_scene="uid://ctf7ybv4w2hvt"
 config/features=PackedStringArray("4.7", "Mobile")
 config/icon="res://assets/icons/godot.svg"
 
+[autoload]
+
+AutoBus="*uid://djvf7r40xtly5"
+
 [display]
 
 window/size/viewport_width=1920
