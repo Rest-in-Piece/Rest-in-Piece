@@ -58,8 +58,8 @@ var pecas := [i, t, o , z, s, l, j]
 var todas_pecas := pecas.duplicate()
 
 # variaveis da grade(tabuleiro)
-const colunas : int = 11
-const linhas : int = 21
+const colunas : int = 10
+const linhas : int = 20
 
 # variaveis de movimentação
 const direcoes := [Vector2i.LEFT, Vector2i.RIGHT, Vector2i.DOWN]
@@ -88,8 +88,11 @@ func _ready() -> void:
 func novo_jogo():
 	velocidade = 1.0
 	etapas = [0, 0, 0] #0 esquerda #1 direita #2 baixo
+	$HUD.get_node("Perdeu").hide()
 	tipo_peca = peca_escolhida()
 	peca_atlas = Vector2i(todas_pecas.find(tipo_peca), 0)
+	prox_tipo_peca = peca_escolhida()
+	prox_peca_atlas = Vector2i(todas_pecas.find(tipo_peca), 0)
 	criar_peca()
 
 func peca_escolhida():
@@ -127,6 +130,8 @@ func criar_peca():
 	pos_atual = pos_inicial
 	peca_ativa = tipo_peca[indice_rotacao]
 	desenhar_peca(peca_ativa, pos_atual, peca_atlas)
+	#mostra a proxima peça
+	desenhar_peca(prox_tipo_peca[0], Vector2i(15,6), prox_peca_atlas)
 	
 func desenhar_peca(peca, posicao, atlas):
 	for bloco in peca:
@@ -148,12 +153,21 @@ func mover_peca(direcao):
 		limpar_peca()
 		pos_atual += direcao
 		desenhar_peca(peca_ativa, pos_atual, peca_atlas)
+	else:
+		if direcao == Vector2i.DOWN:
+			verificar_linhas()
+			tipo_peca = prox_tipo_peca
+			peca_atlas = prox_peca_atlas
+			prox_tipo_peca = peca_escolhida()
+			prox_peca_atlas = Vector2i(todas_pecas.find(tipo_peca), 0)
+			limpar_painel()
+			criar_peca()
+
 	
 func pode_mover(direcao):
 	#verifica se tem espaço para se mover
 	var resposta = true
 	for i in peca_ativa:
-		print(i + pos_atual + direcao)
 		if not esta_livre(i + pos_atual + direcao):
 			resposta = false
 	return resposta
@@ -176,7 +190,32 @@ func esta_livre(posicao):
 	# verifica se existe algum tile nessa posição
 	return get_cell_source_id(posicao) == -1
 	
-
+func limpar_painel():
+	for i in range(14, 19):
+		for j in range(5, 9):
+			erase_cell(Vector2i(i, j))
+	
+func verificar_linhas():
+	var linha : int = linhas
+	while linha > 0:
+		var cont = 0
+		for i in range(colunas):
+			if not esta_livre(Vector2i(i + 1, linha)):
+				cont += 1
+		if cont == colunas:
+			deslocar_linhas(linha)
+		else:
+			linha -= 1
+			
+func deslocar_linhas(linha):
+	var atlas
+	for i in range(linha, 1, -1):
+		for j in range(colunas):
+			atlas = get_cell_atlas_coords(Vector2i(j + 1, i - 1))
+			if atlas == Vector2i(-1, -1):
+				erase_cell(Vector2i(j + 1, i))
+			else:
+				set_cell(Vector2i(j + 1, i), tile_id, atlas)
 	
 	
 	
