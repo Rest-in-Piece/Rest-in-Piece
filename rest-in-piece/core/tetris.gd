@@ -81,8 +81,10 @@ var prox_tipo_peca
 var indice_rotacao : int = 0
 var peca_ativa : Array
 
+# variaveis do jogo
 var pontuacao: int
 @export var recompensa: int = 100
+var jogo_rodando : bool
 
 # variaveis pro tileMap
 var tile_id : int = 0
@@ -93,11 +95,16 @@ var prox_peca_atlas : Vector2i
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	novo_jogo()
-	print(label_pontuacao)
+	hud.get_node("Botão novo jogo").pressed.connect(novo_jogo)
 
 func novo_jogo():
+	jogo_rodando = true
 	etapas = [0, 0, 0] #0 esquerda #1 direita #2 baixo
 	hud.get_node("Perdeu").hide()
+	# limpar tudo
+	limpar_peca()
+	limpar_grid()
+	limpar_painel()
 	tipo_peca = peca_escolhida()
 	peca_atlas = Vector2i(todas_pecas.find(tipo_peca), 0)
 	prox_tipo_peca = peca_escolhida()
@@ -118,31 +125,43 @@ func peca_escolhida():
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
-	if Input.is_action_pressed("mover_esquerda"):
-		etapas[0] += 5
-	if Input.is_action_pressed("mover_direita"):
-		etapas[1] += 5
-	if Input.is_action_pressed("acelerar_queda"):
-		etapas[2] += 5
-	if Input.is_action_just_pressed("rotacionar_peca"):
-		rotacionar_peca()
-	
-	# queda da peça com o passar do tempo
-	etapas[2] += velocidade
-	
-	# mover a peça
-	for i in range(etapas.size()):
-		if etapas[i] >= total_etapas:
-			mover_peca(direcoes[i])
-			etapas[i] = 0
+	if jogo_rodando:
+		if Input.is_action_pressed("mover_esquerda"):
+			etapas[0] += 5
+		if Input.is_action_pressed("mover_direita"):
+			etapas[1] += 5
+		if Input.is_action_pressed("acelerar_queda"):
+			etapas[2] += 5
+		if Input.is_action_just_pressed("rotacionar_peca"):
+			rotacionar_peca()
+		# queda da peça com o passar do tempo
+		etapas[2] += velocidade
+		# mover a peça
+		for i in range(etapas.size()):
+			if etapas[i] >= total_etapas:
+				mover_peca(direcoes[i])
+				etapas[i] = 0
 
 func criar_peca():
 	etapas = [0, 0, 0]
 	pos_atual = pos_inicial
+	indice_rotacao = 0
 	peca_ativa = tipo_peca[0]
+	# verifica se a nova peça pode nascer
+	if not pode_criar_peca():
+		hud.get_node("Perdeu").show()
+		jogo_rodando = false
+		return
 	desenhar_peca(peca_ativa, pos_atual, peca_atlas)
-	#mostra a proxima peça
-	desenhar_peca(prox_tipo_peca[0], Vector2i(15,6), prox_peca_atlas)
+	# mostra a próxima peça
+	desenhar_peca(prox_tipo_peca[0], Vector2i(15, 6), prox_peca_atlas)
+	
+func pode_criar_peca():
+	for bloco in peca_ativa:
+		var posicao = pos_atual + bloco
+		if get_cell_source_id(posicao) != -1:
+			return false
+	return true
 
 func desenhar_peca(peca, posicao, atlas):
 	for bloco in peca:
@@ -173,7 +192,7 @@ func mover_peca(direcao):
 			tipo_peca = prox_tipo_peca
 			peca_atlas = prox_peca_atlas
 			prox_tipo_peca = peca_escolhida()
-			prox_peca_atlas = Vector2i(todas_pecas.find(tipo_peca), 0)
+			prox_peca_atlas = Vector2i(todas_pecas.find(prox_tipo_peca), 0)
 			limpar_painel()
 			criar_peca()
 
@@ -235,6 +254,12 @@ func deslocar_linhas(linha):
 				erase_cell(Vector2i(j + 1, i))
 			else:
 				set_cell(Vector2i(j + 1, i), tile_id, atlas)
+				
+func limpar_grid():
+	for i in range(linhas):
+		for j in range(colunas):
+			erase_cell(Vector2i(j + 1, i + 1))
 	
+			
 	
 	
