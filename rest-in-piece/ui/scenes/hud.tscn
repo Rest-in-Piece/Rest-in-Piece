@@ -85,7 +85,6 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="Botão novo jogo" type="Button" parent="." unique_id=419492684]
-visible = false
 offset_left = 865.0
 offset_top = 758.0
 offset_right = 1045.0

@@ -1,7 +1,9 @@
 
 extends TileMapLayer
 
-@export var hud: CanvasLayer
+signal fim_de_jogo
+signal jogo_iniciado
+signal linhas_destruidas(quantidade: int)
 
 @export var pecas: Array[Peca]
 
@@ -16,7 +18,6 @@ const total_etapas : int = 50
 var pos_inicial := Vector2i(5, 1)
 var pos_atual : Vector2i
 @export var velocidade : float = 1.0
-var aceleracao: float = 0.25
 
 # variaveis das peças no jogo
 var tipo_peca: Peca
@@ -25,8 +26,7 @@ var indice_rotacao : int = 0
 var peca_ativa : Array
 var pecas_disponiveis: Array[Peca]
 
-var pontuacao: int
-@export var recompensa: int = 100
+var jogo_rodando : bool
 
 # variaveis pro tileMap
 var tile_id : int = 0
@@ -39,12 +39,21 @@ func _ready() -> void:
 	novo_jogo()
 
 func novo_jogo():
+	jogo_rodando = true
 	etapas = [0, 0, 0] #0 esquerda #1 direita #2 baixo
+	
+	jogo_iniciado.emit()
+	
+	limpar_peca()
+	limpar_grid()
+	limpar_painel()
+	
 	pecas_disponiveis = pecas.duplicate()
 	tipo_peca = peca_escolhida()
 	peca_atlas = Vector2i(pecas.find(tipo_peca), 0)
 	prox_tipo_peca = peca_escolhida()
 	prox_peca_atlas = Vector2i(pecas.find(prox_tipo_peca), 0)
+	
 	criar_peca()
 
 func peca_escolhida():
@@ -65,30 +74,45 @@ func obter_rotacoes(peca: Peca) -> Array:
 
 
 func _process(delta: float) -> void:
-	if Input.is_action_pressed("mover_esquerda"):
-		etapas[0] += 5
-	if Input.is_action_pressed("mover_direita"):
-		etapas[1] += 5
-	if Input.is_action_pressed("acelerar_queda"):
-		etapas[2] += 5
-	if Input.is_action_just_pressed("rotacionar_peca"):
-		rotacionar_peca()
-	
-	# queda da peça com o passar do tempo
-	etapas[2] += velocidade
-	
-	# mover a peça
-	for i in range(etapas.size()):
-		if etapas[i] >= total_etapas:
-			mover_peca(direcoes[i])
-			etapas[i] = 0
+	if jogo_rodando:
+		if Input.is_action_pressed("mover_esquerda"):
+			etapas[0] += 5
+		if Input.is_action_pressed("mover_direita"):
+			etapas[1] += 5
+		if Input.is_action_pressed("acelerar_queda"):
+			etapas[2] += 5
+		if Input.is_action_just_pressed("rotacionar_peca"):
+			rotacionar_peca()
+		
+		# queda da peça com o passar do tempo
+		etapas[2] += velocidade
+		
+		# mover a peça
+		for i in range(etapas.size()):
+			if etapas[i] >= total_etapas:
+				mover_peca(direcoes[i])
+				etapas[i] = 0
 
 func criar_peca():
 	etapas = [0, 0, 0]
 	pos_atual = pos_inicial
+	indice_rotacao = 0
 	peca_ativa = obter_rotacoes(tipo_peca)[0]
+	
+	if not pode_criar_peca():
+		fim_de_jogo.emit()
+		jogo_rodando = false
+		return
+		
 	desenhar_peca(peca_ativa, pos_atual, peca_atlas)
-	desenhar_peca(obter_rotacoes(prox_tipo_peca)[0], Vector2i(16.5,3), prox_peca_atlas) # AQUI: a posição pra desenhar a peça está estática usando pixels
+	desenhar_peca(obter_rotacoes(prox_tipo_peca)[0], Vector2i(16.5,3), prox_peca_atlas)
+
+func pode_criar_peca():
+	for bloco in peca_ativa:
+		var posicao = pos_atual + bloco
+		if get_cell_source_id(posicao) != -1:
+			return false
+	return true
 
 # mostra a próxima peça
 func desenhar_peca(peca, posicao, atlas):
@@ -110,7 +134,7 @@ func zerar_rotacao():
 	indice_rotacao = 0
 
 func mover_peca(direcao):
-	if (pode_mover(direcao)):
+	if pode_mover(direcao):
 		limpar_peca()
 		pos_atual += direcao
 		desenhar_peca(peca_ativa, pos_atual, peca_atlas)
@@ -121,6 +145,7 @@ func mover_peca(direcao):
 			peca_atlas = prox_peca_atlas
 			prox_tipo_peca = peca_escolhida()
 			prox_peca_atlas = Vector2i(pecas.find(prox_tipo_peca), 0)
+			
 			limpar_painel()
 			criar_peca()
 
@@ -157,6 +182,8 @@ func limpar_painel():
 
 func verificar_linhas():
 	var linha : int = linhas
+	var linhas_apagadas: int = 0
+	
 	while linha > 0:
 		var cont = 0
 		for i in range(colunas):
@@ -164,12 +191,12 @@ func verificar_linhas():
 				cont += 1
 		if cont == colunas:
 			deslocar_linhas(linha)
-			pontuacao += recompensa
-			hud.atualizar_pontuacao(pontuacao)
-			velocidade += aceleracao
-			print("Velocidade: ", velocidade)
+			linhas_apagadas += 1
 		else:
 			linha -= 1
+	
+	if linhas_apagadas > 0:
+		linhas_destruidas.emit(linhas_apagadas)
 
 func deslocar_linhas(linha):
 	var atlas
@@ -180,3 +207,8 @@ func deslocar_linhas(linha):
 				erase_cell(Vector2i(j + 1, i))
 			else:
 				set_cell(Vector2i(j + 1, i), tile_id, atlas)
+
+func limpar_grid():
+	for i in range(linhas):
+		for j in range(colunas):
+			erase_cell(Vector2i(j + 1, i + 1))
