@@ -3,62 +3,7 @@ extends TileMapLayer
 
 @export var hud: CanvasLayer
 
-# peças do tetris
-# aqui instaciamos as peças existentes
-# as coordenadas são os pontos da peça da matriz 
-# rotações da peça ( 0 graus, 90 graus, 180 graus e 270 graus)
-
-# peça reta em formato de I
-var i_0 := [Vector2i(0, 1), Vector2i(1, 1), Vector2i(2, 1), Vector2i(3, 1)]
-var i_90 := [Vector2i(2, 0), Vector2i(2, 1), Vector2i(2, 2), Vector2i(2, 3)]
-var i_180 := [Vector2i(0, 2), Vector2i(1, 2), Vector2i(2, 2), Vector2i(3, 2)]
-var i_270 := [Vector2i(1, 0), Vector2i(1, 1), Vector2i(1, 2), Vector2i(1, 3)]
-var i := [i_0, i_90, i_180, i_270]
-
-# peça em formato de T 
-var t_0 := [Vector2i(1, 0), Vector2i(0, 1), Vector2i(1, 1), Vector2i(2, 1)]
-var t_90 := [Vector2i(1, 0), Vector2i(1, 1), Vector2i(2, 1), Vector2i(1, 2)]
-var t_180 := [Vector2i(0, 1), Vector2i(1, 1), Vector2i(2, 1), Vector2i(1, 2)]
-var t_270 := [Vector2i(1, 0), Vector2i(0, 1), Vector2i(1, 1), Vector2i(1, 2)]
-var t := [t_0, t_90, t_180, t_270]
-
-# peça quadrada
-var o_0 := [Vector2i(0, 0), Vector2i(1, 0), Vector2i(0, 1), Vector2i(1, 1)]
-var o_90 := [Vector2i(0, 0), Vector2i(1, 0), Vector2i(0, 1), Vector2i(1, 1)]
-var o_180 := [Vector2i(0, 0), Vector2i(1, 0), Vector2i(0, 1), Vector2i(1, 1)]
-var o_270 := [Vector2i(0, 0), Vector2i(1, 0), Vector2i(0, 1), Vector2i(1, 1)]
-var o := [o_0, o_90, o_180, o_270]
-
-# peça em formato de Z 
-var z_0 := [Vector2i(0, 0), Vector2i(1, 0), Vector2i(1, 1), Vector2i(2, 1)]
-var z_90 := [Vector2i(2, 0), Vector2i(1, 1), Vector2i(2, 1), Vector2i(1, 2)]
-var z_180 := [Vector2i(0, 1), Vector2i(1, 1), Vector2i(1, 2), Vector2i(2, 2)]
-var z_270 := [Vector2i(1, 0), Vector2i(0, 1), Vector2i(1, 1), Vector2i(0, 2)]
-var z := [z_0, z_90, z_180, z_270]
-
-# outra peça em formato de Z invertido
-var s_0 := [Vector2i(1, 0), Vector2i(2, 0), Vector2i(0, 1), Vector2i(1, 1)]
-var s_90 := [Vector2i(1, 0), Vector2i(1, 1), Vector2i(2, 1), Vector2i(2, 2)]
-var s_180 := [Vector2i(1, 1), Vector2i(2, 1), Vector2i(0, 2), Vector2i(1, 2)]
-var s_270 := [Vector2i(0, 0), Vector2i(0, 1), Vector2i(1, 1), Vector2i(1, 2)]
-var s := [s_0, s_90, s_180, s_270]
-
-# Peça que parece o número 1 invertido
-var l_0 := [Vector2i(2, 0), Vector2i(0, 1), Vector2i(1, 1), Vector2i(2, 1)]
-var l_90 := [Vector2i(1, 0), Vector2i(1, 1), Vector2i(1, 2), Vector2i(2, 2)]
-var l_180 := [Vector2i(0, 1), Vector2i(1, 1), Vector2i(2, 1), Vector2i(0, 2)]
-var l_270 := [Vector2i(0, 0), Vector2i(1, 0), Vector2i(1, 1), Vector2i(1, 2)]
-var l := [l_0, l_90, l_180, l_270]
-
-# peça que parece o número 1
-var j_0 := [Vector2i(0, 0), Vector2i(0, 1), Vector2i(1, 1), Vector2i(2, 1)]
-var j_90 := [Vector2i(1, 0), Vector2i(2, 0), Vector2i(1, 1), Vector2i(1, 2)]
-var j_180 := [Vector2i(0, 1), Vector2i(1, 1), Vector2i(2, 1), Vector2i(2, 2)]
-var j_270 := [Vector2i(1, 0), Vector2i(1, 1), Vector2i(0, 2), Vector2i(1, 2)]
-var j := [j_0, j_90, j_180, j_270]
-
-var pecas := [i, t, o , z, s, l, j]
-var todas_pecas := pecas.duplicate()
+@export var pecas: Array[Peca]
 
 # variaveis da grade(tabuleiro)
 const colunas : int = 10
@@ -74,10 +19,11 @@ var pos_atual : Vector2i
 var aceleracao: float = 0.25
 
 # variaveis das peças no jogo
-var tipo_peca
-var prox_tipo_peca
+var tipo_peca: Peca
+var prox_tipo_peca: Peca
 var indice_rotacao : int = 0
 var peca_ativa : Array
+var pecas_disponiveis: Array[Peca]
 
 var pontuacao: int
 @export var recompensa: int = 100
@@ -94,26 +40,30 @@ func _ready() -> void:
 
 func novo_jogo():
 	etapas = [0, 0, 0] #0 esquerda #1 direita #2 baixo
-	# hud.get_node("Perdeu").hide()  # eu dei hide pelo editor
+	pecas_disponiveis = pecas.duplicate()
 	tipo_peca = peca_escolhida()
-	peca_atlas = Vector2i(todas_pecas.find(tipo_peca), 0)
+	peca_atlas = Vector2i(pecas.find(tipo_peca), 0)
 	prox_tipo_peca = peca_escolhida()
-	prox_peca_atlas = Vector2i(todas_pecas.find(tipo_peca), 0)
+	prox_peca_atlas = Vector2i(pecas.find(prox_tipo_peca), 0)
 	criar_peca()
 
 func peca_escolhida():
 	# retorna uma peça, embaralha o vetor de peças e pega o primeiro
-	var p
-	if not pecas.is_empty():
-		pecas.shuffle()
-		p = pecas.pop_front()
+	var p: Peca
+	if not pecas_disponiveis.is_empty():
+		pecas_disponiveis.shuffle()
+		p = pecas_disponiveis.pop_front()
 	else:
-		pecas = todas_pecas.duplicate()
-		pecas.shuffle()
-		p = pecas.pop_front()
+		pecas_disponiveis = pecas.duplicate()
+		pecas_disponiveis.shuffle()
+		p = pecas_disponiveis.pop_front()
 	return p
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
+func obter_rotacoes(peca: Peca) -> Array:
+	var a = peca.angulos
+	return [a["0"], a["90"], a["180"], a["270"]]
+
+
 func _process(delta: float) -> void:
 	if Input.is_action_pressed("mover_esquerda"):
 		etapas[0] += 5
@@ -136,11 +86,11 @@ func _process(delta: float) -> void:
 func criar_peca():
 	etapas = [0, 0, 0]
 	pos_atual = pos_inicial
-	peca_ativa = tipo_peca[0]
+	peca_ativa = obter_rotacoes(tipo_peca)[0]
 	desenhar_peca(peca_ativa, pos_atual, peca_atlas)
-	#mostra a proxima peça
-	desenhar_peca(prox_tipo_peca[0], Vector2i(16.5,3), prox_peca_atlas) # AQUI: a posição pra desenhar a peça está estática usando pixels
+	desenhar_peca(obter_rotacoes(prox_tipo_peca)[0], Vector2i(16.5,3), prox_peca_atlas) # AQUI: a posição pra desenhar a peça está estática usando pixels
 
+# mostra a próxima peça
 func desenhar_peca(peca, posicao, atlas):
 	for bloco in peca:
 		set_cell(posicao + bloco, tile_id, atlas)
@@ -153,7 +103,7 @@ func rotacionar_peca():
 	if pode_rotacionar():
 		limpar_peca()
 		indice_rotacao = (indice_rotacao + 1) % 4
-		peca_ativa = tipo_peca[indice_rotacao]
+		peca_ativa = obter_rotacoes(tipo_peca)[indice_rotacao]
 		desenhar_peca(peca_ativa, pos_atual, peca_atlas)
 
 func zerar_rotacao():
@@ -170,13 +120,12 @@ func mover_peca(direcao):
 			tipo_peca = prox_tipo_peca
 			peca_atlas = prox_peca_atlas
 			prox_tipo_peca = peca_escolhida()
-			prox_peca_atlas = Vector2i(todas_pecas.find(tipo_peca), 0)
+			prox_peca_atlas = Vector2i(pecas.find(prox_tipo_peca), 0)
 			limpar_painel()
 			criar_peca()
 
-
 func pode_mover(direcao):
-	#verifica se tem espaço para se mover
+	# verifica se tem espaço para se mover
 	var resposta = true
 	for i in peca_ativa:
 		if not esta_livre(i + pos_atual + direcao):
@@ -186,7 +135,7 @@ func pode_mover(direcao):
 func pode_rotacionar():
 	var resposta = true
 	var var_indice_rotacao = (indice_rotacao + 1) % 4
-	for i in tipo_peca[var_indice_rotacao]:
+	for i in obter_rotacoes(tipo_peca)[var_indice_rotacao]:
 		if not esta_livre(i + pos_atual):
 			resposta = false
 	return resposta
@@ -202,8 +151,8 @@ func esta_livre(posicao):
 	return get_cell_source_id(posicao) == -1
 
 func limpar_painel():
-	for i in range(14, 19):
-		for j in range(5, 9):
+	for i in range(14, 21):
+		for j in range(2, 9):
 			erase_cell(Vector2i(i, j))
 
 func verificar_linhas():
@@ -211,7 +160,6 @@ func verificar_linhas():
 	while linha > 0:
 		var cont = 0
 		for i in range(colunas):
-			# AQUI
 			if get_cell_source_id(Vector2i(i + 1, linha)) != -1:
 				cont += 1
 		if cont == colunas:
@@ -232,6 +180,3 @@ func deslocar_linhas(linha):
 				erase_cell(Vector2i(j + 1, i))
 			else:
 				set_cell(Vector2i(j + 1, i), tile_id, atlas)
-	
-	
-	
