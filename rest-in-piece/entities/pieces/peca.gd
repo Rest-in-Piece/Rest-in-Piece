@@ -1,3 +1,4 @@
+
 class_name Peca
 
 extends Resource
@@ -17,3 +18,4 @@ var angulos: Dictionary:
 			"180": angulo_180,
 			"270": angulo_270
 		}
+		# pra acessar o dict: angulos["0"]

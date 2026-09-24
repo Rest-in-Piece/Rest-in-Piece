@@ -18,6 +18,25 @@ bg_color = Color(0.2530101, 0.69875896, 0.468336, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ibkw7"]
 
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_itb64"]
+load_path = "res://.godot/imported/tetrominoes.png-cfcc20b686c961b4cff01f1fc5f30370.ctex"
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_11rbf"]
+texture = SubResource("CompressedTexture2D_itb64")
+texture_region_size = Vector2i(32, 32)
+0:0/0 = 0
+1:0/0 = 0
+2:0/0 = 0
+3:0/0 = 0
+4:0/0 = 0
+5:0/0 = 0
+6:0/0 = 0
+7:0/0 = 0
+
+[sub_resource type="TileSet" id="TileSet_7aupu"]
+tile_size = Vector2i(32, 32)
+sources/0 = SubResource("TileSetAtlasSource_11rbf")
+
 [node name="HUD" type="CanvasLayer" unique_id=1894945411]
 script = ExtResource("1_itb64")
 
@@ -115,3 +134,8 @@ theme_override_font_sizes/font_size = 48
 text = "0"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="ProximaPecaTileMap" type="TileMapLayer" parent="." unique_id=1709088603]
+position = Vector2(1379, 244.00002)
+scale = Vector2(1.025, 1.025)
+tile_set = SubResource("TileSet_7aupu")

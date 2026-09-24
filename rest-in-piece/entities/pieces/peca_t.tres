@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="Peca" format=3 uid="uid://b3gt607mbqwgt"]
 
-[ext_resource type="Script" uid="uid://bpwodnk3jua2h" path="res://entities/pieces/piece.gd" id="1_7kmky"]
+[ext_resource type="Script" uid="uid://bpwodnk3jua2h" path="res://entities/pieces/peca.gd" id="1_7kmky"]
 
 [resource]
 script = ExtResource("1_7kmky")

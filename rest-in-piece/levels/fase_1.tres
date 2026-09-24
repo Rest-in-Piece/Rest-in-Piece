@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="Fase" format=3 uid="uid://4lntf8xgftm2"]
+
+[ext_resource type="Script" uid="uid://b103p3gbf0tcp" path="res://levels/fase.gd" id="1_jhyd7"]
+
+[resource]
+script = ExtResource("1_jhyd7")
+velocidade_inicial = 0.2
+metadata/_custom_type_script = "uid://b103p3gbf0tcp"

@@ -1,64 +1,40 @@
 
+
+# esse script SÓ deve tratar questões relacionadas à atualização da interface.
+# O jogador pontuou? O hud.gd atualiza o label com os pontos atuais. Questões
+# de lógica, como acionar vitória / derrota, devem ser tratadas em outro lugar.
+
 extends CanvasLayer
 
 signal solicitou_novo_jogo
-
-@export var tabuleiro: TileMapLayer
-
-@export var recompensa: int = 100
-@export var aceleracao: float = 0.25
-
-var pontuacao: int = 0
-var aumento_meta : bool = true
-@export var meta: int = 500
 
 @onready var label_perdeu: Label = $Perdeu
 @onready var label_pontuacao: Label = %LabelPontuação
 @onready var label_meta: Label = %LabelMeta
 @onready var botao_novo_jogo: Button = $"Botão novo jogo"
+@onready var tile_map_proxima_peca: TileMapLayer = $ProximaPecaTileMap
+
 
 func _ready() -> void:
-	_conectar_os_signals()
-
-func _conectar_os_signals():
-	if tabuleiro:
-		tabuleiro.jogo_iniciado.connect(_on_jogo_iniciado)
-		tabuleiro.fim_de_jogo.connect(_on_fim_de_jogo)
-		tabuleiro.linhas_destruidas.connect(_on_linhas_destruidas)
-		solicitou_novo_jogo.connect(tabuleiro.novo_jogo)
-	
 	botao_novo_jogo.pressed.connect(func(): solicitou_novo_jogo.emit())
 
+func atualizar_pontuacao(valor: int):
+	label_pontuacao.text = str(valor)
 
-func _on_jogo_iniciado():
+func atualizar_meta(valor: int):
+	label_meta.text = str(valor)
+
+func esconder_tela_derrota():
 	label_perdeu.hide()
 	botao_novo_jogo.hide()
-	pontuacao = 0
-	meta = 500
-	label_pontuacao.text = str(pontuacao)
-	label_meta.text = str(meta)
-	
-	if tabuleiro:
-		tabuleiro.velocidade = 1.0
 
-
-func _on_fim_de_jogo():
+func mostrar_tela_derrota():
 	label_perdeu.show()
 	botao_novo_jogo.show()
 
 
-func _on_linhas_destruidas(qtd: int):
-	pontuacao += recompensa * qtd
-	label_pontuacao.text = str(pontuacao)
-	if pontuacao >= meta:
-		if aumento_meta:
-			meta *= 2
-			aumento_meta = false
-		else:
-			meta *= 2.5
-			aumento_meta = true
-	label_meta.text = str(meta)
-	
-	if tabuleiro:
-		tabuleiro.velocidade += aceleracao * qtd
-		print("Velocidade: ", tabuleiro.velocidade)
+func atualizar_proxima_peca(peca: Peca, atlas_coords: Vector2i):
+	tile_map_proxima_peca.clear()
+	var pos_central = Vector2i(0, 0)
+	for bloco in peca.angulos["0"]:
+		tile_map_proxima_peca.set_cell(pos_central + bloco, 0, atlas_coords)
