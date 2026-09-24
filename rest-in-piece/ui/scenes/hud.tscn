@@ -94,3 +94,24 @@ theme_override_styles/normal = SubResource("StyleBoxFlat_hkg3b")
 theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_wvnxi")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_ibkw7")
 text = "NOVO JOGO"
+
+[node name="LabelSuaMeta" type="Label" parent="." unique_id=341334676]
+offset_left = 394.0
+offset_top = 153.0
+offset_right = 578.0
+offset_bottom = 198.0
+theme_override_font_sizes/font_size = 22
+text = "Meta:"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="LabelMeta" type="Label" parent="." unique_id=127464278]
+unique_name_in_owner = true
+offset_left = 468.0
+offset_top = 175.0
+offset_right = 508.0
+offset_bottom = 263.0
+theme_override_font_sizes/font_size = 48
+text = "0"
+horizontal_alignment = 1
+vertical_alignment = 1

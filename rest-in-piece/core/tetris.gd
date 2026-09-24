@@ -33,7 +33,6 @@ var tile_id : int = 0
 var peca_atlas : Vector2i
 var prox_peca_atlas : Vector2i
 
-
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	novo_jogo()
