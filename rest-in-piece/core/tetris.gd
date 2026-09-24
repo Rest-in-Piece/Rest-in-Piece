@@ -10,6 +10,7 @@ signal fim_de_jogo
 signal jogo_iniciado
 signal linhas_destruidas(quantidade: int)
 signal proxima_peca_sorteada(peca: Peca, atlas_coords: Vector2i)
+signal peca_armazenada_alterada(peca: Peca, atlas_coords: Vector2i)
 
 @export var pecas: Array[Peca]
 
@@ -19,11 +20,17 @@ const LINHAS : int = 20
 
 # variaveis de movimentação
 const direcoes := [Vector2i.LEFT, Vector2i.RIGHT, Vector2i.DOWN]
-var etapas : Array	# quando etapas == total_etapas, realiza o movimento
+var etapas : Array  # quando etapas == total_etapas, realiza o movimento
 const total_etapas : int = 50
-var pos_inicial := Vector2i(5, 1)
+var pos_inicial := Vector2i(5, 2)
 var pos_atual : Vector2i
 var velocidade : float
+
+# variaveis de delay para fixar a peça
+var etapas_fixacao: float = 0.0
+var total_etapas_fixacao: float = 30.0
+var resets_fixacao: int = 0
+const MAX_RESETS_FIXACAO: int = 15
 
 # variaveis das peças no jogo
 var peca: Peca
@@ -31,6 +38,11 @@ var prox_peca: Peca
 var indice_rotacao : int = 0
 var peca_ativa : Array
 var pecas_disponiveis: Array[Peca]
+
+# variáveis da peça armazenada
+var peca_armazenada: Peca
+var peca_armazenada_atlas: Vector2i
+var pode_armazenar: bool = true
 
 var jogo_rodando : bool
 
@@ -44,12 +56,20 @@ var prox_peca_atlas : Vector2i
 func _ready() -> void:
 	pass
 
+
 func _process(delta: float) -> void:
 	if not jogo_rodando:
 		return
 	
 	_processar_inputs()
-	etapas[2] += velocidade   # queda com o passar do tempo
+	
+	if not pode_mover(Vector2i.DOWN):
+		etapas_fixacao += velocidade
+		if etapas_fixacao >= total_etapas_fixacao:
+			travar_peca()
+	else:
+		etapas[2] += velocidade	# queda com o passar do tempo
+		
 	# mover a peça
 	for i in range(etapas.size()):
 		if etapas[i] >= total_etapas:
@@ -67,9 +87,12 @@ func novo_jogo():
 	
 	pecas_disponiveis = pecas.duplicate()
 	peca = seleciona_uma_peca()
-	peca_atlas = Vector2i(pecas.find(peca), 0)
+	peca_atlas = peca.coords_no_atlas
 	prox_peca = seleciona_uma_peca()
-	prox_peca_atlas = Vector2i(pecas.find(prox_peca), 0)
+	prox_peca_atlas = prox_peca.coords_no_atlas
+	
+	peca_armazenada = null
+	pode_armazenar = true
 	
 	proxima_peca_sorteada.emit(prox_peca, prox_peca_atlas)
 	
@@ -101,19 +124,54 @@ func _processar_inputs():
 		etapas[1] += 5
 	if Input.is_action_pressed("acelerar_queda"):
 		etapas[2] += 5
+		if not pode_mover(Vector2i.DOWN):
+			etapas_fixacao += 5.0
+	if Input.is_action_just_pressed("cair_imediatamente"):
+		cair_imediatamente(false)
+	if Input.is_action_just_pressed("posicionar_imediatamente"):
+		cair_imediatamente(true)
 	if Input.is_action_just_pressed("rotacionar_peca"):
 		rotacionar_peca()
+	if Input.is_action_just_pressed("armazenar_peca") and pode_armazenar:
+		armazenar_peca_atual()
 	
 	# ISSO É SÓ PRA FACILITAR OS TESTES
 	if Input.is_action_just_pressed("debug_sortear_nova_peca"):
 			limpar_peca()
 			peca = seleciona_uma_peca()
-			peca_atlas = Vector2i(pecas.find(peca), 0)
+			peca_atlas = peca.coords_no_atlas
 			criar_peca()
+
+
+func armazenar_peca_atual():
+	limpar_peca()
+	pode_armazenar = false
+	
+	if peca_armazenada == null:
+		peca_armazenada = peca
+		peca_armazenada_atlas = peca_atlas
+		peca = prox_peca
+		peca_atlas = prox_peca_atlas
+		prox_peca = seleciona_uma_peca()
+		prox_peca_atlas = prox_peca.coords_no_atlas
+		proxima_peca_sorteada.emit(prox_peca, prox_peca_atlas)
+	else:
+		var temp_peca = peca
+		var temp_atlas = peca_atlas
+		peca = peca_armazenada
+		peca_atlas = peca_armazenada_atlas
+		peca_armazenada = temp_peca
+		peca_armazenada_atlas = temp_atlas
+	
+	peca_armazenada_alterada.emit(peca_armazenada, peca_armazenada_atlas)
+	criar_peca()
 
 
 func criar_peca():
 	etapas = [0, 0, 0]
+	etapas_fixacao = 0.0
+	resets_fixacao = 0
+	
 	pos_atual = pos_inicial
 	indice_rotacao = 0
 	peca_ativa = obter_rotacoes(peca)[0]
@@ -146,12 +204,30 @@ func limpar_peca():
 func zerar_rotacao():
 	indice_rotacao = 0
 
+
 func rotacionar_peca():
-	if pode_rotacionar():
-		limpar_peca()
-		indice_rotacao = (indice_rotacao + 1) % 4
-		peca_ativa = obter_rotacoes(peca)[indice_rotacao]
-		desenhar_peca(peca_ativa, pos_atual, peca_atlas)
+	var proximo_indice = (indice_rotacao + 1) % 4
+	var angulos = [0, 90, 180, 270]
+	
+	var testes_srs = SRS.obter_testes(peca.tipo_srs, angulos[indice_rotacao], angulos[proximo_indice])
+	var peca_rotacionada = obter_rotacoes(peca)[proximo_indice]
+	
+	for offset in testes_srs:
+		if pode_rotacionar(peca_rotacionada, offset):
+			limpar_peca()
+			indice_rotacao = proximo_indice
+			peca_ativa = peca_rotacionada
+			pos_atual += offset
+			desenhar_peca(peca_ativa, pos_atual, peca_atlas)
+			tratar_reset_fixacao()
+			return
+
+
+func pode_rotacionar(peca_teste: Array, offset: Vector2i) -> bool:
+	for bloco in peca_teste:
+		if not posicao_esta_livre(pos_atual + bloco + offset):
+			return false
+	return true
 
 
 func mover_peca(direcao):
@@ -159,19 +235,32 @@ func mover_peca(direcao):
 		limpar_peca()
 		pos_atual += direcao
 		desenhar_peca(peca_ativa, pos_atual, peca_atlas)
-	else:
+		
 		if direcao == Vector2i.DOWN:
-			identificar_e_tratar_linhas_completas()
-			peca = prox_peca
-			peca_atlas = prox_peca_atlas
-			prox_peca = seleciona_uma_peca()
-			prox_peca_atlas = Vector2i(pecas.find(prox_peca), 0)
-			
-			proxima_peca_sorteada.emit(prox_peca, prox_peca_atlas)
-			
-			criar_peca()
+			etapas_fixacao = 0.0
+			resets_fixacao = 0
+		else:
+			tratar_reset_fixacao()
 
-#func fixar_peca()
+
+func travar_peca():
+	identificar_e_tratar_linhas_completas()
+	
+	pode_armazenar = true
+	peca = prox_peca
+	peca_atlas = prox_peca_atlas
+	prox_peca = seleciona_uma_peca()
+	prox_peca_atlas = prox_peca.coords_no_atlas
+	
+	proxima_peca_sorteada.emit(prox_peca, prox_peca_atlas)
+	criar_peca()
+
+
+func tratar_reset_fixacao():
+	if not pode_mover(Vector2i.DOWN):
+		if resets_fixacao < MAX_RESETS_FIXACAO:
+			etapas_fixacao = 0.0
+			resets_fixacao += 1
 
 
 func pode_mover(direcao):
@@ -179,14 +268,6 @@ func pode_mover(direcao):
 	var resposta = true
 	for i in peca_ativa:
 		if not posicao_esta_livre(i + pos_atual + direcao):
-			resposta = false
-	return resposta
-
-func pode_rotacionar():
-	var resposta = true
-	var var_indice_rotacao = (indice_rotacao + 1) % 4
-	for i in obter_rotacoes(peca)[var_indice_rotacao]:
-		if not posicao_esta_livre(i + pos_atual):
 			resposta = false
 	return resposta
 
@@ -199,6 +280,15 @@ func posicao_esta_livre(posicao):
 
 	# se não pertence à peça atual, verifica se existe algum tile nessa posição
 	return get_cell_source_id(posicao) == -1
+
+
+func cair_imediatamente(posicionar_imediatamente):
+	while pode_mover(Vector2i.DOWN):
+		etapas[2] = 0
+		mover_peca(Vector2i.DOWN)
+	
+	if posicionar_imediatamente:
+		travar_peca()
 
 
 func identificar_e_tratar_linhas_completas():

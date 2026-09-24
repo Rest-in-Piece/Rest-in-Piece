@@ -4,8 +4,9 @@
 
 [resource]
 script = ExtResource("1_sjdif")
-angulo_0 = Array[Vector2i]([Vector2i(2, 0), Vector2i(0, 1), Vector2i(1, 1), Vector2i(2, 1)])
-angulo_90 = Array[Vector2i]([Vector2i(1, 0), Vector2i(1, 1), Vector2i(1, 2), Vector2i(2, 2)])
-angulo_180 = Array[Vector2i]([Vector2i(0, 1), Vector2i(1, 1), Vector2i(2, 1), Vector2i(0, 2)])
-angulo_270 = Array[Vector2i]([Vector2i(0, 0), Vector2i(1, 0), Vector2i(1, 1), Vector2i(1, 2)])
+coords_no_atlas = Vector2i(5, 0)
+angulo_0 = Array[Vector2i]([Vector2i(-1, 0), Vector2i(0, 0), Vector2i(1, 0), Vector2i(1, -1)])
+angulo_90 = Array[Vector2i]([Vector2i(0, -1), Vector2i(0, 0), Vector2i(0, 1), Vector2i(1, 1)])
+angulo_180 = Array[Vector2i]([Vector2i(-1, 1), Vector2i(-1, 0), Vector2i(0, 0), Vector2i(1, 0)])
+angulo_270 = Array[Vector2i]([Vector2i(-1, -1), Vector2i(0, -1), Vector2i(0, 0), Vector2i(0, 1)])
 metadata/_custom_type_script = "uid://bpwodnk3jua2h"

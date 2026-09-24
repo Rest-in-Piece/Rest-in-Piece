@@ -1,0 +1,30 @@
+[gd_scene format=3 uid="uid://b3d3xvfp3p8ko"]
+
+[ext_resource type="Script" uid="uid://1d7sjo7dxs36" path="res://gerador_de_pecas.gd" id="1_wnm1u"]
+[ext_resource type="Resource" uid="uid://dguon0fxwequy" path="res://entities/pieces/peca_i.tres" id="2_wnm1u"]
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_affq4"]
+load_path = "res://.godot/imported/tetrominoes.png-cfcc20b686c961b4cff01f1fc5f30370.ctex"
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_5hclr"]
+texture = SubResource("CompressedTexture2D_affq4")
+texture_region_size = Vector2i(32, 32)
+0:0/0 = 0
+1:0/0 = 0
+2:0/0 = 0
+3:0/0 = 0
+4:0/0 = 0
+5:0/0 = 0
+6:0/0 = 0
+7:0/0 = 0
+
+[sub_resource type="TileSet" id="TileSet_onhcv"]
+tile_size = Vector2i(32, 32)
+sources/0 = SubResource("TileSetAtlasSource_5hclr")
+
+[node name="GeradorDePecas" type="TileMapLayer" unique_id=1932844322]
+position = Vector2(128, 128)
+tile_map_data = PackedByteArray(0, 0, 255, 255, 254, 255, 0, 0, 0, 0, 0, 0, 0, 0, 255, 255, 255, 255, 0, 0, 0, 0, 0, 0, 0, 0, 255, 255, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 255, 255, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+tile_set = SubResource("TileSet_onhcv")
+script = ExtResource("1_wnm1u")
+peca_alvo = ExtResource("2_wnm1u")

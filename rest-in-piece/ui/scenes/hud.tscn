@@ -139,3 +139,8 @@ vertical_alignment = 1
 position = Vector2(1379, 244.00002)
 scale = Vector2(1.025, 1.025)
 tile_set = SubResource("TileSet_7aupu")
+
+[node name="PecaArmazenadaTileMap" type="TileMapLayer" parent="." unique_id=52403636]
+position = Vector2(1327.0001, 552.00006)
+scale = Vector2(0.89, 0.89)
+tile_set = SubResource("TileSet_7aupu")

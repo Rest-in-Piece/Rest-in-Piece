@@ -3,6 +3,12 @@ class_name Peca
 
 extends Resource
 
+## Utilizado pra definir o visual dessa peça
+@export var coords_no_atlas: Vector2i
+
+@export_category("Tabela SRS")
+@export_enum("PADRAO", "I", "O") var tipo_srs: String = "PADRAO"
+
 ## cada ângulo deve definir quatro coordenadas
 @export_category("Coordenadas para cada ângulo")
 @export var angulo_0: Array[Vector2i]

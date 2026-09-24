@@ -8,6 +8,8 @@ extends Node
 
 @export var fase: Fase
 
+@export var multiplicador_tempo_fixacao: float = 2.0
+
 @onready var tabuleiro: TileMapLayer = $TabuleiroTileMap
 @onready var hud: CanvasLayer = $TabuleiroTileMap/HUD
 
@@ -22,6 +24,7 @@ func _ready():
 	tabuleiro.linhas_destruidas.connect(_on_linhas_destruidas)
 	tabuleiro.fim_de_jogo.connect(_on_fim_de_jogo)
 	tabuleiro.proxima_peca_sorteada.connect(hud.atualizar_proxima_peca)
+	tabuleiro.peca_armazenada_alterada.connect(hud.atualizar_peca_armazenada)
 	
 	hud.solicitou_novo_jogo.connect(iniciar_novo_jogo)
 	
@@ -37,9 +40,11 @@ func iniciar_novo_jogo():
 	hud.atualizar_pontuacao(pontuacao)
 	hud.atualizar_meta(meta)
 	hud.esconder_tela_derrota()
+	hud.limpar_peca_armazenada()
 	
 	# dá início ao tabuleiro
 	tabuleiro.velocidade = velocidade_atual
+	tabuleiro.total_etapas_fixacao = multiplicador_tempo_fixacao * tabuleiro.total_etapas
 	tabuleiro.novo_jogo()
 
 
@@ -54,6 +59,7 @@ func _on_linhas_destruidas(qtd: int):
 	hud.atualizar_pontuacao(pontuacao)
 	hud.atualizar_meta(meta)
 	tabuleiro.velocidade = velocidade_atual
+	tabuleiro.total_etapas_fixacao = multiplicador_tempo_fixacao * tabuleiro.total_etapas
 	
 	if qtd == 4:
 		# placeholder

@@ -13,6 +13,7 @@ signal solicitou_novo_jogo
 @onready var label_meta: Label = %LabelMeta
 @onready var botao_novo_jogo: Button = $"Botão novo jogo"
 @onready var tile_map_proxima_peca: TileMapLayer = $ProximaPecaTileMap
+@onready var tile_map_peca_armazenada: TileMapLayer = $PecaArmazenadaTileMap
 
 
 func _ready() -> void:
@@ -38,3 +39,16 @@ func atualizar_proxima_peca(peca: Peca, atlas_coords: Vector2i):
 	var pos_central = Vector2i(0, 0)
 	for bloco in peca.angulos["0"]:
 		tile_map_proxima_peca.set_cell(pos_central + bloco, 0, atlas_coords)
+
+
+func atualizar_peca_armazenada(peca: Peca, atlas_coords: Vector2i):
+	tile_map_peca_armazenada.clear()
+	if peca == null:
+		return
+	var pos_central = Vector2i(0, 0)
+	for bloco in peca.angulos["0"]:
+		tile_map_peca_armazenada.set_cell(pos_central + bloco, 0, atlas_coords)
+
+
+func limpar_peca_armazenada():
+	tile_map_peca_armazenada.clear()
