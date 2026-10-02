@@ -4,7 +4,8 @@
 
 [resource]
 script = ExtResource("1_u3c20")
-tipo_srs = "I"
+nome = "I"
+tipo_peca = "I"
 angulo_0 = Array[Vector2i]([Vector2i(-2, -1), Vector2i(-1, -1), Vector2i(0, -1), Vector2i(1, -1)])
 angulo_90 = Array[Vector2i]([Vector2i(0, -2), Vector2i(0, -1), Vector2i(0, 0), Vector2i(0, 1)])
 angulo_180 = Array[Vector2i]([Vector2i(-2, 0), Vector2i(-1, 0), Vector2i(0, 0), Vector2i(1, 0)])

@@ -1,13 +1,15 @@
-
 class_name Peca
 
 extends Resource
 
-## Utilizado pra definir o visual dessa peça
+@export var nome: String = ""
+
+## Utilizado pra definir o visual dessa peça. Pode olhar no TileSet a coord da cor que quer usar.
 @export var coords_no_atlas: Vector2i
 
 @export_category("Tabela SRS")
-@export_enum("PADRAO", "I", "O") var tipo_srs: String = "PADRAO"
+# AQUI
+@export_enum("T", "S", "Z", "J", "L", "I", "O") var tipo_peca: String
 
 ## cada ângulo deve definir quatro coordenadas
 @export_category("Coordenadas para cada ângulo")
@@ -25,3 +27,18 @@ var angulos: Dictionary:
 			"270": angulo_270
 		}
 		# pra acessar o dict: angulos["0"]
+
+# AQUI
+func obter_tipo_tabela_srs() -> String:
+	# AQUI
+	if tipo_peca == "I":
+		# AQUI
+		return "I"
+	# AQUI
+	elif tipo_peca == "O":
+		# AQUI
+		return "O"
+	# AQUI
+	else:
+		# AQUI
+		return "PADRAO"
