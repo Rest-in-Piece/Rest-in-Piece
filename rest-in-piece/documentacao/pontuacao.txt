@@ -1,0 +1,70 @@
+
+
+PONTUAÇÃO
+=========
+
+A pontuação segue o estilo do Balatro: cada jogada gera FICHAS e um MULTIPLICADOR, e o
+resultado é fichas x multiplicador.
+
+
+FLUXO DE UMA JOGADA
+-------------------
+Quando uma peça trava, o Tetris emite os signals nesta ordem:
+  1. spin_realizado(tipo_spin)    (só se houve spin)
+  2. linhas_destruidas(qtd)       (só se houve linhas)
+  3. peca_travada(peca)
+
+O GameManager guarda as informações dos signals 1 e 2 como "pendentes". No signal 3 ele:
+  1. cria um ContextoPontuacao com a peça, as linhas, o spin e as fichas iniciais
+	 (recompensa_por_linha x linhas, hoje 100 por linha) e multiplicador = 1
+  2. entrega o contexto às relíquias, em ordem (GerenciadorDeReliquias.processar_pontuacao)
+  3. emite AutoBus.jogada_resolvida(contexto), para áudio, partículas, estatísticas
+  4. soma contexto.obter_pontuacao_final() à pontuação, verifica a meta e atualiza o HUD
+
+Toda peça travada gera um contexto, com ou sem linhas destruídas.
+
+
+CONTEXTOPONTUACAO (entities/reliquias/contexto_pontuacao.gd)
+------------------------------------------------------------
+Para LER (condições):
+  peca               a peça que travou
+  linhas_destruidas  quantidade de linhas da jogada
+  tipo_spin          "" quando não houve spin; senão "T-Spin", "S-Spin", etc.
+  teve_spin()        atalho para tipo_spin != ""
+
+Para ALTERAR (use sempre os métodos, pois eles marcam que a relíquia ativou):
+  adicionar_fichas(valor)
+  adicionar_multiplicador(valor)         soma ao multiplicador
+  multiplicar_multiplicador(fator)       multiplica o multiplicador
+
+Resultado:
+  obter_pontuacao_final()                round(fichas x multiplicador)
+
+Depois de emitido em jogada_resolvida, o contexto é SOMENTE LEITURA para os ouvintes.
+
+
+SPINS
+-----
+Calculados no tetris.gd (avaliar_spin), só quando a última ação da peça foi uma rotação.
+  - T-Spin: o canto livre do T tem 3 ou mais dos 4 cantos ao redor do bloco central
+	ocupados (parede, chão ou blocos).
+  - S, Z, L, J e I: considerado spin quando a peça não consegue se mover em nenhuma
+	direção (esquerda, direita, cima e baixo).
+O tipo é enviado como texto: "T-Spin", "S-Spin", "Z-Spin", "L-Spin", "J-Spin", "I-Spin".
+
+ATENÇÃO: um spin SEM linhas chega com fichas = 0. Uma relíquia que só soma
+multiplicador não pontua nesse caso. Para valorizar spins sem linhas, a relíquia deve
+usar adicionar_fichas.
+
+
+META
+----
+Quando a pontuação atinge a meta, a meta é multiplicada, alternando x2 e x2.5
+(variável aumento_meta). Como multiplicadores podem fazer uma única jogada passar de
+várias metas, a verificação é um laço (_verificar_meta no GameManager).
+
+
+VELOCIDADE
+----------
+A cada linha destruída, velocidade_atual aumenta em fase.aceleracao. Em seguida as
+regras são recalculadas (ver regras_de_jogo.txt) e entregues ao tabuleiro.

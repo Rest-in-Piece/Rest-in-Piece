@@ -1,0 +1,186 @@
+
+
+SCRIPTS DO PROJETO
+==================
+
+Este arquivo explica a função de cada script e quais lógicas/dados ele deve abrigar.
+Regra geral: cada script tem UMA responsabilidade. Se uma lógica nova não se encaixa na
+responsabilidade de nenhum script existente, provavelmente ela merece um script novo.
+
+Camadas:
+  - Física ........ tetris.gd (tabuleiro, colisão, rotação, linhas)
+  - Lógica ........ game_manager.gd + relíquias (pontuação, metas, regras, bolsa)
+  - Interface ..... hud.gd (só visual)
+  - Comunicação ... auto_bus.gd (signals globais)
+
+Relíquias e regras ficam na camada de lógica: NUNCA mexem direto no tabuleiro nem no HUD.
+
+
+-----------------------------------------------------------------------------------------
+CAMADA FÍSICA
+-----------------------------------------------------------------------------------------
+
+core/tetris.gd  (extends TileMapLayer)
+  Função:
+	Trata SÓ a física e a movimentação das peças na grade.
+
+  Deve abrigar:
+	- a grade (COLUNAS, LINHAS) e o desenho das peças no TileMap
+	- movimento, queda, rotação (com a tabela SRS) e colisão
+	- o delay de fixação e o travamento da peça
+	- detecção e remoção de linhas completas
+	- detecção de spins (avaliar_spin)
+	- sorteio das peças (saco "pecas_disponiveis") e a peça armazenada (hold)
+	- receber os valores de jogabilidade via aplicar_regras(regras)
+
+  NÃO deve abrigar:
+	- pontuação, metas, relíquias (GameManager)
+	- qualquer coisa visual além do próprio tabuleiro (HUD)
+
+  Comunicação:
+	Emite signals locais (linhas_destruidas, spin_realizado, peca_travada, fim_de_jogo...)
+	que o GameManager escuta.
+
+  Ordem dos signals ao travar uma peça:
+	spin_realizado -> linhas_destruidas -> peca_travada
+
+
+entities/pieces/peca.gd  (class_name Peca, extends Resource)
+  Função:
+	Dados de UMA peça: nome, coordenada no atlas, tipo SRS e as coordenadas de cada
+	ângulo (0, 90, 180, 270).
+  
+Deve abrigar:
+	- apenas dados da peça e pequenas consultas sobre eles (ex: obter_tipo_tabela_srs)
+
+  NÃO deve abrigar:
+	- lógica de movimento ou de jogo
+
+
+entities/pieces/tabela_srs.gd  (class_name SRS)
+  Função:
+	Tabelas de "wall kick" do sistema de rotação SRS (padrão e peça I) e a consulta
+	obter_testes().
+
+  Deve abrigar:
+	- somente dados e consulta das tabelas
+
+
+gerador_de_pecas.gd  (@tool, extends TileMapLayer)
+  Função:
+	Ferramenta de EDITOR para desenhar um ângulo da peça no TileMap e gravar as
+	coordenadas no .tres da peça (propriedade peca_alvo).
+
+  Não é usado durante o jogo.
+
+
+
+-----------------------------------------------------------------------------------------
+CAMADA DE LÓGICA
+-----------------------------------------------------------------------------------------
+
+core/game_manager.gd  (extends Node)
+  Função:
+	Define e coordena a lógica da partida.
+
+  Deve abrigar:
+	- pontuação, meta e progressão de velocidade
+	- o GerenciadorDeReliquias e a bolsa_de_pecas
+	- a montagem do ContextoPontuacao a cada peça travada
+	- a montagem das RegrasDeJogo (Fase + relíquias) e a entrega ao tabuleiro
+	- a conexão entre os signals do tabuleiro, do HUD e do AutoBus
+	- recompensas e lojas (adicionar_peca_a_bolsa, adquirir relíquias, etc.)
+
+  NÃO deve abrigar:
+	- física do tabuleiro (Tetris)
+	- código de interface (HUD)
+
+  Comunicação:
+	Fala com o HUD e o Tetris por referência direta. Anuncia fatos pro resto do jogo
+	emitindo signals do AutoBus (jogada_resolvida, partida_encerrada).
+
+
+levels/fase.gd  (class_name Fase, extends Resource)
+  Função:
+	Dados de uma fase, editados no inspetor (.tres em levels/).
+
+  Deve abrigar:
+	- valores BASE: meta, velocidade_inicial, aceleracao, total_etapas_fixacao,
+	  max_resets_fixacao (e blocos_maximos, ainda não utilizado)
+
+  NÃO deve abrigar:
+	- estado da partida em andamento (isso é do GameManager)
+
+
+entities/reliquias/regras_de_jogo.gd  (class_name RegrasDeJogo, extends RefCounted)
+  Função:
+	Valores de jogabilidade EM VIGOR: base da Fase + modificações das relíquias.
+
+  Criado do zero a cada recálculo. Nunca é salvo nem editado no inspetor.
+  Detalhes em regras_de_jogo.txt.
+
+
+entities/reliquias/contexto_pontuacao.gd  (class_name ContextoPontuacao, extends RefCounted)
+  Função:
+	Guarda tudo que aconteceu numa jogada (peça travada) e o valor parcial da
+	pontuação. As relíquias leem as condições daqui e alteram fichas/multiplicador
+	por aqui.
+
+  Detalhes em pontuacao.txt.
+
+
+entities/reliquias/reliquia.gd  (class_name Reliquia, extends Resource)
+  Função:
+	Classe base de toda relíquia, com os hooks (métodos vazios) que cada relíquia
+	sobrescreve conforme a necessidade.
+
+  Detalhes em reliquias.txt.
+
+
+entities/reliquias/reliquia_*.gd
+  Função:
+	Uma relíquia concreta por arquivo. Deve conter apenas a lógica daquela relíquia
+	e os @export com os valores ajustáveis.
+
+
+core/gerenciador_de_reliquias.gd  (class_name GerenciadorDeReliquias, extends RefCounted)
+  Função:
+	Guarda as relíquias do jogador (cópias) e repassa os eventos do jogo pra elas, na
+	ordem em que foram adquiridas.
+
+  Deve abrigar:
+	- adquirir, remover, limpar e o limite de relíquias
+	- a chamada de cada hook em cada relíquia
+
+  NÃO deve abrigar:
+	- nada de tabuleiro nem de HUD
+
+
+
+-----------------------------------------------------------------------------------------
+CAMADA DE INTERFACE
+-----------------------------------------------------------------------------------------
+
+ui/scenes/hud.gd  (extends CanvasLayer)
+  Função:
+	Trata SÓ a atualização da interface (labels, tela de derrota, próxima peça,
+	peça armazenada).
+
+  Deve abrigar:
+	- métodos "atualizar_*", "mostrar_*" e "esconder_*", que apenas exibem o que
+	  recebem
+
+  NÃO deve abrigar:
+	- decisões de lógica (vitória, derrota, pontuação)
+
+
+
+-----------------------------------------------------------------------------------------
+COMUNICAÇÃO
+-----------------------------------------------------------------------------------------
+
+core/auto_bus.gd  (autoload "AutoBus", extends Node)
+  Função:
+	Signals globais. A ÚNICA coisa que ele faz é declarar signals.
+
+  Critérios do que entra, e a lista de signals, em autobus.txt.

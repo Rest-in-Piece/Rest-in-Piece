@@ -1,0 +1,63 @@
+
+
+REGRAS DE JOGO (Fase -> RegrasDeJogo -> Tetris)
+===============================================
+
+Os parâmetros de jogabilidade (velocidade, tempo de fixação, resets de fixação) seguem
+um fluxo único, com um papel bem definido para cada etapa:
+
+  Etapa            Onde                               Papel
+  ---------------  ---------------------------------  --------------------------------------
+  Valor base       Fase (.tres em levels/)            editado por você no inspetor
+  Valor em vigor   RegrasDeJogo                       Fase + modificações das relíquias;
+													  recriado a cada recálculo
+  Consumo          Tetris.aplicar_regras(regras)      o tabuleiro só lê; ninguém escreve
+													  nas variáveis dele direto
+
+O nome do parâmetro é o mesmo nos três lugares, para não haver confusão.
+
+
+PARÂMETROS ATUAIS
+-----------------
+  velocidade             Fase.velocidade_inicial é a base. O GameManager a faz crescer com
+						 fase.aceleracao (velocidade_atual) e a entrega às regras.
+  total_etapas_fixacao   Limite de etapas que a peça espera no chão antes de travar.
+						 Fase.total_etapas_fixacao (padrão: 100).
+  max_resets_fixacao     Quantas vezes mover/rotacionar no chão reinicia o tempo de
+						 fixação. Fase.max_resets_fixacao (padrão: 15).
+
+UNIDADE DE "ETAPAS": é a mesma da queda. O tabuleiro tem total_etapas = 50, que
+equivale ao tempo de uma queda de 1 linha. Logo, total_etapas_fixacao = 100 significa
+"a peça espera o tempo de duas quedas". O tempo real depende da velocidade.
+
+
+COMO O GAMEMANAGER MONTA AS REGRAS
+----------------------------------
+_aplicar_regras() no GameManager:
+  1. cria RegrasDeJogo.criar_a_partir_da_fase(fase, velocidade_atual)
+  2. as relíquias modificam o objeto (hook modificar_regras)
+  3. entrega ao tabuleiro com tabuleiro.aplicar_regras(regras)
+  4. monta o saco de peças sorteáveis (ver bolsa_de_pecas.txt)
+
+É chamado ao iniciar o jogo, quando as relíquias mudam, a cada linha destruída (pois a
+velocidade muda) e quando a bolsa de peças muda.
+
+
+COMO ALTERAR UM VALOR
+---------------------
+  - Mudar o valor base de uma fase: edite o .tres da fase no inspetor.
+  - Mudar o valor por uma relíquia: sobrescreva modificar_regras na relíquia. Exemplo:
+
+	  func modificar_regras(regras: RegrasDeJogo) -> void:
+		  regras.max_resets_fixacao += resets_extras
+		  regras.total_etapas_fixacao += etapas_extras_fixacao
+
+
+COMO ADICIONAR UM PARÂMETRO NOVO
+--------------------------------
+  1. @export na Fase (valor base)
+  2. variável no RegrasDeJogo
+  3. uma linha em RegrasDeJogo.criar_a_partir_da_fase copiando da Fase
+  4. variável no Tetris + uma linha em Tetris.aplicar_regras
+
+As relíquias passam a poder alterar o parâmetro automaticamente (em modificar_regras).

@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="ReliquiaMultiplicadorSpin" format=3 uid="uid://dnlkfvxu7q45c"]
+
+[ext_resource type="Script" uid="uid://btkp103mmksgw" path="res://entities/reliquias/reliquia_mult_spin.gd" id="1_spinr"]
+
+[resource]
+script = ExtResource("1_spinr")
+spins_aceitos = Array[String](["T", "I", "J", "L", "O", "Z", "S"])
+metadata/_custom_type_script = "uid://btkp103mmksgw"

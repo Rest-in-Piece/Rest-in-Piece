@@ -1,0 +1,57 @@
+
+
+BOLSA DE PEÇAS
+==============
+
+A bolsa de peças representa as peças que o jogador POSSUI na partida. Ela cresce com
+recompensas (fim de batalha) e lojas.
+
+
+COMO FUNCIONA
+-------------
+  GameManager.bolsa_de_pecas   (permanente na partida)
+		|
+		|  cópia
+		v
+  relíquias: modificar_pecas_do_saco   (temporário, enquanto a relíquia existir)
+		|
+		v
+  Tetris.pecas_do_saco      (de onde o tabuleiro sorteia)
+
+  - A bolsa começa com as peças exportadas em "pecas_iniciais" no TabuleiroTileMap,
+	copiadas em iniciar_novo_jogo.
+  - As relíquias NÃO alteram a bolsa; elas só alteram uma cópia, e a cada recálculo
+	(ver regras_de_jogo.txt) a cópia é feita de novo.
+  - O tabuleiro sorteia em "sacos": embaralha, tira peça por peça, e só reabastece
+	quando o saco esvazia.
+
+
+COMO ADICIONAR PEÇAS (recompensas e lojas)
+------------------------------------------
+No GameManager:
+
+	adicionar_peca_a_bolsa(peca, copias)
+
+Exemplo, duas cópias da peça O:
+
+	adicionar_peca_a_bolsa(preload("res://entities/pieces/peca_o.tres"), 2)
+
+A peça entra no sorteio no PRÓXIMO reabastecimento do saco do tabuleiro. Como
+recompensas acontecem entre batalhas, a próxima batalha já a inclui desde o início.
+
+Remover peças (ex: loja que "afina" a bolsa) seria uma função análoga, apagando uma
+ocorrência por cópia (Array.erase). Ainda não foi implementada.
+
+
+BOLSA x HOOK DE RELÍQUIA
+------------------------
+  Adicionar peça PERMANENTE (recompensa, loja) ........ bolsa_de_pecas
+  Alterar o saco ENQUANTO a relíquia existir .......... Reliquia.modificar_pecas_do_saco
+	  (ex: "a peça I aparece em dobro enquanto você tiver esta relíquia")
+
+
+OBSERVAÇÃO SOBRE O RESET
+------------------------
+Hoje iniciar_novo_jogo reseta a bolsa e as relíquias, porque é o único início que
+existe. Quando houver separação entre RUN e BATALHA, o reset da bolsa (e das relíquias)
+deve ir para o início da run, senão as recompensas somem a cada batalha.

@@ -1,0 +1,65 @@
+
+
+AUTOBUS (signals globais)
+=========================
+
+AutoBus (core/auto_bus.gd, autoload) é um script com acesso global. A ÚNICA coisa que
+ele faz é declarar signals. Quem emite não sabe quem escuta, e quem escuta não precisa
+de referência a quem emite.
+
+O risco de um bus é virar o canal padrão de tudo e acumular centenas de signals. Para
+evitar isso, só entra aqui o que cumpre os três critérios abaixo.
+
+
+CRITÉRIOS (a resposta precisa ser "sim" nas três)
+-------------------------------------------------
+  1. É um fato que JÁ aconteceu (nome no passado), e não um comando?
+  2. Quem emite não precisa saber quem escuta?
+  3. Quem escuta é um sistema de fora (áudio, partículas, estatísticas, save,
+	 conquistas) e não um nó vizinho de quem emite?
+
+Comunicação entre nós vizinhos (tetris -> GameManager, hud -> GameManager) continua
+sendo um signal comum, declarado no próprio nó.
+
+Também NÃO entram no bus:
+  - estado (ex: a pontuação atual)
+  - comandos ("toque este som"): o sistema de áudio escuta o FATO e decide
+  - eventos por frame
+
+
+SIGNALS ATUAIS
+--------------
+  reliquia_ativada(reliquia)             uma relíquia contribuiu na pontuação
+  jogada_resolvida(contexto)             uma peça travou, com ou sem pontos
+  partida_encerrada(pontuacao_final)     o jogador perdeu
+
+Ouvintes de jogada_resolvida filtram pelo contexto (ex: contexto.linhas_destruidas > 0
+para som de linha, contexto.teve_spin() para efeito de spin). O contexto é SOMENTE
+LEITURA para os ouvintes.
+
+
+SIGNALS QUE CONTINUAM LOCAIS
+----------------------------
+  Tetris:  linhas_destruidas, spin_realizado, peca_travada, fim_de_jogo, jogo_iniciado,
+		   proxima_peca_sorteada, peca_armazenada_alterada
+  HUD:     solicitou_novo_jogo
+  GerenciadorDeReliquias: reliquias_alteradas
+
+Todos têm emissor e ouvinte conhecidos, ligados pelo GameManager.
+
+
+BOAS PRÁTICAS
+-------------
+  - Envie um OBJETO que já carrega tudo (ex: ContextoPontuacao) em vez de vários
+	parâmetros. Se um ouvinte precisar de mais um dado, a assinatura do signal não muda.
+  - Organize os signals por seção (relíquias, partida, ...) com comentário.
+  - Se o bus passar de umas 10 a 15 signals, divida por domínio (por exemplo, um
+	segundo autoload só para eventos de loja/run).
+
+
+COMO ADICIONAR UM SIGNAL NOVO
+-----------------------------
+  1. Confira os três critérios acima.
+  2. Declare o signal em auto_bus.gd, com um comentário dizendo quando é emitido.
+  3. Emita de UM único lugar (o dono do fato).
+  4. Quem quiser reagir conecta: AutoBus.nome_do_signal.connect(metodo)

@@ -8,7 +8,6 @@ extends Resource
 @export var coords_no_atlas: Vector2i
 
 @export_category("Tabela SRS")
-# AQUI
 @export_enum("T", "S", "Z", "J", "L", "I", "O") var tipo_peca: String
 
 ## cada ângulo deve definir quatro coordenadas
@@ -28,17 +27,10 @@ var angulos: Dictionary:
 		}
 		# pra acessar o dict: angulos["0"]
 
-# AQUI
 func obter_tipo_tabela_srs() -> String:
-	# AQUI
 	if tipo_peca == "I":
-		# AQUI
 		return "I"
-	# AQUI
 	elif tipo_peca == "O":
-		# AQUI
 		return "O"
-	# AQUI
 	else:
-		# AQUI
 		return "PADRAO"

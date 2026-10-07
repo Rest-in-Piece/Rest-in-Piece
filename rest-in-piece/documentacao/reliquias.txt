@@ -1,0 +1,129 @@
+
+
+SISTEMA DE RELÍQUIAS
+====================
+
+Relíquias concedem efeitos passivos ao jogador. Elas ficam na camada de lógica e só
+interagem com o jogo pelos HOOKS descritos abaixo, nunca mexendo direto no tabuleiro
+ou no HUD.
+
+
+COMO FUNCIONA
+
+-------------
+Toda relíquia estende a classe base Reliquia (entities/reliquias/reliquia.gd) e
+sobrescreve SÓ os hooks de que precisa. Os hooks não sobrescritos não fazem nada.
+
+  Hook                                 Quando é chamado                   Serve para
+  -----------------------------------  ---------------------------------  ---------------------------
+  ao_pontuar(contexto)                 toda vez que uma peça trava        fichas, multiplicador,
+									   (mesmo sem linhas destruídas)      relíquias que evoluem
+  modificar_regras(regras)             sempre que as regras são           tempo de fixação,
+									   recalculadas                       velocidade, resets
+  modificar_pecas_sorteaveis(pecas)    idem                               alterar TEMPORARIAMENTE o
+																		  saco de peças
+
+Cada hook recebe um objeto e o modifica:
+  - ao_pontuar recebe um ContextoPontuacao (ver pontuacao.txt)
+  - modificar_regras recebe um RegrasDeJogo (ver regras_de_jogo.txt)
+  - modificar_pecas_sorteaveis recebe uma CÓPIA do saco de peças (ver bolsa_de_pecas.txt)
+
+Quem chama os hooks é o GerenciadorDeReliquias, em ordem de aquisição.
+
+
+ORDEM IMPORTA
+-------------
+As relíquias rodam na ordem do array "reliquias" do gerenciador. Uma relíquia que SOMA
+multiplicador antes de uma que MULTIPLICA rende mais, como no Balatro. Trocar a ordem
+das relíquias é só reordenar esse array.
+
+
+ESTADO PRÓPRIO E CÓPIAS
+-----------------------
+O gerenciador guarda uma CÓPIA (duplicate()) de cada relíquia adquirida. Assim, uma
+relíquia que cresce com o tempo não altera o arquivo .tres.
+  - Variáveis com @export: copiadas do .tres.
+  - Variáveis sem @export: começam no valor padrão em cada cópia (use isso pro estado).
+
+CUIDADO: o duplicate() é raso para sub-resources. Se uma relíquia passar a ter
+Resources dentro dela (ex: listas de efeitos), o estado deles seria compartilhado entre
+cópias. Nesse caso, use uma cópia profunda (confira duplicate_deep() na documentação da
+sua versão do Godot) no GerenciadorDeReliquias.adquirir.
+
+
+LIMITE
+------
+GerenciadorDeReliquias.MAX_RELIQUIAS (padrão: 5). adquirir() retorna false quando
+o limite foi atingido.
+
+
+FEEDBACK VISUAL E SONORO
+------------------------
+Quando uma relíquia contribui na pontuação, o gerenciador emite
+AutoBus.reliquia_ativada(reliquia). HUD, áudio e partículas podem escutar esse signal
+sem acoplamento. Para o gerenciador saber que a relíquia contribuiu, use os métodos do
+contexto (adicionar_fichas, adicionar_multiplicador, multiplicar_multiplicador): eles
+marcam a ativação. Alterar os campos direto NÃO marca.
+
+
+RELÍQUIAS DE EXEMPLO (entities/reliquias/)
+------------------------------------------
+  ReliquiaFichasPorLinha        só ajuda na pontuação: +fichas por linha destruída
+  ReliquiaMultiplicadorSpin     pontua sob condição: +multiplicador quando há spin
+								(lista opcional de spins aceitos; vazia = qualquer spin)
+  ReliquiaTetrisCrescente       evolui: cresce a cada Tetris (4 linhas) e soma o
+								acumulado em toda jogada com linhas
+  ReliquiaFixacaoResistente     altera a jogabilidade: mais resets e mais tempo de
+								fixação
+
+
+COMO CRIAR UMA RELÍQUIA NOVA
+----------------------------
+1. Crie um script que estenda Reliquia e sobrescreva os hooks necessários. Exemplo:
+
+	 class_name ReliquiaExemplo
+	 extends Reliquia
+
+	 @export var fichas_extras: int = 30
+
+	 func ao_pontuar(contexto: ContextoPontuacao) -> void:
+		 if contexto.linhas_destruidas > 0:
+			 contexto.adicionar_fichas(fichas_extras)
+
+2. No FileSystem: botão direito -> New Resource -> escolha a classe. Ajuste os valores
+   no inspetor e preencha "nome" e "descricao" (e "icone", se houver).
+3. Para testar: arraste o .tres para "Reliquias Iniciais" no GameManager.
+
+Dicas:
+  - Valores ajustáveis sempre com @export, pra balancear sem mexer no código.
+  - Estado que muda durante a partida: variável SEM @export.
+  - Uma relíquia que só altera regras ou peças não precisa implementar ao_pontuar.
+
+
+O QUE UMA RELÍQUIA NÃO DEVE FAZER
+---------------------------------
+  - Mexer no tabuleiro, no HUD ou em nós da cena. Ela só altera os objetos que os
+	hooks entregam (contexto, regras, cópia do saco).
+  - Adicionar peças de forma PERMANENTE. Isso é recompensa/loja e usa a bolsa de peças
+	(ver bolsa_de_pecas.txt). O hook modificar_pecas_sorteaveis é para efeitos que
+	valem apenas enquanto a relíquia existir.
+
+
+COMO ADICIONAR UM TIPO NOVO DE EFEITO
+-------------------------------------
+Exemplo: reagir ao armazenar uma peça.
+  1. Adicione um novo hook (método vazio) na classe base Reliquia.
+  2. Adicione no GerenciadorDeReliquias um método que chama esse hook em cada relíquia.
+  3. Chame esse método do GameManager no momento certo.
+Se o efeito precisar devolver algo ao jogo, adicione um campo no objeto de contexto
+entregue ao hook, e o GameManager aplica. A relíquia nunca alcança o jogo diretamente.
+
+
+IDEIA EM ABERTO: RELÍQUIAS COMPOSTAS
+------------------------------------
+Foi avaliada a ideia de montar relíquias a partir de Condições e Efeitos separados
+(resources reutilizáveis). Decisão: adiar até existirem ~8-10 relíquias com padrões
+repetidos. Quando chegar a hora, entra como mais uma subclasse de Reliquia (por
+exemplo ReliquiaComposta), sem reescrever o que já existe. Uma alternativa mais
+simples é um único resource "FiltroDeJogada" (spins aceitos, linhas mínimas, peças
+aceitas) reutilizado pelas relíquias.

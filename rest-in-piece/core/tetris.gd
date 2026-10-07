@@ -10,6 +10,7 @@ signal linhas_destruidas(quantidade: int)
 signal proxima_peca_sorteada(peca: Peca, atlas_coords: Vector2i)
 signal peca_armazenada_alterada(peca: Peca, atlas_coords: Vector2i)
 signal spin_realizado(tipo_spin: String)
+signal peca_travada(peca: Peca)
 
 @export var pecas: Array[Peca]
 
@@ -25,18 +26,19 @@ var pos_inicial := Vector2i(5, 2)
 var pos_atual : Vector2i
 var velocidade : float
 
-# variaveis de delay para fixar a peça
+# variaveis de delay para fixar a peça (os totais vêm do RegrasDeJogo)
 var etapas_fixacao: float = 0.0
-var total_etapas_fixacao: float = 30.0
+var total_etapas_fixacao: float
 var resets_fixacao: int = 0
-const MAX_RESETS_FIXACAO: int = 15
+var max_resets_fixacao: int
 
 # variaveis das peças no jogo
 var peca: Peca
 var prox_peca: Peca
 var indice_rotacao : int = 0
 var peca_ativa : Array
-var pecas_disponiveis: Array[Peca]
+var saco_atual: Array[Peca]
+var pecas_do_saco: Array[Peca] # AQUI saco de peças já modificado pelas relíquias (definido pelo GameManager)
 
 # variáveis da peça armazenada
 var peca_armazenada: Peca
@@ -81,11 +83,14 @@ func novo_jogo():
 	jogo_rodando = true
 	etapas = [0, 0, 0] #0 esquerda #1 direita #2 baixo
 	
+	if pecas_do_saco.is_empty():
+		pecas_do_saco = pecas.duplicate()
+	
 	jogo_iniciado.emit()
 	limpar_peca()
 	#limpar_grid()
 	
-	pecas_disponiveis = pecas.duplicate()
+	saco_atual = pecas_do_saco.duplicate()
 	peca = seleciona_uma_peca()
 	peca_atlas = peca.coords_no_atlas
 	prox_peca = seleciona_uma_peca()
@@ -102,13 +107,13 @@ func novo_jogo():
 # embaralha o vetor de peças e retorna a primeira
 func seleciona_uma_peca() -> Peca:
 	var p: Peca
-	if not pecas_disponiveis.is_empty():
-		pecas_disponiveis.shuffle()
-		p = pecas_disponiveis.pop_front()
+	if not saco_atual.is_empty():
+		saco_atual.shuffle()
+		p = saco_atual.pop_front()
 	else:
-		pecas_disponiveis = pecas.duplicate()
-		pecas_disponiveis.shuffle()
-		p = pecas_disponiveis.pop_front()
+		saco_atual = pecas_do_saco.duplicate()
+		saco_atual.shuffle()
+		p = saco_atual.pop_front()
 	return p
 
 
@@ -130,13 +135,9 @@ func _processar_inputs():
 		cair_imediatamente(false)
 	if Input.is_action_just_pressed("posicionar_imediatamente"):
 		cair_imediatamente(true)
-	# AQUI
 	if Input.is_action_just_pressed("rotacionar_sentido_horario"):
-		# AQUI
 		rotacionar_peca(1)
-	# AQUI
 	if Input.is_action_just_pressed("rotacionar_sentido_anti_horario"):
-		# AQUI
 		rotacionar_peca(-1)
 	if Input.is_action_just_pressed("armazenar_peca") and pode_armazenar:
 		armazenar_peca_atual()
@@ -214,7 +215,6 @@ func zerar_rotacao():
 
 
 func rotacionar_peca(sentido: int):
-	# AQUI
 	var proximo_indice = (indice_rotacao + sentido + 4) % 4
 	var angulos = [0, 90, 180, 270]
 	
@@ -260,6 +260,8 @@ func travar_peca():
 	avaliar_spin()
 	
 	identificar_e_tratar_linhas_completas()
+	
+	peca_travada.emit(peca)
 	
 	pode_armazenar = true
 	peca = prox_peca
@@ -322,26 +324,19 @@ func avaliar_spin():
 		if cantos_ocupados >= 3:
 			print("T-Spin realizado")
 			spin_realizado.emit("T-Spin")
-			
-	# AQUI
+	
 	elif peca.tipo_peca in ["S", "Z", "L", "J", "I"]:
-		# AQUI
 		var sem_saida_horizontal = not pode_mover(Vector2i.LEFT) and not pode_mover(Vector2i.RIGHT)
-		# AQUI
 		var sem_saida_vertical = not pode_mover(Vector2i.UP) and not pode_mover(Vector2i.DOWN)
-		# AQUI
 		
-		# AQUI
 		if sem_saida_horizontal and sem_saida_vertical:
-			# AQUI
 			print(peca.tipo_peca + "-Spin realizado")
-			# AQUI
 			spin_realizado.emit(peca.tipo_peca + "-Spin")
 
 
 func tratar_reset_fixacao():
 	if not pode_mover(Vector2i.DOWN):
-		if resets_fixacao < MAX_RESETS_FIXACAO:
+		if resets_fixacao < max_resets_fixacao:
 			etapas_fixacao = 0.0
 			resets_fixacao += 1
 
@@ -407,3 +402,10 @@ func limpar_grid():
 	for i in range(LINHAS):
 		for j in range(COLUNAS):
 			erase_cell(Vector2i(j + 1, i + 1))
+
+
+# único ponto de entrada pros valores de jogabilidade definidos pelo GameManager
+func aplicar_regras(regras: RegrasJogo):
+	velocidade = regras.velocidade
+	total_etapas_fixacao = regras.total_etapas_fixacao
+	max_resets_fixacao = regras.max_resets_fixacao

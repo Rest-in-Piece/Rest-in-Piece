@@ -1,23 +1,24 @@
 
-
-# AutoBus é um script com acesso público global.
-# A ÚNICA coisa que ele faz é criar signals.
-
-# Um signal é uma forma de comunicação que auxilia a manter
-# o encapsulamento das informações. Se um inimigo morre, ele 
-# não vai mexer nas estatísticas do jogo para que o jogador
-# complete a quest; ele vai apenas dizer "eu morri!" (emitir
-# um sinal), e qualquer script que tenha interesse nessa in-
-# formação pode subscrever (connect) esse signal para poder
-# executar sua própria lógica.
-
-# Só temos que tomar cuidado pra não sobrecarregar demais o
-# EventBus. Lidar com centenas de signals em um script pode
-# ser bem trabalhoso, criando dependências difíceis de iden-
-# tificar e debugar
-
 extends Node
 
-# quero adicionar um signal pra indicar que a linha foi com-
-# pletada. Porém, não sei quantos detalhes preciso inserir
-# no signal
+# CRITÉRIO PRA UM SIGNAL ENTRAR NESSE SCRIPT (precisa responder "sim" nas três):
+# 1. é um fato que JÁ aconteceu (nome no passado) e não um comando?
+# 2. quem emite não precisa saber quem escuta?
+# 3. quem escuta é um sistema de fora (áudio, partículas, estatísticas, save...)
+#    e não um nó vizinho de quem emite?
+# Comunicação entre nós vizinhos (tetris → GameManager, hud → GameManager) continua
+# sendo um signal comum, declarado no próprio nó.
+
+
+# --- relíquias ---
+
+# emitido quando uma relíquia contribuiu na pontuação (animação do ícone, som...)
+signal reliquia_ativada(reliquia: Reliquia)
+
+
+# --- partida ---
+
+# emitido toda vez que uma peça trava, com ou sem pontos (ouvintes filtram pelo contexto)
+signal jogada_resolvida(contexto: ContextoPontuacao)
+
+signal partida_encerrada(pontuacao_final: int)

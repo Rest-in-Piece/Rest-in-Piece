@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="ReliquiaFichasPorLinha" format=3 uid="uid://b5ekeecrdls7m"]
+
+[ext_resource type="Script" uid="uid://cvctxwhfihm6b" path="res://entities/reliquias/reliquia_pontos_por_linha.gd" id="1_nkefy"]
+
+[resource]
+script = ExtResource("1_nkefy")
+nome = "Teste relíquia ponto por linha"
+descricao = "Descrição da Teste relíquia ponto por linha"
+metadata/_custom_type_script = "uid://cvctxwhfihm6b"
