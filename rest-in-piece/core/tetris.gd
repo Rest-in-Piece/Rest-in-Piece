@@ -88,7 +88,7 @@ func novo_jogo():
 	
 	jogo_iniciado.emit()
 	limpar_peca()
-	#limpar_grid()
+	# limpar_grid()  AQUI DESCOMENTAR
 	
 	saco_atual = pecas_do_saco.duplicate()
 	peca = seleciona_uma_peca()
@@ -124,11 +124,11 @@ func obter_rotacoes(peca: Peca) -> Array:
 
 func _processar_inputs():
 	if Input.is_action_pressed("mover_esquerda"):
-		etapas[0] += 5
+		etapas[0] += 13
 	if Input.is_action_pressed("mover_direita"):
-		etapas[1] += 5
+		etapas[1] += 13
 	if Input.is_action_pressed("acelerar_queda"):
-		etapas[2] += 5
+		etapas[2] += 13
 		if not pode_mover(Vector2i.DOWN):
 			etapas_fixacao += 5.0
 	if Input.is_action_just_pressed("cair_imediatamente"):

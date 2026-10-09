@@ -4,5 +4,5 @@
 
 [resource]
 script = ExtResource("1_spinr")
-spins_aceitos = Array[String](["T", "I", "J", "L", "O", "Z", "S"])
+spins_aceitos = Array[String](["T-Spin", "I-Spin", "J-Spin", "L-Spin", "O-Spin", "Z-Spin", "S-Spin"])
 metadata/_custom_type_script = "uid://btkp103mmksgw"
