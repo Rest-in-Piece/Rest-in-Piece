@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="ReliquiaMultiplicadorPorAltura" format=3 uid="uid://b2ljiy0rkhadw"]
+
+[ext_resource type="Script" uid="uid://ckukjya1jm6ae" path="res://entities/reliquias/reliquia_mult_por_altura.gd" id="1_tu1eh"]
+
+[resource]
+script = ExtResource("1_tu1eh")
+metadata/_custom_type_script = "uid://ckukjya1jm6ae"

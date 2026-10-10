@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="ReliquiaBonusHardDrop" format=3 uid="uid://cu6v6lcljefk4"]
+
+[ext_resource type="Script" uid="uid://dprihij3ff4rc" path="res://entities/reliquias/reliquia_bonus_hard_drop.gd" id="1_csbyx"]
+
+[resource]
+script = ExtResource("1_csbyx")
+metadata/_custom_type_script = "uid://dprihij3ff4rc"

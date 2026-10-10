@@ -1,4 +1,5 @@
 
+
 # esse script define e coordena a lógica do jogo. O jogador destruiu linhas? O 
 # game_manager.gd calcula os pontos e chama os sinais para outros scripts executarem
 # suas próprias lógicas. Não coordena física e nem interface visual.
@@ -18,16 +19,17 @@ var pontuacao: int = 0
 var meta: int = 0
 var aumento_meta: bool = true
 var velocidade_atual: float = 1.0
-var recompensa_por_linha: int = 100
 
 var gerenciador_reliquias: GerenciadorDeReliquias = GerenciadorDeReliquias.new()
 
-# peças que o jogador possui na partida. Começa com as peças do tabuleiro e cresce com
-# recompensas e lojas
+# peças que o jogador possui na partida. Cada elemento é uma CÓPIA, pra que buffs
+# permanentes de uma peça não afetem as outras do mesmo tipo (nem o arquivo .tres)
 var bolsa_de_pecas: Array[Peca] = []
 
+var peca_armazenada: Peca
+
 # informações da jogada atual, consumidas quando a peça trava
-var linhas_pendentes: int = 0
+var linhas_pendentes: Array[LinhaPontuada] = []
 var tipo_spin_pendente: String = ""
 
 func _ready():
@@ -35,6 +37,7 @@ func _ready():
 	tabuleiro.fim_de_jogo.connect(_on_fim_de_jogo)
 	tabuleiro.proxima_peca_sorteada.connect(hud.atualizar_proxima_peca)
 	tabuleiro.peca_armazenada_alterada.connect(hud.atualizar_peca_armazenada)
+	tabuleiro.peca_armazenada_alterada.connect(_on_peca_armazenada_alterada)
 	tabuleiro.spin_realizado.connect(_on_spin_realizado)
 	tabuleiro.peca_travada.connect(_on_peca_travada)
 	gerenciador_reliquias.reliquias_alteradas.connect(_aplicar_regras)
@@ -48,11 +51,13 @@ func iniciar_novo_jogo():
 	meta = fase.meta
 	velocidade_atual = fase.velocidade_inicial
 	aumento_meta = true
-	linhas_pendentes = 0
+	linhas_pendentes = []
 	tipo_spin_pendente = ""
+	peca_armazenada = null
 	
-	# a bolsa precisa ser resetada antes das relíquias, que disparam o recálculo
-	bolsa_de_pecas = tabuleiro.pecas.duplicate()
+	bolsa_de_pecas.clear()
+	for peca_inicial in tabuleiro.pecas:
+		bolsa_de_pecas.append(peca_inicial.duplicate() as Peca)
 	
 	gerenciador_reliquias.limpar()
 	for reliquia in reliquias_iniciais:
@@ -75,27 +80,26 @@ func _aplicar_regras():
 	gerenciador_reliquias.aplicar_regras(regras)
 	tabuleiro.aplicar_regras(regras)
 	
-	var pecas_do_saco: Array[Peca] = bolsa_de_pecas.duplicate()
-	gerenciador_reliquias.aplicar_pecas_sorteaveis(pecas_do_saco)
-	tabuleiro.pecas_do_saco = pecas_do_saco
+	var pecas_sorteaveis: Array[Peca] = bolsa_de_pecas.duplicate()
+	gerenciador_reliquias.aplicar_pecas_sorteaveis(pecas_sorteaveis)
+	tabuleiro.pecas_sorteaveis = pecas_sorteaveis
 
 
-# usada por recompensas de fim de batalha e lojas. A peça passa a ser sorteável no
-# próximo reabastecimento do saco do tabuleiro (a próxima batalha já a inclui)
+# usada por recompensas de fim de batalha e lojas. Cada cópia é uma peça independente
 func adicionar_peca_a_bolsa(peca: Peca, copias: int = 1):
 	for i in range(copias):
-		bolsa_de_pecas.append(peca)
+		bolsa_de_pecas.append(peca.duplicate() as Peca)
 	_aplicar_regras()
 
 
-func _on_linhas_destruidas(qtd: int):
+func _on_linhas_destruidas(linhas: Array[LinhaPontuada]):
 	# a pontuação é calculada em _on_peca_travada, aqui só guardamos a informação
-	linhas_pendentes = qtd
+	linhas_pendentes = linhas
 	
-	velocidade_atual += fase.aceleracao * qtd
+	velocidade_atual += fase.aceleracao * linhas.size()
 	_aplicar_regras()
 	
-	if qtd == 4:
+	if linhas.size() == 4:
 		# placeholder
 		print("TETRIS")
 
@@ -104,19 +108,25 @@ func _on_spin_realizado(tipo_spin: String):
 	tipo_spin_pendente = tipo_spin
 
 
+func _on_peca_armazenada_alterada(peca: Peca, _atlas_coords: Vector2i):
+	peca_armazenada = peca
+	gerenciador_reliquias.processar_armazenamento(peca)
+
+
 # toda peça que trava gera uma pontuação, com ou sem linhas destruídas
-func _on_peca_travada(peca: Peca):
+func _on_peca_travada(peca: Peca, casas_hard_drop: int):
 	var contexto := ContextoPontuacao.new()
 	contexto.peca = peca
-	contexto.linhas_destruidas = linhas_pendentes
+	contexto.peca_armazenada = peca_armazenada
+	contexto.linhas = linhas_pendentes
 	contexto.tipo_spin = tipo_spin_pendente
-	contexto.pontos = recompensa_por_linha * linhas_pendentes
+	contexto.casas_hard_drop = casas_hard_drop
 	
-	linhas_pendentes = 0
+	linhas_pendentes = []
 	tipo_spin_pendente = ""
 	
 	gerenciador_reliquias.processar_pontuacao(contexto)
-	
+
 	AutoBus.jogada_resolvida.emit(contexto)
 	
 	var pontos: int = contexto.obter_pontuacao_final()

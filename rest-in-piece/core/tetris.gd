@@ -1,3 +1,5 @@
+
+
 # esse script SÓ deve tratar a física e a movimentação das peças na grade.
 # A peça colidiu? Uma linha foi preenchida? O tetris.gd atualiza o tabuleiro. 
 # Questões de pontuação e avanço de meta devem ser tratadas no GameManager.
@@ -6,11 +8,11 @@ extends TileMapLayer
 
 signal fim_de_jogo
 signal jogo_iniciado
-signal linhas_destruidas(quantidade: int)
 signal proxima_peca_sorteada(peca: Peca, atlas_coords: Vector2i)
 signal peca_armazenada_alterada(peca: Peca, atlas_coords: Vector2i)
 signal spin_realizado(tipo_spin: String)
-signal peca_travada(peca: Peca)
+signal linhas_destruidas(linhas: Array[LinhaPontuada])
+signal peca_travada(peca: Peca, casas_hard_drop: int)
 
 @export var pecas: Array[Peca]
 
@@ -26,19 +28,20 @@ var pos_inicial := Vector2i(5, 2)
 var pos_atual : Vector2i
 var velocidade : float
 
-# variaveis de delay para fixar a peça (os totais vêm do RegrasDeJogo)
+# variaveis de delay para fixar a peça (os totais vêm do RegrasJogo)
 var etapas_fixacao: float = 0.0
 var total_etapas_fixacao: float
 var resets_fixacao: int = 0
 var max_resets_fixacao: int
 
 # variaveis das peças no jogo
+var pecas_sorteaveis: Array[Peca] = []
 var peca: Peca
 var prox_peca: Peca
 var indice_rotacao : int = 0
 var peca_ativa : Array
 var saco_atual: Array[Peca]
-var pecas_do_saco: Array[Peca] # AQUI saco de peças já modificado pelas relíquias (definido pelo GameManager)
+var pecas_do_saco: Array[Peca] # saco de peças já modificado pelas relíquias (definido pelo GameManager)
 
 # variáveis da peça armazenada
 var peca_armazenada: Peca
@@ -51,6 +54,9 @@ var jogo_rodando : bool
 var tile_id : int = 0
 var peca_atlas : Vector2i
 var prox_peca_atlas : Vector2i
+var blocos_fixados: Dictionary[Vector2i, BlocoFixado] = {}
+# casas que a peça atual desceu com hard drop (zerado a cada peça nova)
+var casas_descidas_hard_drop: int = 0
 
 var ultima_acao_foi_rotacao: bool = false
 
@@ -71,7 +77,7 @@ func _process(delta: float) -> void:
 			travar_peca()
 	else:
 		etapas[2] += velocidade   # queda com o passar do tempo
-		
+	
 	# mover a peça
 	for i in range(etapas.size()):
 		if etapas[i] >= total_etapas:
@@ -124,11 +130,11 @@ func obter_rotacoes(peca: Peca) -> Array:
 
 func _processar_inputs():
 	if Input.is_action_pressed("mover_esquerda"):
-		etapas[0] += 13
+		etapas[0] += 10
 	if Input.is_action_pressed("mover_direita"):
-		etapas[1] += 13
+		etapas[1] += 10
 	if Input.is_action_pressed("acelerar_queda"):
-		etapas[2] += 13
+		etapas[2] += 10
 		if not pode_mover(Vector2i.DOWN):
 			etapas_fixacao += 5.0
 	if Input.is_action_just_pressed("cair_imediatamente"):
@@ -178,6 +184,7 @@ func criar_peca():
 	etapas = [0, 0, 0]
 	etapas_fixacao = 0.0
 	resets_fixacao = 0
+	casas_descidas_hard_drop = 0
 	
 	pos_atual = pos_inicial
 	indice_rotacao = 0
@@ -259,9 +266,10 @@ func mover_peca(direcao):
 func travar_peca():
 	avaliar_spin()
 	
+	registrar_blocos_da_peca()
 	identificar_e_tratar_linhas_completas()
 	
-	peca_travada.emit(peca)
+	peca_travada.emit(peca, casas_descidas_hard_drop)
 	
 	pode_armazenar = true
 	peca = prox_peca
@@ -364,41 +372,43 @@ func cair_imediatamente(posicionar_imediatamente):
 	while pode_mover(Vector2i.DOWN):
 		etapas[2] = 0
 		mover_peca(Vector2i.DOWN)
+		casas_descidas_hard_drop += 1
 	
 	if posicionar_imediatamente:
 		travar_peca()
 
 
 func identificar_e_tratar_linhas_completas():
-	var linha : int = LINHAS
-	var linhas_apagadas: int = 0
+	var linhas_completas: Array[LinhaPontuada] = []
 	
-	while linha > 0:
-		var cont = 0
-		for i in range(COLUNAS):
-			if get_cell_source_id(Vector2i(i + 1, linha)) != -1:
-				cont += 1
-		if cont == COLUNAS:
-			deslocar_linhas(linha)
-			linhas_apagadas += 1
-		else:
-			linha -= 1
+	for linha in range(LINHAS, 0, -1):
+		if linha_esta_completa(linha):
+			linhas_completas.append(criar_linha_pontuada(linha))
 	
-	if linhas_apagadas > 0:
-		linhas_destruidas.emit(linhas_apagadas)
+	for i in range(linhas_completas.size() - 1, -1, -1):
+		deslocar_linhas(linhas_completas[i].indice_linha)
+	
+	if not linhas_completas.is_empty():
+		linhas_destruidas.emit(linhas_completas)
 
 # desloca linhas para baixo a partir de uma linha (inclusive todas as linhas acima dela)
 func deslocar_linhas(linha):
 	var atlas
 	for i in range(linha, 1, -1):
 		for j in range(COLUNAS):
-			atlas = get_cell_atlas_coords(Vector2i(j + 1, i - 1))
+			var posicao_origem := Vector2i(j + 1, i - 1)
+			var posicao_destino := Vector2i(j + 1, i)
+			
+			atlas = get_cell_atlas_coords(posicao_origem)
 			if atlas == Vector2i(-1, -1):
-				erase_cell(Vector2i(j + 1, i))
+				erase_cell(posicao_destino)
 			else:
-				set_cell(Vector2i(j + 1, i), tile_id, atlas)
+				set_cell(posicao_destino, tile_id, atlas)
+			
+			mover_dados_do_bloco(posicao_origem, posicao_destino)
 
 func limpar_grid():
+	blocos_fixados.clear()
 	for i in range(LINHAS):
 		for j in range(COLUNAS):
 			erase_cell(Vector2i(j + 1, i + 1))
@@ -409,3 +419,34 @@ func aplicar_regras(regras: RegrasJogo):
 	velocidade = regras.velocidade
 	total_etapas_fixacao = regras.total_etapas_fixacao
 	max_resets_fixacao = regras.max_resets_fixacao
+
+
+func registrar_blocos_da_peca():
+	for deslocamento in peca_ativa:
+		blocos_fixados[pos_atual + deslocamento] = BlocoFixado.criar_a_partir_da_peca(peca)
+
+
+func linha_esta_completa(linha: int) -> bool:
+	for coluna in range(1, COLUNAS + 1):
+		if get_cell_source_id(Vector2i(coluna, linha)) == -1:
+			return false
+	return true
+
+func mover_dados_do_bloco(posicao_origem: Vector2i, posicao_destino: Vector2i):
+	if blocos_fixados.has(posicao_origem):
+		blocos_fixados[posicao_destino] = blocos_fixados[posicao_origem]
+	else:
+		blocos_fixados.erase(posicao_destino)
+
+# monta os dados de uma linha completa, da esquerda pra direita (ordem de leitura dos pontos)
+func criar_linha_pontuada(linha: int) -> LinhaPontuada:
+	var linha_pontuada := LinhaPontuada.new()
+	linha_pontuada.indice_linha = linha
+	linha_pontuada.altura = LINHAS - linha + 1
+	
+	for coluna in range(1, COLUNAS + 1):
+		var posicao := Vector2i(coluna, linha)
+		var bloco_fixado: BlocoFixado = blocos_fixados.get(posicao)
+		linha_pontuada.blocos.append(BlocoPontuado.criar_a_partir_do_bloco_fixado(posicao, bloco_fixado))
+	
+	return linha_pontuada

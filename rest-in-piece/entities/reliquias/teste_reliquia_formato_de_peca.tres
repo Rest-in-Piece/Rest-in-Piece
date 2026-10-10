@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="ReliquiaFormatoDePeca" format=3 uid="uid://dlao0x1u6733l"]
+
+[ext_resource type="Script" uid="uid://cqloxa3g8vdh4" path="res://entities/reliquias/reliquia_formato_de_peca.gd" id="1_hs0wy"]
+
+[resource]
+script = ExtResource("1_hs0wy")
+formatos_aceitos = Array[String](["T"])
+metadata/_custom_type_script = "uid://cqloxa3g8vdh4"

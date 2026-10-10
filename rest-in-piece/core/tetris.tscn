@@ -7,6 +7,7 @@
 [ext_resource type="PackedScene" uid="uid://b8dp7yalnfjlr" path="res://ui/scenes/hud.tscn" id="3_yo8nm"]
 [ext_resource type="Resource" uid="uid://dnlkfvxu7q45c" path="res://entities/reliquias/teste_reliquia_mult_spin.tres" id="4_la0xn"]
 [ext_resource type="Resource" uid="uid://b5ekeecrdls7m" path="res://entities/reliquias/teste_reliquia_ponto_por_linha.tres" id="5_la0xn"]
+[ext_resource type="Resource" uid="uid://cumlgnc1ll0iq" path="res://entities/reliquias/teste_reliquia_buff_peca_armazenada.tres" id="6_kier8"]
 [ext_resource type="Script" uid="uid://bpwodnk3jua2h" path="res://entities/pecas/peca.gd" id="9_kier8"]
 [ext_resource type="Resource" uid="uid://dguon0fxwequy" path="res://entities/pecas/peca_i.tres" id="10_2j0jo"]
 [ext_resource type="Resource" uid="uid://4lntf8xgftm2" path="res://levels/fase_1.tres" id="10_wlauo"]
@@ -36,7 +37,7 @@ sources/0 = SubResource("TileSetAtlasSource_uppkp")
 [node name="GameManager" type="Node2D" unique_id=380485723]
 script = ExtResource("1_oismu")
 fase = ExtResource("10_wlauo")
-reliquias_iniciais = Array[ExtResource("3_wjvaw")]([ExtResource("4_la0xn"), ExtResource("5_la0xn")])
+reliquias_iniciais = Array[ExtResource("3_wjvaw")]([ExtResource("4_la0xn"), ExtResource("5_la0xn"), ExtResource("6_kier8")])
 
 [node name="TabuleiroTileMap" type="TileMapLayer" parent="." unique_id=1250284640]
 z_index = -1

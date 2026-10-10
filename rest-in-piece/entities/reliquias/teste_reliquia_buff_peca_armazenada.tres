@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="ReliquiaBuffPecaArmazenada" format=3 uid="uid://cumlgnc1ll0iq"]
+
+[ext_resource type="Script" uid="uid://coh8gs5tsho78" path="res://entities/reliquias/reliquia_buff_peca_armazenada.gd" id="1_h4mli"]
+
+[resource]
+script = ExtResource("1_h4mli")
+pontos_por_peca_por_nivel = Array[int]([3, 6, 9])
+metadata/_custom_type_script = "uid://coh8gs5tsho78"
