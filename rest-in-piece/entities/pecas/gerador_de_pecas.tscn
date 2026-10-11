@@ -24,7 +24,7 @@ sources/0 = SubResource("TileSetAtlasSource_5hclr")
 
 [node name="GeradorDePecas" type="TileMapLayer" unique_id=1932844322]
 position = Vector2(128, 128)
-tile_map_data = PackedByteArray(0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0)
+tile_map_data = PackedByteArray(0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0)
 tile_set = SubResource("TileSet_onhcv")
 script = ExtResource("1_wnm1u")
 peca_alvo = ExtResource("2_8rija")

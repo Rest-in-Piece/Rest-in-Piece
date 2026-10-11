@@ -31,7 +31,7 @@ func modificar_regras(_regras: RegrasJogo) -> void:
 	pass
 
 # altera o saco de peças sorteáveis. O array recebido pode ser modificado direto
-func modificar_pecas_sorteaveis(_pecas: Array[Peca]) -> void:
+func modificar_pecas_do_saco(_pecas: Array[Peca]) -> void:
 	pass
 
 # chamado pra cada quadradinho de cada linha, da esquerda pra direita, ANTES de os
@@ -50,4 +50,14 @@ func ao_pontuar(_contexto: ContextoPontuacao) -> void:
 
 # chamado quando o jogador dá hold. Recebe a peça que ficou armazenada
 func ao_armazenar_peca(_peca_armazenada: Peca) -> void:
+	pass
+
+# chamado quando a peça trava, ANTES de os quadradinhos dela serem registrados no tabuleiro.
+# Use pra guardar bônus nos quadradinhos da peça (travamento.adicionar_pontos_por_bloco)
+func ao_travar_peca(_travamento: TravamentoDePeca) -> void:
+	pass
+
+# chamado todo quadro enquanto uma peça está em jogo. Use pra efeitos baseados em tempo
+# (contexto.delta em segundos reais). Pedidos ao jogo são feitos pelos métodos do contexto
+func ao_passar_tempo(_contexto: ContextoDeTempo) -> void:
 	pass

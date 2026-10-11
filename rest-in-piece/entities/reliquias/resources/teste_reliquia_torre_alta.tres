@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="ReliquiaTorreAlta" format=3 uid="uid://bug53qghwf2uq"]
+
+[ext_resource type="Script" uid="uid://d0n1k7yerjoch" path="res://entities/reliquias/scripts/reliquia_torre_alta.gd" id="1_b543x"]
+
+[resource]
+script = ExtResource("1_b543x")
+metadata/_custom_type_script = "uid://d0n1k7yerjoch"

@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="ReliquiaFixacaoResistente" format=3 uid="uid://bkg3x8ee74wbf"]
 
-[ext_resource type="Script" uid="uid://bvsr01ivdaxf7" path="res://entities/reliquias/reliquia_fixacao_resistente.gd" id="1_ivg5b"]
+[ext_resource type="Script" uid="uid://bvsr01ivdaxf7" path="res://entities/reliquias/scripts/reliquia_fixacao_resistente.gd" id="1_ivg5b"]
 
 [resource]
 script = ExtResource("1_ivg5b")

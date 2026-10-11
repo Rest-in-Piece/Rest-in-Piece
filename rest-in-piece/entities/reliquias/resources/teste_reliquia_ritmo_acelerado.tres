@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="ReliquiaRitmoAcelerado" format=3 uid="uid://bt4olj5i6cv4c"]
+
+[ext_resource type="Script" uid="uid://3lvts85edlbn" path="res://entities/reliquias/scripts/reliquia_ritmo_acelerado.gd" id="1_jffpl"]
+
+[resource]
+script = ExtResource("1_jffpl")
+metadata/_custom_type_script = "uid://3lvts85edlbn"

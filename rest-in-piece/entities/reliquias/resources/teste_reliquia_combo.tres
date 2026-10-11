@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="ReliquiaCombo" format=3 uid="uid://bwadiqljpft21"]
+
+[ext_resource type="Script" uid="uid://djynh3fp1h2jn" path="res://entities/reliquias/scripts/reliquia_combo.gd" id="1_m2x7o"]
+
+[resource]
+script = ExtResource("1_m2x7o")
+metadata/_custom_type_script = "uid://djynh3fp1h2jn"

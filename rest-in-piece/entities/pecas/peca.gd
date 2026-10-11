@@ -48,3 +48,12 @@ func obter_pontos_por_bloco() -> int:
 
 func obter_multiplicador_por_bloco() -> float:
 	return multiplicador_por_bloco + multiplicador_extra
+
+
+# cópia independente da peça, mantendo os buffs permanentes (o duplicate() sozinho não
+# copia variáveis sem @export)
+func criar_copia() -> Peca:
+	var copia := duplicate() as Peca
+	copia.pontos_extras = pontos_extras
+	copia.multiplicador_extra = multiplicador_extra
+	return copia

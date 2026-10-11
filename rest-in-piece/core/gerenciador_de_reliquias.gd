@@ -43,9 +43,9 @@ func aplicar_regras(regras: RegrasJogo):
 	for reliquia in reliquias:
 		reliquia.modificar_regras(regras)
 
-func aplicar_pecas_sorteaveis(pecas: Array[Peca]):
+func aplicar_pecas_do_saco(pecas: Array[Peca]):
 	for reliquia in reliquias:
-		reliquia.modificar_pecas_sorteaveis(pecas)
+		reliquia.modificar_pecas_do_saco(pecas)
 
 func processar_armazenamento(peca_armazenada: Peca):
 	for reliquia in reliquias:
@@ -67,6 +67,13 @@ func processar_pontuacao(contexto: ContextoPontuacao):
 		if contexto.ativou_reliquia:
 			AutoBus.reliquia_ativada.emit(reliquia)
 
+func processar_travamento(travamento: TravamentoDePeca):
+	for reliquia in reliquias:
+		travamento.ativou_reliquia = false
+		reliquia.ao_travar_peca(travamento)
+		
+		if travamento.ativou_reliquia:
+			AutoBus.reliquia_ativada.emit(reliquia)
 
 func _processar_blocos_da_linha(contexto: ContextoPontuacao, linha: LinhaPontuada):
 	for bloco in linha.blocos:
@@ -97,4 +104,13 @@ func _processar_linha(contexto: ContextoPontuacao, linha: LinhaPontuada):
 		
 		var alterou_linha: bool = linha.pontos != pontos_antes or linha.zerada != estava_zerada
 		if alterou_linha or contexto.ativou_reliquia:
+			AutoBus.reliquia_ativada.emit(reliquia)
+
+
+func processar_tempo(contexto: ContextoDeTempo):
+	for reliquia in reliquias:
+		contexto.ativou_reliquia = false
+		reliquia.ao_passar_tempo(contexto)
+		
+		if contexto.ativou_reliquia:
 			AutoBus.reliquia_ativada.emit(reliquia)

@@ -13,6 +13,7 @@ signal peca_armazenada_alterada(peca: Peca, atlas_coords: Vector2i)
 signal spin_realizado(tipo_spin: String)
 signal linhas_destruidas(linhas: Array[LinhaPontuada])
 signal peca_travada(peca: Peca, casas_hard_drop: int)
+signal peca_travando(travamento: TravamentoDePeca)
 
 @export var pecas: Array[Peca]
 
@@ -20,13 +21,26 @@ signal peca_travada(peca: Peca, casas_hard_drop: int)
 const COLUNAS : int = 10
 const LINHAS : int = 20
 
+const FPS_REFERENCIA: float = 60.0
+const DELTA_MAXIMO: float = 0.1
+const ETAPAS_QUEDA_RAPIDA: float = 10.0
+const ETAPAS_FIXACAO_QUEDA_RAPIDA: float = 5.0
+
 # variaveis de movimentação
-const direcoes := [Vector2i.LEFT, Vector2i.RIGHT, Vector2i.DOWN]
-var etapas : Array  # quando etapas == total_etapas, realiza o movimento
 const total_etapas : int = 50
+var etapas_queda: float = 0.0  # quando chega em total_etapas, a peça desce uma casa
 var pos_inicial := Vector2i(5, 2)
 var pos_atual : Vector2i
 var velocidade : float
+
+# movimento lateral (em segundos reais, não depende do FPS)
+const ATRASO_DESLOCAMENTO_LATERAL: float = 0.17
+const INTERVALO_INICIAL_DESLOCAMENTO: float = 0.09
+const INTERVALO_MINIMO_DESLOCAMENTO: float = 0.03
+const FATOR_ACELERACAO_DESLOCAMENTO: float = 0.85
+var direcao_lateral: Vector2i = Vector2i.ZERO  # ZERO = nenhuma tecla lateral ativa
+var tempo_ate_proximo_deslocamento: float = 0.0
+var intervalo_deslocamento_atual: float = INTERVALO_INICIAL_DESLOCAMENTO
 
 # variaveis de delay para fixar a peça (os totais vêm do RegrasJogo)
 var etapas_fixacao: float = 0.0
@@ -35,7 +49,6 @@ var resets_fixacao: int = 0
 var max_resets_fixacao: int
 
 # variaveis das peças no jogo
-var pecas_sorteaveis: Array[Peca] = []
 var peca: Peca
 var prox_peca: Peca
 var indice_rotacao : int = 0
@@ -69,32 +82,42 @@ func _process(delta: float) -> void:
 	if not jogo_rodando:
 		return
 	
-	_processar_inputs()
+	# AQUI
+	var delta_limitado: float = minf(delta, DELTA_MAXIMO)
+	var passo_tempo: float = delta_limitado * FPS_REFERENCIA
+	
+	# AQUI
+	_processar_movimento_lateral(delta_limitado)
+	_processar_inputs(passo_tempo)
+	
+	# um input pode ter travado a peça e causado game over
+	if not jogo_rodando:
+		return
 	
 	if not pode_mover(Vector2i.DOWN):
-		etapas_fixacao += velocidade
+		etapas_fixacao += velocidade * passo_tempo
 		if etapas_fixacao >= total_etapas_fixacao:
 			travar_peca()
 	else:
-		etapas[2] += velocidade   # queda com o passar do tempo
+		# AQUI
+		etapas_queda += velocidade * passo_tempo
 	
-	# mover a peça
-	for i in range(etapas.size()):
-		if etapas[i] >= total_etapas:
-			mover_peca(direcoes[i])
-			etapas[i] = 0
+	# a sobra é mantida em vez de perdida
+	# AQUI
+	if etapas_queda >= total_etapas:
+		mover_peca(Vector2i.DOWN)
+		etapas_queda -= total_etapas
 
 
 func novo_jogo():
 	jogo_rodando = true
-	etapas = [0, 0, 0] #0 esquerda #1 direita #2 baixo
+	etapas_queda = 0.0
+	_parar_movimento_lateral()
 	
-	if pecas_do_saco.is_empty():
-		pecas_do_saco = pecas.duplicate()
+	assert(not pecas_do_saco.is_empty(), "o GameManager precisa definir pecas_do_saco antes de novo_jogo")
 	
 	jogo_iniciado.emit()
-	limpar_peca()
-	# limpar_grid()  AQUI DESCOMENTAR
+	#limpar_grid() # AQUI DESCOMENTAR
 	
 	saco_atual = pecas_do_saco.duplicate()
 	peca = seleciona_uma_peca()
@@ -128,15 +151,12 @@ func obter_rotacoes(peca: Peca) -> Array:
 	return [a["0"], a["90"], a["180"], a["270"]]
 
 
-func _processar_inputs():
-	if Input.is_action_pressed("mover_esquerda"):
-		etapas[0] += 10
-	if Input.is_action_pressed("mover_direita"):
-		etapas[1] += 10
+func _processar_inputs(passo_tempo: float):
 	if Input.is_action_pressed("acelerar_queda"):
-		etapas[2] += 10
+		# AQUI
+		etapas_queda += ETAPAS_QUEDA_RAPIDA * passo_tempo
 		if not pode_mover(Vector2i.DOWN):
-			etapas_fixacao += 5.0
+			etapas_fixacao += ETAPAS_FIXACAO_QUEDA_RAPIDA * passo_tempo
 	if Input.is_action_just_pressed("cair_imediatamente"):
 		cair_imediatamente(false)
 	if Input.is_action_just_pressed("posicionar_imediatamente"):
@@ -150,10 +170,59 @@ func _processar_inputs():
 	
 	# ISSO É SÓ PRA FACILITAR OS TESTES
 	if Input.is_action_just_pressed("debug_sortear_nova_peca"):
-			limpar_peca()
-			peca = seleciona_uma_peca()
-			peca_atlas = peca.coords_no_atlas
-			criar_peca()
+		limpar_peca()
+		peca = seleciona_uma_peca()
+		peca_atlas = peca.coords_no_atlas
+		criar_peca()
+
+
+# AQUI
+func _processar_movimento_lateral(delta_segundos: float):
+	var esquerda_pressionada: bool = Input.is_action_pressed("mover_esquerda")
+	var direita_pressionada: bool = Input.is_action_pressed("mover_direita")
+	
+	# a direção apertada por último tem prioridade
+	if Input.is_action_just_pressed("mover_esquerda"):
+		_iniciar_movimento_lateral(Vector2i.LEFT, true)
+	elif Input.is_action_just_pressed("mover_direita"):
+		_iniciar_movimento_lateral(Vector2i.RIGHT, true)
+	
+	# soltou a direção atual: continua na outra, se ela ainda estiver pressionada
+	if direcao_lateral == Vector2i.LEFT and not esquerda_pressionada:
+		_parar_movimento_lateral()
+		if direita_pressionada:
+			_iniciar_movimento_lateral(Vector2i.RIGHT, false)
+	elif direcao_lateral == Vector2i.RIGHT and not direita_pressionada:
+		_parar_movimento_lateral()
+		if esquerda_pressionada:
+			_iniciar_movimento_lateral(Vector2i.LEFT, false)
+	
+	if direcao_lateral == Vector2i.ZERO:
+		return
+	
+	# o while garante o ritmo correto mesmo se um quadro demorar mais que um intervalo
+	tempo_ate_proximo_deslocamento -= delta_segundos
+	while tempo_ate_proximo_deslocamento <= 0.0:
+		mover_peca(direcao_lateral)
+		tempo_ate_proximo_deslocamento += intervalo_deslocamento_atual
+		intervalo_deslocamento_atual = maxf(
+				intervalo_deslocamento_atual * FATOR_ACELERACAO_DESLOCAMENTO,
+				INTERVALO_MINIMO_DESLOCAMENTO)
+
+
+# AQUI
+func _iniciar_movimento_lateral(direcao: Vector2i, mover_agora: bool):
+	direcao_lateral = direcao
+	tempo_ate_proximo_deslocamento = ATRASO_DESLOCAMENTO_LATERAL
+	intervalo_deslocamento_atual = INTERVALO_INICIAL_DESLOCAMENTO
+	
+	if mover_agora:
+		mover_peca(direcao)
+
+
+# AQUI
+func _parar_movimento_lateral():
+	direcao_lateral = Vector2i.ZERO
 
 
 func armazenar_peca_atual():
@@ -181,10 +250,13 @@ func armazenar_peca_atual():
 
 
 func criar_peca():
-	etapas = [0, 0, 0]
+	etapas_queda = 0.0
 	etapas_fixacao = 0.0
 	resets_fixacao = 0
 	casas_descidas_hard_drop = 0
+	# se a tecla continuar pressionada na peça seguinte, o deslocamento segue sem a pausa
+	# inicial, mas recomeça na velocidade lenta (evita a peça nova "voar" até a parede)
+	intervalo_deslocamento_atual = INTERVALO_INICIAL_DESLOCAMENTO
 	
 	pos_atual = pos_inicial
 	indice_rotacao = 0
@@ -266,7 +338,13 @@ func mover_peca(direcao):
 func travar_peca():
 	avaliar_spin()
 	
-	registrar_blocos_da_peca()
+	# as relíquias podem guardar bônus nos quadradinhos antes de eles serem registrados
+	var travamento := TravamentoDePeca.new()
+	travamento.peca = peca
+	travamento.casas_hard_drop = casas_descidas_hard_drop
+	peca_travando.emit(travamento)
+	
+	registrar_blocos_da_peca(travamento)
 	identificar_e_tratar_linhas_completas()
 	
 	peca_travada.emit(peca, casas_descidas_hard_drop)
@@ -279,6 +357,10 @@ func travar_peca():
 	
 	proxima_peca_sorteada.emit(prox_peca, prox_peca_atlas)
 	criar_peca()
+
+func registrar_blocos_da_peca(travamento: TravamentoDePeca):
+	for deslocamento in peca_ativa:
+		blocos_fixados[pos_atual + deslocamento] = BlocoFixado.criar_a_partir_da_peca(peca, travamento)
 
 
 func avaliar_spin():
@@ -368,11 +450,12 @@ func posicao_esta_livre(posicao):
 	return get_cell_source_id(posicao) == -1
 
 
-func cair_imediatamente(posicionar_imediatamente):
+func cair_imediatamente(posicionar_imediatamente: bool):
 	while pode_mover(Vector2i.DOWN):
-		etapas[2] = 0
 		mover_peca(Vector2i.DOWN)
 		casas_descidas_hard_drop += 1
+	
+	etapas_queda = 0.0
 	
 	if posicionar_imediatamente:
 		travar_peca()
@@ -406,6 +489,13 @@ func deslocar_linhas(linha):
 				set_cell(posicao_destino, tile_id, atlas)
 			
 			mover_dados_do_bloco(posicao_origem, posicao_destino)
+	
+	# a linha do topo não tem de onde copiar, então precisa ser esvaziada
+	for j in range(COLUNAS):
+		var posicao_topo := Vector2i(j + 1, 1)
+		erase_cell(posicao_topo)
+		blocos_fixados.erase(posicao_topo)
+
 
 func limpar_grid():
 	blocos_fixados.clear()
@@ -419,11 +509,6 @@ func aplicar_regras(regras: RegrasJogo):
 	velocidade = regras.velocidade
 	total_etapas_fixacao = regras.total_etapas_fixacao
 	max_resets_fixacao = regras.max_resets_fixacao
-
-
-func registrar_blocos_da_peca():
-	for deslocamento in peca_ativa:
-		blocos_fixados[pos_atual + deslocamento] = BlocoFixado.criar_a_partir_da_peca(peca)
 
 
 func linha_esta_completa(linha: int) -> bool:
@@ -450,3 +535,32 @@ func criar_linha_pontuada(linha: int) -> LinhaPontuada:
 		linha_pontuada.blocos.append(BlocoPontuado.criar_a_partir_do_bloco_fixado(posicao, bloco_fixado))
 	
 	return linha_pontuada
+
+
+# troca a peça em jogo por outra, mantendo posição e rotação. Não conta como spin
+# AQUI
+func substituir_peca_atual(nova_peca: Peca) -> bool:
+	var DESLOCAMENTOS_SUBSTITUICAO := [   # AQUI APAGAR
+		Vector2i.ZERO, Vector2i.LEFT, Vector2i.RIGHT, Vector2i.UP, Vector2i(-2, 0), Vector2i(2, 0)
+	]
+	
+	if not jogo_rodando:
+		return false
+	
+	var nova_forma: Array = obter_rotacoes(nova_peca)[indice_rotacao]
+	
+	for deslocamento in DESLOCAMENTOS_SUBSTITUICAO:
+		if not pode_rotacionar(nova_forma, deslocamento):
+			continue
+		
+		limpar_peca()
+		peca = nova_peca
+		peca_atlas = nova_peca.coords_no_atlas
+		peca_ativa = nova_forma
+		pos_atual += deslocamento
+		desenhar_peca(peca_ativa, pos_atual, peca_atlas)
+		
+		ultima_acao_foi_rotacao = false
+		return true
+	
+	return false

@@ -92,6 +92,17 @@ text = "0"
 horizontal_alignment = 1
 vertical_alignment = 1
 
+[node name="LabelPecas" type="Label" parent="." unique_id=1056268082]
+unique_name_in_owner = true
+offset_left = 1527.0
+offset_top = 555.0
+offset_right = 1567.0
+offset_bottom = 643.0
+theme_override_font_sizes/font_size = 48
+text = "0"
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [node name="Perdeu" type="Label" parent="." unique_id=1367725232]
 visible = false
 offset_left = 834.0
@@ -100,6 +111,17 @@ offset_right = 1073.0
 offset_bottom = 622.0
 theme_override_font_sizes/font_size = 26
 text = "Você Perdeu!"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Venceu" type="Label" parent="." unique_id=1163786332]
+visible = false
+offset_left = 834.0
+offset_top = 564.0
+offset_right = 1073.0
+offset_bottom = 622.0
+theme_override_font_sizes/font_size = 26
+text = "Você venceu a fase!"
 horizontal_alignment = 1
 vertical_alignment = 1
 

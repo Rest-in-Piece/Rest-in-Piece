@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="ReliquiaMultiplicadorSpin" format=3 uid="uid://dnlkfvxu7q45c"]
 
-[ext_resource type="Script" uid="uid://btkp103mmksgw" path="res://entities/reliquias/reliquia_mult_spin.gd" id="1_spinr"]
+[ext_resource type="Script" uid="uid://btkp103mmksgw" path="res://entities/reliquias/scripts/reliquia_mult_spin.gd" id="1_spinr"]
 
 [resource]
 script = ExtResource("1_spinr")
