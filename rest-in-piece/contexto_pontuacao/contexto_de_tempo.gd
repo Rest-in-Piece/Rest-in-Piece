@@ -10,6 +10,7 @@ extends RefCounted
 var delta: float = 0.0  # segundos reais desde o último quadro
 var peca_atual: Peca
 var pecas_do_saco: Array[Peca] = []
+var peca_apoiada: bool = false  # true quando a peça está encostada no chão ou em outra peça
 
 # pedidos (o GameManager aplica depois dos hooks)
 var candidatas_substituicao: Array[Peca] = []

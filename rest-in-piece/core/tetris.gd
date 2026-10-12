@@ -82,11 +82,9 @@ func _process(delta: float) -> void:
 	if not jogo_rodando:
 		return
 	
-	# AQUI
 	var delta_limitado: float = minf(delta, DELTA_MAXIMO)
 	var passo_tempo: float = delta_limitado * FPS_REFERENCIA
 	
-	# AQUI
 	_processar_movimento_lateral(delta_limitado)
 	_processar_inputs(passo_tempo)
 	
@@ -99,11 +97,9 @@ func _process(delta: float) -> void:
 		if etapas_fixacao >= total_etapas_fixacao:
 			travar_peca()
 	else:
-		# AQUI
 		etapas_queda += velocidade * passo_tempo
 	
 	# a sobra é mantida em vez de perdida
-	# AQUI
 	if etapas_queda >= total_etapas:
 		mover_peca(Vector2i.DOWN)
 		etapas_queda -= total_etapas
@@ -153,7 +149,6 @@ func obter_rotacoes(peca: Peca) -> Array:
 
 func _processar_inputs(passo_tempo: float):
 	if Input.is_action_pressed("acelerar_queda"):
-		# AQUI
 		etapas_queda += ETAPAS_QUEDA_RAPIDA * passo_tempo
 		if not pode_mover(Vector2i.DOWN):
 			etapas_fixacao += ETAPAS_FIXACAO_QUEDA_RAPIDA * passo_tempo
@@ -175,8 +170,11 @@ func _processar_inputs(passo_tempo: float):
 		peca_atlas = peca.coords_no_atlas
 		criar_peca()
 
+func parar_jogo():
+	jogo_rodando = false
+	_parar_movimento_lateral()
 
-# AQUI
+
 func _processar_movimento_lateral(delta_segundos: float):
 	var esquerda_pressionada: bool = Input.is_action_pressed("mover_esquerda")
 	var direita_pressionada: bool = Input.is_action_pressed("mover_direita")
@@ -210,7 +208,6 @@ func _processar_movimento_lateral(delta_segundos: float):
 				INTERVALO_MINIMO_DESLOCAMENTO)
 
 
-# AQUI
 func _iniciar_movimento_lateral(direcao: Vector2i, mover_agora: bool):
 	direcao_lateral = direcao
 	tempo_ate_proximo_deslocamento = ATRASO_DESLOCAMENTO_LATERAL
@@ -220,7 +217,6 @@ func _iniciar_movimento_lateral(direcao: Vector2i, mover_agora: bool):
 		mover_peca(direcao)
 
 
-# AQUI
 func _parar_movimento_lateral():
 	direcao_lateral = Vector2i.ZERO
 
@@ -348,6 +344,9 @@ func travar_peca():
 	identificar_e_tratar_linhas_completas()
 	
 	peca_travada.emit(peca, casas_descidas_hard_drop)
+	
+	if not jogo_rodando:
+		return
 	
 	pode_armazenar = true
 	peca = prox_peca
@@ -538,9 +537,8 @@ func criar_linha_pontuada(linha: int) -> LinhaPontuada:
 
 
 # troca a peça em jogo por outra, mantendo posição e rotação. Não conta como spin
-# AQUI
 func substituir_peca_atual(nova_peca: Peca) -> bool:
-	var DESLOCAMENTOS_SUBSTITUICAO := [   # AQUI APAGAR
+	var DESLOCAMENTOS_SUBSTITUICAO := [
 		Vector2i.ZERO, Vector2i.LEFT, Vector2i.RIGHT, Vector2i.UP, Vector2i(-2, 0), Vector2i(2, 0)
 	]
 	

@@ -14,11 +14,9 @@ var fichas: float = 0.0
 var multiplicador: float = 1.0
 
 # peças somadas ao limite da fase por efeitos desta jogada (o GameManager aplica)
-# AQUI
 var pecas_extras: int = 0
 
 # uma jogada zerada ignora qualquer ganho posterior (como a LinhaPontuada)
-# AQUI
 var zerado: bool = false
 
 # usado pelo gerenciador pra saber se a relíquia atual participou da pontuação
@@ -30,32 +28,27 @@ var linhas_destruidas: int:
 
 
 func adicionar_fichas(valor: float):
-	# AQUI
 	if zerado:
 		return
 	fichas += valor
 	ativou_reliquia = true
 
 func adicionar_multiplicador(valor: float):
-	# AQUI
 	if zerado:
 		return
 	multiplicador += valor
 	ativou_reliquia = true
 
 func multiplicar_multiplicador(fator: float):
-	# AQUI
 	if zerado:
 		return
 	multiplicador *= fator
 	ativou_reliquia = true
 
-# AQUI
 func adicionar_pecas_extras(quantidade: int):
 	pecas_extras += quantidade
 	ativou_reliquia = true
 
-# AQUI
 func zerar():
 	fichas = 0.0
 	zerado = true

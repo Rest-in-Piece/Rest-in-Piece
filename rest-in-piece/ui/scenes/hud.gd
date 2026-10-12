@@ -7,11 +7,9 @@ extends CanvasLayer
 signal solicitou_novo_jogo
 
 @onready var label_perdeu: Label = $Perdeu
-# AQUI
 @onready var label_venceu: Label = $Venceu
 @onready var label_pontuacao: Label = %LabelPontuação
 @onready var label_meta: Label = %LabelMeta
-# AQUI
 @onready var label_pecas: Label = %LabelPecas
 @onready var botao_novo_jogo: Button = $"Botão novo jogo"
 @onready var tile_map_proxima_peca: TileMapLayer = $ProximaPecaTileMap
@@ -19,10 +17,8 @@ signal solicitou_novo_jogo
 
 
 func _ready() -> void:
-	# AQUI
 	botao_novo_jogo.pressed.connect(_on_botao_novo_jogo_pressed)
 
-# AQUI
 func _on_botao_novo_jogo_pressed():
 	solicitou_novo_jogo.emit()
 
@@ -32,11 +28,9 @@ func atualizar_pontuacao(valor: int):
 func atualizar_meta(valor: int):
 	label_meta.text = str(valor)
 
-# AQUI
 func atualizar_pecas(posicionadas: int, maximas: int):
 	label_pecas.text = "%d / %d" % [posicionadas, maximas]
 
-# AQUI
 func esconder_telas_de_fim():
 	label_perdeu.hide()
 	label_venceu.hide()
@@ -46,7 +40,6 @@ func mostrar_tela_derrota():
 	label_perdeu.show()
 	botao_novo_jogo.show()
 
-# AQUI
 func mostrar_tela_vitoria():
 	label_venceu.show()
 	botao_novo_jogo.show()

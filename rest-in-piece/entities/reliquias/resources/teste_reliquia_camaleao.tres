@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="ReliquiaCamaleao" format=3 uid="uid://cq88sffr85rka"]
+
+[ext_resource type="Script" uid="uid://c2hy7fbhnwdhf" path="res://entities/reliquias/scripts/reliquia_camaleao.gd" id="1_snqnn"]
+
+[resource]
+script = ExtResource("1_snqnn")
+metadata/_custom_type_script = "uid://c2hy7fbhnwdhf"

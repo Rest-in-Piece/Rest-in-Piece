@@ -23,6 +23,11 @@ func ao_passar_tempo(contexto: ContextoDeTempo) -> void:
 	if intervalo_em_segundos <= 0.0:
 		return
 	
+	# o tempo não corre enquanto a peça está apoiada: evita transformar a peça entre o
+	# hard drop e a fixação
+	if contexto.peca_apoiada:
+		return
+	
 	segundos_acumulados += contexto.delta
 	if segundos_acumulados < intervalo_em_segundos:
 		return

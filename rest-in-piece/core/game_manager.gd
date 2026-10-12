@@ -21,20 +21,17 @@ var velocidade_atual: float = 1.0
 var gerenciador_reliquias: GerenciadorDeReliquias = GerenciadorDeReliquias.new()
 
 # regras em vigor (Fase + relíquias), recriadas em _aplicar_regras
-# AQUI
 var regras_atuais: RegrasJogo
 
 # peças que o jogador possui na partida. Cada elemento é uma CÓPIA, pra que buffs
 # permanentes de uma peça não afetem as outras do mesmo tipo (nem o arquivo .tres)
 var bolsa_de_pecas: Array[Peca] = []
 # a bolsa depois de as relíquias alterarem uma cópia (de onde o tabuleiro sorteia)
-# AQUI
 var pecas_do_saco_atual: Array[Peca] = []
 
 var peca_armazenada: Peca
 
 # limite de peças da fase
-# AQUI
 var pecas_posicionadas: int = 0
 var pecas_extras_da_partida: int = 0  # somadas ao limite por efeitos (ex: relíquias)
 
@@ -67,6 +64,7 @@ func _process(delta: float):
 	contexto.delta = delta
 	contexto.peca_atual = tabuleiro.peca
 	contexto.pecas_do_saco = pecas_do_saco_atual
+	contexto.peca_apoiada = not tabuleiro.pode_mover(Vector2i.DOWN)
 	
 	gerenciador_reliquias.processar_tempo(contexto)
 	
@@ -91,7 +89,6 @@ func iniciar_novo_jogo():
 	linhas_pendentes = []
 	tipo_spin_pendente = ""
 	peca_armazenada = null
-	# AQUI
 	pecas_posicionadas = 0
 	pecas_extras_da_partida = 0
 	
@@ -116,7 +113,6 @@ func iniciar_novo_jogo():
 
 
 # monta as regras em vigor (Fase + relíquias) e entrega pro tabuleiro
-# AQUI
 func _aplicar_regras():
 	regras_atuais = RegrasJogo.criar_a_partir_da_fase(fase, velocidade_atual)
 	gerenciador_reliquias.aplicar_regras(regras_atuais)
@@ -138,13 +134,10 @@ func adicionar_peca_a_bolsa(peca: Peca, copias: int = 1):
 
 
 func obter_pecas_maximas() -> int:
-	return true
-	#return regras_atuais.pecas_maximas + pecas_extras_da_partida
+	return regras_atuais.pecas_maximas + pecas_extras_da_partida
 
-# AQUI
 func _atualizar_hud_pecas():
-	pass
-	#hud.atualizar_pecas(pecas_posicionadas, obter_pecas_maximas())
+	hud.atualizar_pecas(pecas_posicionadas, obter_pecas_maximas())
 
 
 func _on_linhas_destruidas(linhas: Array[LinhaPontuada]):
@@ -193,7 +186,6 @@ func _on_peca_travada(peca: Peca, casas_hard_drop: int):
 		hud.atualizar_meta(meta)
 	
 	# o limite é verificado DEPOIS da pontuação, que pode conceder peças extras
-	# AQUI
 	pecas_posicionadas += 1
 	pecas_extras_da_partida += contexto.pecas_extras
 	_atualizar_hud_pecas()
@@ -204,7 +196,6 @@ func _on_peca_travada(peca: Peca, casas_hard_drop: int):
 
 # todo spin concede um bônus base, com ou sem relíquias e com ou sem linhas destruídas.
 # É aplicado ANTES das relíquias, pra que elas ampliem o bônus
-# AQUI
 func _aplicar_bonus_base_de_spin(contexto: ContextoPontuacao):
 	if not contexto.teve_spin():
 		return
@@ -228,8 +219,8 @@ func _on_fim_de_jogo():
 # o limite de peças acabou e todas as pontuações já foram resolvidas. A fase é vencida se
 # a meta DA FASE foi atingida (a variável "meta" dobra durante a partida, então não serve
 # pra essa comparação). Caso contrário, é derrota
-# AQUI
 func _resolver_fim_do_limite_de_pecas():
+	print("LIMITE: posicionadas=", pecas_posicionadas, " maximas=", obter_pecas_maximas(), " pontuacao=", pontuacao, " meta_fase=", fase.meta)
 	tabuleiro.parar_jogo()
 	
 	if pontuacao >= fase.meta:
@@ -238,12 +229,10 @@ func _resolver_fim_do_limite_de_pecas():
 		_perder_partida()
 
 
-# AQUI
 func _concluir_fase():
 	hud.mostrar_tela_vitoria()
 	AutoBus.fase_concluida.emit(pontuacao)
 
-# AQUI
 func _perder_partida():
 	hud.mostrar_tela_derrota()
 	AutoBus.partida_perdida.emit(pontuacao)
