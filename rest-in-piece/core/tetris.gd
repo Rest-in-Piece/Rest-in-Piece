@@ -14,6 +14,7 @@ signal spin_realizado(tipo_spin: String)
 signal linhas_destruidas(linhas: Array[LinhaPontuada])
 signal peca_travada(peca: Peca, casas_hard_drop: int)
 signal peca_travando(travamento: TravamentoDePeca)
+signal blocos_quebrados(quantidade: int)
 
 @export var pecas: Array[Peca]
 
@@ -340,6 +341,7 @@ func travar_peca():
 	travamento.casas_hard_drop = casas_descidas_hard_drop
 	peca_travando.emit(travamento)
 	
+	_envelhecer_blocos_fixados()   # NOVO: antes de registrar, pra peça nova não envelhecer já na própria trava
 	registrar_blocos_da_peca(travamento)
 	identificar_e_tratar_linhas_completas()
 	
@@ -356,6 +358,8 @@ func travar_peca():
 	
 	proxima_peca_sorteada.emit(prox_peca, prox_peca_atlas)
 	criar_peca()
+	
+
 
 func registrar_blocos_da_peca(travamento: TravamentoDePeca):
 	for deslocamento in peca_ativa:
@@ -562,3 +566,28 @@ func substituir_peca_atual(nova_peca: Peca) -> bool:
 		return true
 	
 	return false
+
+func _envelhecer_blocos_fixados():
+	
+	var quebrados: Array[Vector2i] = []
+	
+	for posicao in blocos_fixados:
+		var bloco: BlocoFixado = blocos_fixados[posicao]
+		if bloco.durabilidade < 0:
+			continue
+		bloco.durabilidade -= 1
+		if bloco.durabilidade <= 0:
+			quebrados.append(posicao)
+			continue
+	
+		var atlas: Vector2i = bloco.obter_atlas_do_estagio()
+		if atlas != Vector2i(-1, -1) and atlas != get_cell_atlas_coords(posicao):
+			set_cell(posicao, tile_id, atlas)
+	
+	# apagar só depois do laço, porque não dá pra remover do dicionário enquanto ele é percorrido
+	for posicao in quebrados:
+		erase_cell(posicao)
+		blocos_fixados.erase(posicao)
+	
+	if not quebrados.is_empty():
+		blocos_quebrados.emit(quebrados.size())
