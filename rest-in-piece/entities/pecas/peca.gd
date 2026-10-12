@@ -14,8 +14,8 @@ extends Resource
 @export var pontos_por_bloco: int = 10
 @export var multiplicador_por_bloco: float = 1.0
 
-## quantas peças travadas o bloco aguenta antes de quebrar (0 = nunca quebra)
-@export var durabilidade_por_bloco: int = 0
+## quantos blocos NÃO-vidro empilhados acima o bloco aguenta antes de quebrar (0 = não é frágil)
+@export var resistencia_ao_peso_por_bloco: int = 0
 
 @export_category("Tabela SRS")
 @export_enum("T", "S", "Z", "J", "L", "I", "O") var tipo_peca: String

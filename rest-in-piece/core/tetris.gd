@@ -341,9 +341,9 @@ func travar_peca():
 	travamento.casas_hard_drop = casas_descidas_hard_drop
 	peca_travando.emit(travamento)
 	
-	_envelhecer_blocos_fixados()   # NOVO: antes de registrar, pra peça nova não envelhecer já na própria trava
 	registrar_blocos_da_peca(travamento)
 	identificar_e_tratar_linhas_completas()
+	_atualizar_pressao_dos_blocos_frageis()
 	
 	peca_travada.emit(peca, casas_descidas_hard_drop)
 	
@@ -567,27 +567,37 @@ func substituir_peca_atual(nova_peca: Peca) -> bool:
 	
 	return false
 
-func _envelhecer_blocos_fixados():
-	
+func _atualizar_pressao_dos_blocos_frageis():
 	var quebrados: Array[Vector2i] = []
 	
 	for posicao in blocos_fixados:
 		var bloco: BlocoFixado = blocos_fixados[posicao]
-		if bloco.durabilidade < 0:
+		if not bloco.eh_fragil():
 			continue
-		bloco.durabilidade -= 1
-		if bloco.durabilidade <= 0:
+		
+		bloco.pressao = maxi(bloco.pressao, _contar_peso_acima(posicao))
+		
+		if bloco.pressao >= bloco.resistencia:
 			quebrados.append(posicao)
 			continue
-	
+		
 		var atlas: Vector2i = bloco.obter_atlas_do_estagio()
 		if atlas != Vector2i(-1, -1) and atlas != get_cell_atlas_coords(posicao):
 			set_cell(posicao, tile_id, atlas)
 	
-	# apagar só depois do laço, porque não dá pra remover do dicionário enquanto ele é percorrido
 	for posicao in quebrados:
 		erase_cell(posicao)
 		blocos_fixados.erase(posicao)
 	
 	if not quebrados.is_empty():
 		blocos_quebrados.emit(quebrados.size())
+
+
+# a linha 1 é o topo, então "acima" significa y menor
+func _contar_peso_acima(posicao: Vector2i) -> int:
+	var total: int = 0
+	for y in range(1, posicao.y):
+		var outro: BlocoFixado = blocos_fixados.get(Vector2i(posicao.x, y))
+		if outro != null and not outro.eh_fragil():
+			total += 1
+	return total
