@@ -343,7 +343,7 @@ func travar_peca():
 	
 	registrar_blocos_da_peca(travamento)
 	identificar_e_tratar_linhas_completas()
-	_atualizar_pressao_dos_blocos_frageis()
+	_quebrar_blocos_frageis_com_peso_acima()
 	
 	peca_travada.emit(peca, casas_descidas_hard_drop)
 	
@@ -567,37 +567,33 @@ func substituir_peca_atual(nova_peca: Peca) -> bool:
 	
 	return false
 
-func _atualizar_pressao_dos_blocos_frageis():
+# todo bloco frágil (vidro) quebra NA HORA se existir um bloco NÃO frágil acima dele, na
+# mesma coluna. Quebra todos os que estiverem nessa situação, não só o mais próximo.
+# A célula é liberada imediatamente (a lógica não espera); só a animação dura um pouco
+func _quebrar_blocos_frageis_com_peso_acima():
 	var quebrados: Array[Vector2i] = []
-	
+
 	for posicao in blocos_fixados:
 		var bloco: BlocoFixado = blocos_fixados[posicao]
-		if not bloco.eh_fragil():
-			continue
-		
-		bloco.pressao = maxi(bloco.pressao, _contar_peso_acima(posicao))
-		
-		if bloco.pressao >= bloco.resistencia:
+		if bloco.eh_fragil and _tem_bloco_solido_acima(posicao):
 			quebrados.append(posicao)
-			continue
-		
-		var atlas: Vector2i = bloco.obter_atlas_do_estagio()
-		if atlas != Vector2i(-1, -1) and atlas != get_cell_atlas_coords(posicao):
-			set_cell(posicao, tile_id, atlas)
-	
+
 	for posicao in quebrados:
+		var bloco: BlocoFixado = blocos_fixados[posicao]
+		var atlas_atual: Vector2i = get_cell_atlas_coords(posicao)
+
 		erase_cell(posicao)
 		blocos_fixados.erase(posicao)
-	
+		EfeitoQuebraVidro.tocar(self, tile_id, posicao, bloco.atlas_da_quebra, atlas_atual)
+
 	if not quebrados.is_empty():
 		blocos_quebrados.emit(quebrados.size())
 
 
 # a linha 1 é o topo, então "acima" significa y menor
-func _contar_peso_acima(posicao: Vector2i) -> int:
-	var total: int = 0
+func _tem_bloco_solido_acima(posicao: Vector2i) -> bool:
 	for y in range(1, posicao.y):
 		var outro: BlocoFixado = blocos_fixados.get(Vector2i(posicao.x, y))
-		if outro != null and not outro.eh_fragil():
-			total += 1
-	return total
+		if outro != null and not outro.eh_fragil:
+			return true
+	return false

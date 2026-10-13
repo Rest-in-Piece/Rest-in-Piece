@@ -4,7 +4,8 @@ extends Resource
 
 @export var nome: String = ""
 
-## tiles do atlas, do inteiro ao mais rachado. Vazio = o bloco não muda de visual
+## frames da animação de quebra do bloco, em ordem: o primeiro é o bloco inteiro e os
+## seguintes são as rachaduras. Vazio = o bloco só some, sem rachar
 @export var atlas_por_estagio_de_dano: Array[Vector2i] = []
 
 ## Utilizado pra definir o visual dessa peça. Pode olhar no TileSet a coord da cor que quer usar.
@@ -14,8 +15,9 @@ extends Resource
 @export var pontos_por_bloco: int = 10
 @export var multiplicador_por_bloco: float = 1.0
 
-## quantos blocos NÃO-vidro empilhados acima o bloco aguenta antes de quebrar (0 = não é frágil)
-@export var resistencia_ao_peso_por_bloco: int = 0
+## vidro: o bloco quebra IMEDIATAMENTE quando uma peça que não é frágil trava em algum
+## ponto acima dele, na mesma coluna
+@export var eh_fragil: bool = false
 
 @export_category("Tabela SRS")
 @export_enum("T", "S", "Z", "J", "L", "I", "O") var tipo_peca: String
