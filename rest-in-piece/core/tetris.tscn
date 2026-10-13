@@ -7,6 +7,7 @@
 [ext_resource type="PackedScene" uid="uid://b8dp7yalnfjlr" path="res://ui/scenes/hud.tscn" id="3_yo8nm"]
 [ext_resource type="Resource" uid="uid://cq88sffr85rka" path="res://entities/reliquias/resources/teste_reliquia_camaleao.tres" id="4_la0xn"]
 [ext_resource type="Resource" uid="uid://dnlkfvxu7q45c" path="res://entities/reliquias/resources/teste_reliquia_mult_spin.tres" id="5_la0xn"]
+[ext_resource type="Script" uid="uid://ckiembakjrs4n" path="res://entities/reliquias/scripts/reliquia_so_tetris.gd" id="4_la0xn"]
 [ext_resource type="Script" uid="uid://bpwodnk3jua2h" path="res://entities/pecas/peca.gd" id="9_kier8"]
 [ext_resource type="Resource" uid="uid://dguon0fxwequy" path="res://entities/pecas/peca_i.tres" id="10_2j0jo"]
 [ext_resource type="Resource" uid="uid://4lntf8xgftm2" path="res://levels/fase_1.tres" id="10_wlauo"]
@@ -16,6 +17,11 @@
 [ext_resource type="Resource" uid="uid://cc5u8vixjh3jd" path="res://entities/pecas/peca_s.tres" id="14_aril8"]
 [ext_resource type="Resource" uid="uid://b3gt607mbqwgt" path="res://entities/pecas/peca_t.tres" id="15_noosx"]
 [ext_resource type="Resource" uid="uid://c08uth3g2u3jr" path="res://entities/pecas/peca_z.tres" id="16_jtwxc"]
+[ext_resource type="Resource" uid="uid://cek1lfbokxf5q" path="res://entities/pecas/peca_vidro.tres" id="16_kier8"]
+
+[sub_resource type="Resource" id="Resource_uyiaa"]
+script = ExtResource("4_la0xn")
+metadata/_custom_type_script = "uid://ckiembakjrs4n"
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_uppkp"]
 texture = ExtResource("1_uppkp")
@@ -28,6 +34,9 @@ texture_region_size = Vector2i(32, 32)
 5:0/0 = 0
 6:0/0 = 0
 7:0/0 = 0
+8:0/0 = 0
+9:0/0 = 0
+10:0/0 = 0
 
 [sub_resource type="TileSet" id="TileSet_wvnxi"]
 tile_size = Vector2i(32, 32)
@@ -36,7 +45,7 @@ sources/0 = SubResource("TileSetAtlasSource_uppkp")
 [node name="GameManager" type="Node2D" unique_id=380485723]
 script = ExtResource("1_oismu")
 fase = ExtResource("10_wlauo")
-reliquias_iniciais = Array[ExtResource("3_wjvaw")]([ExtResource("4_la0xn"), ExtResource("5_la0xn")])
+reliquias_iniciais = Array[ExtResource("3_wjvaw")]([SubResource("Resource_uyiaa")])
 
 [node name="TabuleiroTileMap" type="TileMapLayer" parent="." unique_id=1250284640]
 z_index = 2
@@ -45,6 +54,6 @@ scale = Vector2(1.28, 1.28)
 tile_map_data = PackedByteArray("AAAAAAAAAAAHAAAAAAAAAAEAAAAHAAAAAAAAAAIAAAAHAAAAAAAAAAMAAAAHAAAAAAAAAAQAAAAHAAAAAAAAAAUAAAAHAAAAAAAAAAYAAAAHAAAAAAAAAAcAAAAHAAAAAAAAAAgAAAAHAAAAAAAAAAkAAAAHAAAAAAAAAAoAAAAHAAAAAAAAAAsAAAAHAAAAAAAAAAwAAAAHAAAAAAAAAA0AAAAHAAAAAAAAAA4AAAAHAAAAAAAAAA8AAAAHAAAAAAAAABAAAAAHAAAAAAAAABEAAAAHAAAAAAAAABIAAAAHAAAAAAAAABMAAAAHAAAAAAAAABQAAAAHAAAAAAAAABUAAAAHAAAAAAABAAAAAAAHAAAAAAABABUAAAAHAAAAAAACAAAAAAAHAAAAAAACABUAAAAHAAAAAAADAAAAAAAHAAAAAAADABUAAAAHAAAAAAAEAAAAAAAHAAAAAAAEABUAAAAHAAAAAAAFAAAAAAAHAAAAAAAFABUAAAAHAAAAAAAGAAAAAAAHAAAAAAAGABUAAAAHAAAAAAAHAAAAAAAHAAAAAAAHABUAAAAHAAAAAAAIAAAAAAAHAAAAAAAIABUAAAAHAAAAAAAJAAAAAAAHAAAAAAAJABUAAAAHAAAAAAAKAAAAAAAHAAAAAAAKABUAAAAHAAAAAAALAAAAAAAHAAAAAAALAAEAAAAHAAAAAAALAAIAAAAHAAAAAAALAAMAAAAHAAAAAAALAAQAAAAHAAAAAAALAAUAAAAHAAAAAAALAAYAAAAHAAAAAAALAAcAAAAHAAAAAAALAAgAAAAHAAAAAAALAAkAAAAHAAAAAAALAAoAAAAHAAAAAAALAAsAAAAHAAAAAAALAAwAAAAHAAAAAAALAA0AAAAHAAAAAAALAA4AAAAHAAAAAAALAA8AAAAHAAAAAAALABAAAAAHAAAAAAALABEAAAAHAAAAAAALABIAAAAHAAAAAAALABMAAAAHAAAAAAALABQAAAAHAAAAAAALABUAAAAHAAAAAAABABQAAAADAAAAAAACABQAAAADAAAAAAABABMAAAADAAAAAAACABMAAAADAAAAAAADABMAAAADAAAAAAAIABMAAAADAAAAAAAJABQAAAADAAAAAAAJABMAAAADAAAAAAAKABMAAAADAAAAAAAKABQAAAADAAAAAAAHABMAAAADAAAAAAAGABMAAAADAAAAAAAEABMAAAADAAAAAAADABQAAAADAAAAAAAEABQAAAADAAAAAAABABIAAAADAAAAAAACABIAAAADAAAAAAADABIAAAADAAAAAAAEABIAAAADAAAAAAAEABEAAAADAAAAAAADABEAAAADAAAAAAACABEAAAADAAAAAAABABEAAAADAAAAAAAGABEAAAADAAAAAAAHABEAAAADAAAAAAAIABEAAAADAAAAAAAJABEAAAADAAAAAAAKABEAAAADAAAAAAAJABIAAAADAAAAAAAIABIAAAADAAAAAAAHABIAAAADAAAAAAAGABIAAAADAAAAAAAKABIAAAADAAAAAAA=")
 tile_set = SubResource("TileSet_wvnxi")
 script = ExtResource("2_uppkp")
-pecas = Array[ExtResource("9_kier8")]([ExtResource("10_2j0jo"), ExtResource("11_q0ki0"), ExtResource("12_ftrd0"), ExtResource("14_aril8"), ExtResource("15_noosx"), ExtResource("16_jtwxc"), ExtResource("13_wjatw")])
+pecas = Array[ExtResource("9_kier8")]([ExtResource("10_2j0jo"), ExtResource("11_q0ki0"), ExtResource("12_ftrd0"), ExtResource("14_aril8"), ExtResource("15_noosx"), ExtResource("16_jtwxc"), ExtResource("13_wjatw"), ExtResource("16_kier8")])
 
 [node name="HUD" parent="TabuleiroTileMap" unique_id=1894945411 instance=ExtResource("3_yo8nm")]
