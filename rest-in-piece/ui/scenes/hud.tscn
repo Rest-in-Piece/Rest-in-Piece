@@ -13,7 +13,6 @@ bg_color = Color(0.2, 0.21960784, 0.30588236, 1)
 
 [sub_resource type="Theme" id="Theme_2ktye"]
 PanelContainer/styles/panel = SubResource("StyleBoxFlat_06g6o")
-[ext_resource type="Texture2D" uid="uid://chy1h8jd6be03" path="res://entities/pecas/tetrominoes.png" id="3_11rbf"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8w10v"]
 bg_color = Color(0.6, 0.6, 0.6, 0)
