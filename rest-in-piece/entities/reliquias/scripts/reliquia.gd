@@ -10,7 +10,7 @@ const NIVEL_MAXIMO: int = 3
 
 @export var nome: String = ""
 @export_multiline var descricao: String = ""
-@export var icone: Texture2D
+@export var textura: Texture2D
 @export_range(1, 3) var nivel: int = 1
 
 

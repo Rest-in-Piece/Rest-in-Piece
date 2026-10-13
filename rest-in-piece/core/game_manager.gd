@@ -1,3 +1,5 @@
+
+
 # esse script define e coordena a lógica do jogo. O jogador destruiu linhas? O 
 # game_manager.gd calcula os pontos e chama os sinais para outros scripts executarem
 # suas próprias lógicas. Não coordena física e nem interface visual.
@@ -50,6 +52,7 @@ func _ready():
 	tabuleiro.peca_travando.connect(gerenciador_reliquias.processar_travamento)
 	tabuleiro.peca_travada.connect(_on_peca_travada)
 	gerenciador_reliquias.reliquias_alteradas.connect(_aplicar_regras)
+	gerenciador_reliquias.reliquias_alteradas.connect(_atualizar_hud_reliquias)
 	
 	hud.solicitou_novo_jogo.connect(iniciar_novo_jogo)
 	
@@ -131,6 +134,14 @@ func adicionar_peca_a_bolsa(peca: Peca, copias: int = 1):
 	for i in range(copias):
 		bolsa_de_pecas.append(peca.criar_copia())
 	_aplicar_regras()
+
+
+# usada por recompensas e lojas. Retorna false se o limite de relíquias foi atingido
+func adquirir_reliquia(reliquia: Reliquia) -> bool:
+	return gerenciador_reliquias.adquirir(reliquia)
+
+func _atualizar_hud_reliquias():
+	hud.atualizar_reliquias(gerenciador_reliquias.reliquias)
 
 
 func obter_pecas_maximas() -> int:

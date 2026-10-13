@@ -2,7 +2,17 @@
 
 [ext_resource type="Script" uid="uid://btkp103mmksgw" path="res://entities/reliquias/scripts/reliquia_mult_spin.gd" id="1_spinr"]
 
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_vygui"]
+load_path = "res://.godot/imported/Magic_Items_01_pack_FREE-16x16.png-15f39e7dcf3b1163351a8a2472acde2c.ctex"
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_x6d2m"]
+atlas = SubResource("CompressedTexture2D_vygui")
+region = Rect2(48, 32, 16, 16)
+
 [resource]
 script = ExtResource("1_spinr")
 spins_aceitos = Array[String](["T-Spin", "I-Spin", "J-Spin", "L-Spin", "O-Spin", "Z-Spin", "S-Spin"])
+nome = "Máquina de Lavar"
+descricao = "Pontuar através de um Spin aumenta em 2 o multiplicador"
+textura = SubResource("AtlasTexture_x6d2m")
 metadata/_custom_type_script = "uid://btkp103mmksgw"

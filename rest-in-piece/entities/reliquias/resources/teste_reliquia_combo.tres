@@ -2,6 +2,16 @@
 
 [ext_resource type="Script" uid="uid://djynh3fp1h2jn" path="res://entities/reliquias/scripts/reliquia_combo.gd" id="1_m2x7o"]
 
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_m2x7o"]
+load_path = "res://.godot/imported/Magic_Items_01_pack_FREE-16x16.png-15f39e7dcf3b1163351a8a2472acde2c.ctex"
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ie40m"]
+atlas = SubResource("CompressedTexture2D_m2x7o")
+region = Rect2(112, 32, 16, 16)
+
 [resource]
 script = ExtResource("1_m2x7o")
+nome = "Gauntlets"
+descricao = "A cada vez consecutiva que posiciona uma peça que pontua, aumenta em 0.25 o multiplicador"
+textura = SubResource("AtlasTexture_ie40m")
 metadata/_custom_type_script = "uid://djynh3fp1h2jn"

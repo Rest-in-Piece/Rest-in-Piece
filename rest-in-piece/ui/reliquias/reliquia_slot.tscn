@@ -1,0 +1,18 @@
+[gd_scene format=3 uid="uid://4ba84tlnc5s8"]
+
+[ext_resource type="Script" uid="uid://46gy6s0kw0hl" path="res://ui/reliquias/reliquia_slot.gd" id="1_aecm1"]
+
+[node name="ReliquiaSlot" type="PanelContainer" unique_id=1739094575]
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("1_aecm1")
+
+[node name="Margem" type="MarginContainer" parent="." unique_id=508209829]
+layout_mode = 2
+
+[node name="Textura" type="TextureRect" parent="Margem" unique_id=320004228]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5

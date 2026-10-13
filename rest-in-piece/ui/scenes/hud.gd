@@ -1,3 +1,4 @@
+
 # esse script SÓ deve tratar questões relacionadas à atualização da interface.
 # O jogador pontuou? O hud.gd atualiza o label com os pontos atuais. Questões
 # de lógica, como acionar vitória / derrota, devem ser tratadas em outro lugar.
@@ -5,6 +6,8 @@
 extends CanvasLayer
 
 signal solicitou_novo_jogo
+
+const CENA_RELIQUIA_SLOT: PackedScene = preload("uid://4ba84tlnc5s8")
 
 @onready var label_perdeu: Label = $Perdeu
 @onready var label_venceu: Label = $Venceu
@@ -14,10 +17,17 @@ signal solicitou_novo_jogo
 @onready var botao_novo_jogo: Button = $"Botão novo jogo"
 @onready var tile_map_proxima_peca: TileMapLayer = $ProximaPecaTileMap
 @onready var tile_map_peca_armazenada: TileMapLayer = $PecaArmazenadaTileMap
+@onready var lista_reliquias: ListaReliquias = %ListaReliquias
+@onready var painel_info_reliquia: Control = %PainelInfoReliquia
+@onready var label_nome_reliquia: Label = %LabelNomeReliquia
+@onready var label_descricao_reliquia: Label = %LabelDescricaoReliquia
 
 
 func _ready() -> void:
 	botao_novo_jogo.pressed.connect(_on_botao_novo_jogo_pressed)
+	lista_reliquias.reliquia_hover_iniciado.connect(mostrar_info_reliquia)
+	lista_reliquias.reliquia_hover_encerrado.connect(esconder_info_reliquia)
+	esconder_info_reliquia()
 
 func _on_botao_novo_jogo_pressed():
 	solicitou_novo_jogo.emit()
@@ -59,6 +69,18 @@ func atualizar_peca_armazenada(peca: Peca, atlas_coords: Vector2i):
 	var pos_central = Vector2i(0, 0)
 	for bloco in peca.angulos["0"]:
 		tile_map_peca_armazenada.set_cell(pos_central + bloco, 0, atlas_coords)
+
+
+func atualizar_reliquias(reliquias: Array[Reliquia]):
+	lista_reliquias.exibir(reliquias)
+
+func mostrar_info_reliquia(reliquia: Reliquia):
+	label_nome_reliquia.text = reliquia.nome
+	label_descricao_reliquia.text = reliquia.descricao
+	painel_info_reliquia.show()
+
+func esconder_info_reliquia():
+	painel_info_reliquia.hide()
 
 
 func limpar_peca_armazenada():

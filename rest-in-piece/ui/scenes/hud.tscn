@@ -2,6 +2,17 @@
 
 [ext_resource type="Texture2D" uid="uid://cgodqahkv04eo" path="res://ui/backgrounds/Screenshot_1.png" id="1_aydmx"]
 [ext_resource type="Script" uid="uid://d0kbphkox74yp" path="res://ui/scenes/hud.gd" id="1_itb64"]
+[ext_resource type="Script" uid="uid://b3ssx4c85ix60" path="res://lista_reliquias.gd" id="3_11rbf"]
+[ext_resource type="Script" uid="uid://dof1c2f4yw6ko" path="res://entities/reliquias/scripts/reliquia.gd" id="4_mvcki"]
+[ext_resource type="Resource" uid="uid://cq88sffr85rka" path="res://entities/reliquias/resources/teste_reliquia_camaleao.tres" id="5_gmud1"]
+[ext_resource type="Resource" uid="uid://dnlkfvxu7q45c" path="res://entities/reliquias/resources/teste_reliquia_mult_spin.tres" id="6_xshj6"]
+[ext_resource type="Resource" uid="uid://bwadiqljpft21" path="res://entities/reliquias/resources/teste_reliquia_combo.tres" id="7_gmud1"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_06g6o"]
+bg_color = Color(0.2, 0.21960784, 0.30588236, 1)
+
+[sub_resource type="Theme" id="Theme_2ktye"]
+PanelContainer/styles/panel = SubResource("StyleBoxFlat_06g6o")
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8w10v"]
 bg_color = Color(0.6, 0.6, 0.6, 0)
@@ -41,10 +52,60 @@ sources/0 = SubResource("TileSetAtlasSource_11rbf")
 script = ExtResource("1_itb64")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1432215097]
+visible = false
 modulate = Color(1, 1, 1, 0.19215687)
 position = Vector2(958.75, 537.75)
 scale = Vector2(1.7126899, 1.5640466)
 texture = ExtResource("1_aydmx")
+
+[node name="PanelContainer" type="PanelContainer" parent="." unique_id=1195014327]
+offset_left = 318.0
+offset_top = 34.0
+offset_right = 546.0
+offset_bottom = 110.0
+theme = SubResource("Theme_2ktye")
+
+[node name="PainelReliquias" type="MarginContainer" parent="PanelContainer" unique_id=2057496816]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 6
+
+[node name="ListaReliquias" type="HBoxContainer" parent="PanelContainer/PainelReliquias" unique_id=1518096014]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 8
+script = ExtResource("3_11rbf")
+reliquias_de_preview = Array[ExtResource("4_mvcki")]([ExtResource("5_gmud1"), ExtResource("6_xshj6"), ExtResource("7_gmud1")])
+
+[node name="PainelInfoReliquia" type="PanelContainer" parent="." unique_id=1270136081]
+unique_name_in_owner = true
+z_index = 3
+offset_left = 372.0
+offset_top = 111.0
+offset_right = 592.0
+offset_bottom = 161.0
+mouse_filter = 2
+
+[node name="Margem" type="MarginContainer" parent="PainelInfoReliquia" unique_id=1166615422]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Textos" type="VBoxContainer" parent="PainelInfoReliquia/Margem" unique_id=1523124880]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="LabelNomeReliquia" type="Label" parent="PainelInfoReliquia/Margem/Textos" unique_id=303560424]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="LabelDescricaoReliquia" type="Label" parent="PainelInfoReliquia/Margem/Textos" unique_id=980300327]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(220, 0)
+layout_mode = 2
+autowrap_mode = 3
 
 [node name="Panel" type="Panel" parent="." unique_id=566553705]
 offset_left = 1252.0

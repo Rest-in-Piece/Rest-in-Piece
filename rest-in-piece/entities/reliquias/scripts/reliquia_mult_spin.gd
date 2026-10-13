@@ -1,6 +1,6 @@
 
 
-# aumenta o multiplicador quando realiza um spin específico
+# aumenta o multiplicador quando pontua usando um spin específico
 class_name ReliquiaMultiplicadorSpin
 extends Reliquia
 
