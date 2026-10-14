@@ -8,10 +8,10 @@
 [ext_resource type="Resource" uid="uid://dnlkfvxu7q45c" path="res://entities/reliquias/resources/teste_reliquia_mult_spin.tres" id="6_xshj6"]
 [ext_resource type="Resource" uid="uid://bwadiqljpft21" path="res://entities/reliquias/resources/teste_reliquia_combo.tres" id="7_gmud1"]
 [ext_resource type="PackedScene" uid="uid://bp5y3loag8irt" path="res://ui/scenes/painel_recompensas.tscn" id="8_ex61b"]
-[ext_resource type="Texture2D" uid="uid://chy1h8jd6be03" path="res://entities/pecas/tetrominoes.png" id="8_tiles"]
+[ext_resource type="Texture2D" uid="uid://chy1h8jd6be03" path="res://entities/pecas/texturas/tetrominoes.png" id="8_tiles"]
 [ext_resource type="Script" uid="uid://bwdhplobdt3o7" path="res://ui/scenes/painel_recompensas.gd" id="9_2avf4"]
-[ext_resource type="Texture2D" uid="uid://ddx0dx670dsgb" path="res://entities/pecas/bomba.png" id="9_bomba_tiles"]
-[ext_resource type="Texture2D" uid="uid://cn33xnpa65hkj" path="res://entities/pecas/areia.svg" id="10_areia_tiles"]
+[ext_resource type="Texture2D" uid="uid://ddx0dx670dsgb" path="res://entities/pecas/texturas/bomba.png" id="9_bomba_tiles"]
+[ext_resource type="Texture2D" uid="uid://cn33xnpa65hkj" path="res://entities/pecas/texturas/areia.svg" id="10_areia_tiles"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_06g6o"]
 bg_color = Color(0.2, 0.21960784, 0.30588236, 1)

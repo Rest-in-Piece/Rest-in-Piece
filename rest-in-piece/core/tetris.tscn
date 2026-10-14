@@ -1,7 +1,7 @@
 [gd_scene format=4 uid="uid://ctf7ybv4w2hvt"]
 
 [ext_resource type="Script" uid="uid://dt682djovwjie" path="res://core/game_manager.gd" id="1_oismu"]
-[ext_resource type="Texture2D" uid="uid://chy1h8jd6be03" path="res://entities/pecas/tetrominoes.png" id="1_uppkp"]
+[ext_resource type="Texture2D" uid="uid://chy1h8jd6be03" path="res://entities/pecas/texturas/tetrominoes.png" id="1_uppkp"]
 [ext_resource type="Script" uid="uid://b103p3gbf0tcp" path="res://levels/fase.gd" id="2_aril8"]
 [ext_resource type="Script" uid="uid://bmhjollnq5ugp" path="res://core/tetris.gd" id="2_uppkp"]
 [ext_resource type="Script" uid="uid://dof1c2f4yw6ko" path="res://entities/reliquias/scripts/reliquia.gd" id="3_wjvaw"]
@@ -22,10 +22,10 @@
 [ext_resource type="Resource" uid="uid://c08uth3g2u3jr" path="res://entities/pecas/peca_z.tres" id="16_jtwxc"]
 [ext_resource type="Resource" uid="uid://cek1lfbokxf5q" path="res://entities/pecas/peca_vidro.tres" id="16_kier8"]
 [ext_resource type="Resource" path="res://entities/pecas/peca_bomba.tres" id="17_bomba"]
-[ext_resource type="Texture2D" uid="uid://ddx0dx670dsgb" path="res://entities/pecas/bomba.png" id="18_bomba_tiles"]
+[ext_resource type="Texture2D" uid="uid://ddx0dx670dsgb" path="res://entities/pecas/texturas/bomba.png" id="18_bomba_tiles"]
 [ext_resource type="Resource" path="res://entities/pecas/peca_fantasma.tres" id="19_fantasma"]
 [ext_resource type="Resource" path="res://entities/pecas/peca_areia.tres" id="20_areia"]
-[ext_resource type="Texture2D" uid="uid://cn33xnpa65hkj" path="res://entities/pecas/areia.svg" id="21_areia_tiles"]
+[ext_resource type="Texture2D" uid="uid://cn33xnpa65hkj" path="res://entities/pecas/texturas/areia.svg" id="21_areia_tiles"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_uppkp"]
 texture = ExtResource("1_uppkp")
