@@ -56,6 +56,7 @@ func _ready():
 	assert(not fases.is_empty(), "defina ao menos uma fase em 'fases' no GameManager")
 	
 	tabuleiro.linhas_destruidas.connect(_on_linhas_destruidas)
+	tabuleiro.blocos_explodidos.connect(_on_blocos_explodidos)
 	tabuleiro.fim_de_jogo.connect(_on_fim_de_jogo)
 	tabuleiro.proxima_peca_sorteada.connect(hud.atualizar_proxima_peca)
 	tabuleiro.peca_armazenada_alterada.connect(hud.atualizar_peca_armazenada)
@@ -193,7 +194,7 @@ func _atualizar_hud_pecas():
 
 func _on_linhas_destruidas(linhas: Array[LinhaPontuada]):
 	# a pontuação é calculada em _on_peca_travada, aqui só guardamos a informação
-	linhas_pendentes = linhas
+	linhas_pendentes.append_array(linhas)
 	
 	velocidade_atual += fase.aceleracao * linhas.size()
 	_aplicar_regras()
@@ -201,6 +202,10 @@ func _on_linhas_destruidas(linhas: Array[LinhaPontuada]):
 	if linhas.size() == 4:
 		# placeholder
 		print("TETRIS")
+
+
+func _on_blocos_explodidos(linhas: Array[LinhaPontuada]):
+	linhas_pendentes.append_array(linhas)
 
 
 func _on_spin_realizado(tipo_spin: String):

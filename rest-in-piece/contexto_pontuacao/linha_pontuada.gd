@@ -1,6 +1,6 @@
 
 
-# uma linha completa no momento em que é destruída. O tetris.gd preenche os fatos
+# uma linha completa ou parcial no momento em que é destruída. O tetris.gd preenche os fatos
 # (posição e quadradinhos); os pontos são calculados durante a pontuação.
 
 class_name LinhaPontuada
@@ -8,6 +8,7 @@ extends RefCounted
 
 var indice_linha: int = 0  # posição no grid (1 = topo)
 var altura: int = 1  # 1 = linha de baixo, 20 = linha do topo
+var completa: bool = true  # false para blocos destruídos pela bomba
 var blocos: Array[BlocoPontuado] = []  # da esquerda pra direita
 var pontos: float = 0.0
 var zerada: bool = false

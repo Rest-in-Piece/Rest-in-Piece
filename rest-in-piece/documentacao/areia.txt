@@ -1,0 +1,38 @@
+PECA AREIA
+==========
+
+Resource: res://entities/pecas/peca_areia.tres. Uma copia no saco inicial,
+formato L, textura dourada com graos. Usa os controles das pecas comuns.
+
+Ate travar, a Areia se move, gira e colide como um tetromino comum. Nao
+atravessa blocos e nao precisa de tecla de ativacao. O delay de fixacao,
+hard drop, hold e tabela SRS sao os mesmos do formato escolhido.
+
+Peca.cai_em_blocos_ao_travar habilita o efeito. Ao registrar seus blocos,
+o tabuleiro os processa de baixo para cima. Cada celula desce na propria
+coluna enquanto a casa imediatamente abaixo estiver vazia e valida.
+Celulas apoiadas nao se movem. As celulas superiores acompanham as que
+caem abaixo delas; nenhuma celula desaparece ou substitui blocos antigos.
+Uma cavidade abaixo de um bloco solido nao pode ser atravessada pela Areia.
+
+O assentamento e resolvido no travamento, antes de limpar linhas, calcular
+pressao do vidro e sortear a proxima peca. Nao ha gravidade global para
+blocos antigos nem animacao separada da queda dos graos. O movimento extra
+individual nao e somado a casas_descidas_hard_drop. Pontos, multiplicador,
+resistencia e bonus de reliquias acompanham os dados de cada quadradinho.
+Somente linhas completas pontuam segundo as regras normais da partida.
+
+Para outros formatos, duplique um resource comum, habilite
+cai_em_blocos_ao_travar e use id_fonte_tiles = 2, coords_no_atlas = (0, 0).
+Os demais efeitos ficam desativados na variante inicial.
+
+Para testar manualmente, execute a cena de jogo e use a acao
+debug_sortear_nova_peca (tecla de crase) ate aparecer o L dourado com graos.
+Leve-o sobre um apoio com um buraco ao lado e deixe travar: somente as
+colunas sem apoio descem. Espaco/E acelera a chegada ao apoio, mantendo
+o delay de fixacao existente. As reliquias continuam como configuradas.
+
+Testes, depois de importar o projeto no Godot:
+godot --headless --path rest-in-piece --script res://tests/test_areia.gd
+godot --headless --path rest-in-piece --script res://tests/test_bomba.gd
+godot --headless --path rest-in-piece --script res://tests/test_fantasma.gd

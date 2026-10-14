@@ -1,0 +1,175 @@
+[gd_scene load_steps=3 format=3 uid="uid://0hqj4af7wstw"]
+
+[ext_resource type="Script" path="res://ui/menu_inicial.gd" id="1_a2ua6"]
+
+[sub_resource type="SystemFont" id="SystemFont_p2vmo"]
+
+[node name="MenuInicial" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_a2ua6")
+
+[node name="Menu" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Titulo" type="Label" parent="Menu"]
+layout_mode = 1
+offset_left = 8.0
+offset_top = 8.0
+offset_right = 980.0
+offset_bottom = 227.0
+theme_override_fonts/font = SubResource("SystemFont_p2vmo")
+theme_override_font_sizes/font_size = 160
+text = "Rest in Piece"
+
+[node name="ContainerBotoes" type="VBoxContainer" parent="Menu"]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 64.0
+offset_top = -846.0
+offset_right = 623.0
+offset_bottom = -64.0
+grow_vertical = 0
+
+[node name="NovoJogo" type="Button" parent="Menu/ContainerBotoes"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 80
+text = "Novo Jogo"
+
+[node name="Inventario" type="Button" parent="Menu/ContainerBotoes"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 80
+text = "Inventario"
+
+[node name="AbrirPacote" type="Button" parent="Menu/ContainerBotoes"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 80
+text = "Abrir Pacote"
+
+[node name="Configuraçoes" type="Button" parent="Menu/ContainerBotoes"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 80
+text = "Configurações"
+
+[node name="Creditos" type="Button" parent="Menu/ContainerBotoes"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 80
+text = "Créditos"
+
+[node name="Margem" type="Control" parent="Menu/ContainerBotoes"]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 2
+
+[node name="Sair" type="Button" parent="Menu/ContainerBotoes"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 80
+text = "Sair"
+
+[node name="Versao" type="Label" parent="Menu"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -147.0
+offset_top = -83.0
+offset_right = 147.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_font_sizes/font_size = 60
+text = "versão 0.1"
+
+[node name="Creditos" type="Control" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ContainerCreditos" type="VBoxContainer" parent="Creditos"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -500.0
+offset_top = -495.5
+offset_right = 500.0
+offset_bottom = 495.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Titulo" type="Label" parent="Creditos/ContainerCreditos"]
+layout_mode = 2
+theme_override_fonts/font = SubResource("SystemFont_p2vmo")
+theme_override_font_sizes/font_size = 160
+text = "Créditos"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="FecharCreditos" type="Button" parent="Creditos/ContainerCreditos/Titulo"]
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -100.0
+offset_top = -50.0
+offset_bottom = 50.0
+grow_horizontal = 0
+grow_vertical = 2
+theme_override_font_sizes/font_size = 60
+text = "X"
+
+[node name="PanelContainer" type="PanelContainer" parent="Creditos/ContainerCreditos"]
+custom_minimum_size = Vector2(1000, 768)
+layout_mode = 2
+
+[node name="Pivo" type="Control" parent="Creditos/ContainerCreditos/PanelContainer"]
+layout_mode = 2
+
+[node name="ScrollContainer" type="ScrollContainer" parent="Creditos/ContainerCreditos/PanelContainer/Pivo"]
+custom_minimum_size = Vector2(950, 768)
+layout_mode = 0
+offset_left = 44.0
+offset_top = 0.5
+offset_right = 994.0
+offset_bottom = 768.5
+
+[node name="Creditos" type="Label" parent="Creditos/ContainerCreditos/PanelContainer/Pivo/ScrollContainer"]
+layout_mode = 2
+theme_override_constants/line_spacing = 0
+theme_override_constants/shadow_outline_size = 0
+theme_override_font_sizes/font_size = 64
+text = "Equipe de Programação:
+- Gustavo
+- Otavio
+- Paulo
+
+Equipe de Arte:
+- Gustavo
+- Otavio
+- Paulo
+
+Equipe de Design:
+- Gustavo
+- Otavio
+- Paulo"
+
+[connection signal="pressed" from="Creditos/ContainerCreditos/Titulo/FecharCreditos" to="." method="_quando_botao_fechar_creditos_pressionado"]

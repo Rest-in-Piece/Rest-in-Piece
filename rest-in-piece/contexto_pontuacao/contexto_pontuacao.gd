@@ -24,7 +24,11 @@ var ativou_reliquia: bool = false
 
 var linhas_destruidas: int:
 	get:
-		return linhas.size()
+		var quantidade: int = 0
+		for linha in linhas:
+			if linha.completa:
+				quantidade += 1
+		return quantidade
 
 
 func adicionar_fichas(valor: float):
