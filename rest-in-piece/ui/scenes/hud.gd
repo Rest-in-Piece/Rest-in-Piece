@@ -57,18 +57,20 @@ func mostrar_tela_vitoria():
 
 func atualizar_proxima_peca(peca: Peca, atlas_coords: Vector2i):
 	tile_map_proxima_peca.clear()
+	tile_map_proxima_peca.modulate = peca.obter_cor_visual()
 	var pos_central = Vector2i(0, 0)
 	for bloco in peca.angulos["0"]:
-		tile_map_proxima_peca.set_cell(pos_central + bloco, 0, atlas_coords)
+		tile_map_proxima_peca.set_cell(pos_central + bloco, peca.id_fonte_tiles, atlas_coords)
 
 
 func atualizar_peca_armazenada(peca: Peca, atlas_coords: Vector2i):
 	tile_map_peca_armazenada.clear()
+	tile_map_peca_armazenada.modulate = peca.obter_cor_visual() if peca != null else Color.WHITE
 	if peca == null:
 		return
 	var pos_central = Vector2i(0, 0)
 	for bloco in peca.angulos["0"]:
-		tile_map_peca_armazenada.set_cell(pos_central + bloco, 0, atlas_coords)
+		tile_map_peca_armazenada.set_cell(pos_central + bloco, peca.id_fonte_tiles, atlas_coords)
 
 
 func atualizar_reliquias(reliquias: Array[Reliquia]):

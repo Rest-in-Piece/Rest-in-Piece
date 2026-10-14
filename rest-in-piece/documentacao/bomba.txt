@@ -1,0 +1,31 @@
+BOMBA
+=====
+
+Resource: res://entities/pecas/peca_bomba.tres
+
+A bomba ocupa uma casa, nao muda de forma ao girar e aparece uma vez a cada
+ciclo do saco inicial (ao lado das sete pecas normais e da peca de vidro).
+O sprite em pixel art esta em res://entities/pecas/bomba.png, com fundo
+transparente e importacao limitada a 32x32 pixels. A mesma textura aparece
+na grade, na previa da proxima peca e no hold, em fontes de tiles proprias.
+Peca.id_fonte_tiles escolhe a fonte do TileSet (0 = blocos, 1 = bomba).
+
+Ao travar, explode uma area 3x3 centrada na sua posicao. A explosao acontece
+antes da verificacao de linhas completas e da pressao sobre os blocos frageis.
+A bomba desaparece sem conceder pontos pelo proprio bloco. Paredes, teto e
+chao ficam fora da area valida; blocos fora do 3x3 continuam no lugar.
+Nao ha queda individual dos blocos que ficaram acima dos buracos.
+
+Os blocos atingidos sao agrupados por linha, da esquerda para a direita, como
+LinhaPontuada com completa = false. Pontos, multiplicadores e bonus salvos
+no BlocoFixado sao preservados. Tiles sem BlocoFixado usam os valores padrao,
+assim como na limpeza de uma linha completa.
+
+O sinal blocos_explodidos entrega essas linhas parciais ao GameManager, que
+as acumula junto com quaisquer linhas completas da mesma jogada. O fluxo de
+pontuacao e os hooks de bloco/linha das reliquias sao os mesmos. Somente
+linhas completas contam em ContextoPontuacao.linhas_destruidas e aumentam
+a velocidade, ativam combos ou concedem pecas extras por linhas.
+
+Teste no terminal, apos importar o projeto no editor:
+godot --headless --path rest-in-piece --script res://tests/test_bomba.gd

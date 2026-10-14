@@ -1,0 +1,36 @@
+PECA FANTASMA
+=============
+
+Resource inicial: res://entities/pecas/peca_fantasma.tres (formato T).
+Controle: F para materializar antes do fundo. Espaco/E levam ao fundo e
+materializam automaticamente, sem precisar apertar F.
+
+Peca.atravessa_blocos habilita o efeito em qualquer formato I, O, T, L, J,
+S ou Z, mantendo suas rotacoes e tabela SRS. O saco inicial tem uma Fantasma.
+Para outra variante, duplique um resource de formato comum e habilite a
+propriedade atravessa_blocos. O visual ativo fica translucido; a variante
+inicial usa o tile ciano do atlas existente. Ao materializar, fica opaca.
+
+A camada PecaFantasma desenha a peca sobre o tabuleiro sem substituir ou
+apagar tiles fixos. Gravidade, movimento e rotacao ignoram blocos fixos,
+mas continuam respeitando x = 1..10 e y = 1..20. Hold e substituicoes por
+reliquias mantem essas regras; uma troca para peca comum so ocorre se couber.
+
+Materializar verifica cada celula: somente posicoes vazias e validas viram
+tiles permanentes e recebem dados de BlocoFixado. Celulas ocupadas somem
+sem alterar o tile ou os dados originais. Uma materializacao vazia encerra
+o turno sem limpar linhas ou recalcular pressao dos blocos frageis.
+Quando ha celulas novas, linhas, pontos e bonus de travamento seguem o fluxo
+existente. Fantasmas nao concedem spin, pois atravessam as colisoes que o
+definem. Cada materializacao consome uma peca do limite, inclusive vazia.
+
+Ao chegar ao fundo, a Fantasma materializa imediatamente com as mesmas
+regras por celula. Isso vale para gravidade, queda acelerada e hard drop.
+Tocar blocos fixos continua sem travar: apenas o limite inferior encerra
+automaticamente o turno. Nao existe mais espera de 5 segundos nem parametro
+de prazo na fase. F continua disponivel para materializar antes do fundo.
+Inputs do quadro em que a peca materializa nao afetam a proxima peca.
+
+Testes, apos importar o projeto no Godot:
+godot --headless --path rest-in-piece --script res://tests/test_fantasma.gd
+godot --headless --path rest-in-piece --script res://tests/test_bomba.gd

@@ -12,11 +12,13 @@ signal proxima_peca_sorteada(peca: Peca, atlas_coords: Vector2i)
 signal peca_armazenada_alterada(peca: Peca, atlas_coords: Vector2i)
 signal spin_realizado(tipo_spin: String)
 signal linhas_destruidas(linhas: Array[LinhaPontuada])
+signal blocos_explodidos(linhas: Array[LinhaPontuada])
 signal peca_travada(peca: Peca, casas_hard_drop: int)
 signal peca_travando(travamento: TravamentoDePeca)
 signal blocos_quebrados(quantidade: int)
 
 @export var pecas: Array[Peca]
+@onready var camada_fantasma: TileMapLayer = $PecaFantasma
 
 # variaveis da grade (tabuleiro)
 const COLUNAS : int = 10
@@ -48,6 +50,7 @@ var etapas_fixacao: float = 0.0
 var total_etapas_fixacao: float
 var resets_fixacao: int = 0
 var max_resets_fixacao: int
+var turno_atual: int = 0
 
 # variaveis das peças no jogo
 var peca: Peca
@@ -65,7 +68,6 @@ var pode_armazenar: bool = true
 var jogo_rodando : bool
 
 # variaveis pro tileMap
-var tile_id : int = 0
 var peca_atlas : Vector2i
 var prox_peca_atlas : Vector2i
 var blocos_fixados: Dictionary[Vector2i, BlocoFixado] = {}
@@ -82,17 +84,25 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	if not jogo_rodando:
 		return
+	if peca.atravessa_blocos and not pode_mover(Vector2i.DOWN):
+		materializar_fantasma()
+		return
 	
 	var delta_limitado: float = minf(delta, DELTA_MAXIMO)
 	var passo_tempo: float = delta_limitado * FPS_REFERENCIA
+	var turno_antes_dos_inputs: int = turno_atual
 	
 	_processar_movimento_lateral(delta_limitado)
 	_processar_inputs(passo_tempo)
 	
 	# um input pode ter travado a peça e causado game over
-	if not jogo_rodando:
+	if not jogo_rodando or turno_atual != turno_antes_dos_inputs:
 		return
-	
+
+	if peca.atravessa_blocos:
+		_processar_fantasma(passo_tempo)
+		return
+
 	if not pode_mover(Vector2i.DOWN):
 		etapas_fixacao += velocidade * passo_tempo
 		if etapas_fixacao >= total_etapas_fixacao:
@@ -106,8 +116,22 @@ func _process(delta: float) -> void:
 		etapas_queda -= total_etapas
 
 
+func _processar_fantasma(passo_tempo: float):
+	if not pode_mover(Vector2i.DOWN):
+		materializar_fantasma()
+		return
+
+	etapas_queda += velocidade * passo_tempo
+	if etapas_queda >= total_etapas:
+		mover_peca(Vector2i.DOWN)
+		etapas_queda -= total_etapas
+		if not pode_mover(Vector2i.DOWN):
+			materializar_fantasma()
+
+
 func novo_jogo():
 	jogo_rodando = true
+	camada_fantasma.clear()
 	etapas_queda = 0.0
 	_parar_movimento_lateral()
 	
@@ -149,14 +173,23 @@ func obter_rotacoes(peca: Peca) -> Array:
 
 
 func _processar_inputs(passo_tempo: float):
+	if peca.atravessa_blocos and Input.is_action_just_pressed("materializar_fantasma"):
+		materializar_fantasma()
+		return
+
+	var turno_dos_inputs: int = turno_atual
 	if Input.is_action_pressed("acelerar_queda"):
 		etapas_queda += ETAPAS_QUEDA_RAPIDA * passo_tempo
-		if not pode_mover(Vector2i.DOWN):
+		if not peca.atravessa_blocos and not pode_mover(Vector2i.DOWN):
 			etapas_fixacao += ETAPAS_FIXACAO_QUEDA_RAPIDA * passo_tempo
 	if Input.is_action_just_pressed("cair_imediatamente"):
 		cair_imediatamente(false)
+		if not jogo_rodando or turno_atual != turno_dos_inputs:
+			return
 	if Input.is_action_just_pressed("posicionar_imediatamente"):
 		cair_imediatamente(true)
+		if not jogo_rodando or turno_atual != turno_dos_inputs:
+			return
 	if Input.is_action_just_pressed("rotacionar_sentido_horario"):
 		rotacionar_peca(1)
 	if Input.is_action_just_pressed("rotacionar_sentido_anti_horario"):
@@ -247,6 +280,8 @@ func armazenar_peca_atual():
 
 
 func criar_peca():
+	turno_atual += 1
+	camada_fantasma.clear()
 	etapas_queda = 0.0
 	etapas_fixacao = 0.0
 	resets_fixacao = 0
@@ -272,17 +307,26 @@ func criar_peca():
 func pode_criar_peca():
 	for bloco in peca_ativa:
 		var posicao = pos_atual + bloco
-		if get_cell_source_id(posicao) != -1:
+		if not posicao_esta_no_tabuleiro(posicao):
+			return false
+		if not peca.atravessa_blocos and get_cell_source_id(posicao) != -1:
 			return false
 	return true
 
 
-# mostra a próxima peça
+# A Fantasma usa outra camada para nunca substituir os tiles fixos.
 func desenhar_peca(peca_desenho, posicao, atlas):
+	var destino: TileMapLayer = camada_fantasma if peca.atravessa_blocos else self
+	if peca.atravessa_blocos:
+		camada_fantasma.modulate = peca.obter_cor_visual()
 	for bloco in peca_desenho:
-		set_cell(posicao + bloco, tile_id, atlas)
+		if posicao_esta_no_tabuleiro(posicao + bloco):
+			destino.set_cell(posicao + bloco, peca.id_fonte_tiles, atlas)
 
 func limpar_peca():
+	if peca != null and peca.atravessa_blocos:
+		camada_fantasma.clear()
+		return
 	for i in peca_ativa:
 		erase_cell(pos_atual + i)
 
@@ -310,9 +354,10 @@ func rotacionar_peca(sentido: int):
 			return
 
 
-func pode_rotacionar(peca_teste: Array, offset: Vector2i) -> bool:
+func pode_rotacionar(peca_teste: Array, offset: Vector2i, peca_alvo: Peca = null) -> bool:
+	var atravessa: bool = peca.atravessa_blocos if peca_alvo == null else peca_alvo.atravessa_blocos
 	for bloco in peca_teste:
-		if not posicao_esta_livre(pos_atual + bloco + offset):
+		if not _posicao_esta_livre_para_peca(pos_atual + bloco + offset, atravessa):
 			return false
 	return true
 
@@ -332,6 +377,11 @@ func mover_peca(direcao):
 			tratar_reset_fixacao()
 
 
+func materializar_fantasma():
+	if jogo_rodando and peca.atravessa_blocos:
+		travar_peca()
+
+
 func travar_peca():
 	avaliar_spin()
 	
@@ -341,9 +391,14 @@ func travar_peca():
 	travamento.casas_hard_drop = casas_descidas_hard_drop
 	peca_travando.emit(travamento)
 	
-	registrar_blocos_da_peca(travamento)
-	identificar_e_tratar_linhas_completas()
-	_atualizar_pressao_dos_blocos_frageis()
+	var quantidade_fixada: int = registrar_blocos_da_peca(travamento)
+	camada_fantasma.clear()
+	# Uma materializacao sem celulas livres apenas encerra o turno.
+	if quantidade_fixada > 0:
+		if peca.explode_ao_travar and not peca.atravessa_blocos:
+			_explodir_bomba()
+		identificar_e_tratar_linhas_completas()
+		_atualizar_pressao_dos_blocos_frageis()
 	
 	peca_travada.emit(peca, casas_descidas_hard_drop)
 	
@@ -361,13 +416,74 @@ func travar_peca():
 	
 
 
-func registrar_blocos_da_peca(travamento: TravamentoDePeca):
+func registrar_blocos_da_peca(travamento: TravamentoDePeca) -> int:
+	var posicoes_registradas: Array[Vector2i] = []
 	for deslocamento in peca_ativa:
-		blocos_fixados[pos_atual + deslocamento] = BlocoFixado.criar_a_partir_da_peca(peca, travamento)
+		var posicao: Vector2i = pos_atual + deslocamento
+		if peca.atravessa_blocos:
+			if not posicao_esta_no_tabuleiro(posicao) or get_cell_source_id(posicao) != -1:
+				continue
+			set_cell(posicao, peca.id_fonte_tiles, peca_atlas)
+		blocos_fixados[posicao] = BlocoFixado.criar_a_partir_da_peca(peca, travamento)
+		posicoes_registradas.append(posicao)
+	if peca.cai_em_blocos_ao_travar:
+		_assentar_blocos_de_areia(posicoes_registradas)
+	return posicoes_registradas.size()
+
+
+func _assentar_blocos_de_areia(posicoes: Array[Vector2i]):
+	# Os de baixo caem primeiro, liberando espaco para os de cima na mesma coluna.
+	posicoes.sort_custom(func(a: Vector2i, b: Vector2i): return a.y > b.y)
+	for origem in posicoes:
+		var destino: Vector2i = origem
+		while posicao_esta_no_tabuleiro(destino + Vector2i.DOWN) and get_cell_source_id(destino + Vector2i.DOWN) == -1:
+			destino += Vector2i.DOWN
+		if destino == origem:
+			continue
+
+		var fonte: int = get_cell_source_id(origem)
+		var atlas: Vector2i = get_cell_atlas_coords(origem)
+		erase_cell(origem)
+		set_cell(destino, fonte, atlas)
+		mover_dados_do_bloco(origem, destino)
+		blocos_fixados.erase(origem)
+
+
+func _explodir_bomba():
+	var linhas_explodidas: Array[LinhaPontuada] = []
+	var linha_inicial: int = maxi(1, pos_atual.y - 1)
+	var linha_final: int = mini(LINHAS, pos_atual.y + 1)
+	var coluna_inicial: int = maxi(1, pos_atual.x - 1)
+	var coluna_final: int = mini(COLUNAS, pos_atual.x + 1)
+
+	# A borda fica fora da explosao. A propria bomba e consumida, sem pontuar.
+	for linha in range(linha_final, linha_inicial - 1, -1):
+		var linha_pontuada := LinhaPontuada.new()
+		linha_pontuada.indice_linha = linha
+		linha_pontuada.altura = LINHAS - linha + 1
+		linha_pontuada.completa = false
+
+		for coluna in range(coluna_inicial, coluna_final + 1):
+			var posicao := Vector2i(coluna, linha)
+			if get_cell_source_id(posicao) == -1:
+				continue
+
+			if not peca_ativa.has(posicao - pos_atual):
+				var bloco_fixado: BlocoFixado = blocos_fixados.get(posicao)
+				linha_pontuada.blocos.append(BlocoPontuado.criar_a_partir_do_bloco_fixado(posicao, bloco_fixado))
+
+			erase_cell(posicao)
+			blocos_fixados.erase(posicao)
+
+		if not linha_pontuada.blocos.is_empty():
+			linhas_explodidas.append(linha_pontuada)
+
+	if not linhas_explodidas.is_empty():
+		blocos_explodidos.emit(linhas_explodidas)
 
 
 func avaliar_spin():
-	if not ultima_acao_foi_rotacao:
+	if peca.atravessa_blocos or not ultima_acao_foi_rotacao:
 		return
 		
 	if peca.tipo_peca == "T":
@@ -428,6 +544,8 @@ func avaliar_spin():
 
 
 func tratar_reset_fixacao():
+	if peca.atravessa_blocos:
+		return
 	if not pode_mover(Vector2i.DOWN):
 		if resets_fixacao < max_resets_fixacao:
 			etapas_fixacao = 0.0
@@ -443,11 +561,25 @@ func pode_mover(direcao):
 	return resposta
 
 
-func posicao_esta_livre(posicao):
+func posicao_esta_no_tabuleiro(posicao: Vector2i) -> bool:
+	return posicao.x >= 1 and posicao.x <= COLUNAS and posicao.y >= 1 and posicao.y <= LINHAS
+
+
+func posicao_esta_livre(posicao: Vector2i) -> bool:
+	return _posicao_esta_livre_para_peca(posicao, peca.atravessa_blocos)
+
+
+func _posicao_esta_livre_para_peca(posicao: Vector2i, atravessa: bool) -> bool:
+	if not posicao_esta_no_tabuleiro(posicao):
+		return false
+	if atravessa:
+		return true
+
 	# verifica se a posição pertence à peça atual
-	for bloco in peca_ativa:
-		if pos_atual + bloco == posicao:
-			return true
+	if not peca.atravessa_blocos:
+		for bloco in peca_ativa:
+			if pos_atual + bloco == posicao:
+				return true
 
 	# se não pertence à peça atual, verifica se existe algum tile nessa posição
 	return get_cell_source_id(posicao) == -1
@@ -460,7 +592,7 @@ func cair_imediatamente(posicionar_imediatamente: bool):
 	
 	etapas_queda = 0.0
 	
-	if posicionar_imediatamente:
+	if posicionar_imediatamente or peca.atravessa_blocos:
 		travar_peca()
 
 
@@ -489,7 +621,7 @@ func deslocar_linhas(linha):
 			if atlas == Vector2i(-1, -1):
 				erase_cell(posicao_destino)
 			else:
-				set_cell(posicao_destino, tile_id, atlas)
+				set_cell(posicao_destino, get_cell_source_id(posicao_origem), atlas)
 			
 			mover_dados_do_bloco(posicao_origem, posicao_destino)
 	
@@ -552,7 +684,7 @@ func substituir_peca_atual(nova_peca: Peca) -> bool:
 	var nova_forma: Array = obter_rotacoes(nova_peca)[indice_rotacao]
 	
 	for deslocamento in DESLOCAMENTOS_SUBSTITUICAO:
-		if not pode_rotacionar(nova_forma, deslocamento):
+		if not pode_rotacionar(nova_forma, deslocamento, nova_peca):
 			continue
 		
 		limpar_peca()
@@ -583,7 +715,7 @@ func _atualizar_pressao_dos_blocos_frageis():
 		
 		var atlas: Vector2i = bloco.obter_atlas_do_estagio()
 		if atlas != Vector2i(-1, -1) and atlas != get_cell_atlas_coords(posicao):
-			set_cell(posicao, tile_id, atlas)
+			set_cell(posicao, get_cell_source_id(posicao), atlas)
 	
 	for posicao in quebrados:
 		erase_cell(posicao)

@@ -16,6 +16,11 @@
 [ext_resource type="Resource" uid="uid://b3gt607mbqwgt" path="res://entities/pecas/peca_t.tres" id="15_noosx"]
 [ext_resource type="Resource" uid="uid://c08uth3g2u3jr" path="res://entities/pecas/peca_z.tres" id="16_jtwxc"]
 [ext_resource type="Resource" uid="uid://cek1lfbokxf5q" path="res://entities/pecas/peca_vidro.tres" id="16_kier8"]
+[ext_resource type="Resource" path="res://entities/pecas/peca_bomba.tres" id="17_bomba"]
+[ext_resource type="Texture2D" uid="uid://ddx0dx670dsgb" path="res://entities/pecas/bomba.png" id="18_bomba_tiles"]
+[ext_resource type="Resource" path="res://entities/pecas/peca_fantasma.tres" id="19_fantasma"]
+[ext_resource type="Resource" path="res://entities/pecas/peca_areia.tres" id="20_areia"]
+[ext_resource type="Texture2D" path="res://entities/pecas/areia.svg" id="21_areia_tiles"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_uppkp"]
 texture = ExtResource("1_uppkp")
@@ -32,9 +37,21 @@ texture_region_size = Vector2i(32, 32)
 9:0/0 = 0
 10:0/0 = 0
 
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_bomba"]
+texture = ExtResource("18_bomba_tiles")
+texture_region_size = Vector2i(32, 32)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_areia"]
+texture = ExtResource("21_areia_tiles")
+texture_region_size = Vector2i(32, 32)
+0:0/0 = 0
+
 [sub_resource type="TileSet" id="TileSet_wvnxi"]
 tile_size = Vector2i(32, 32)
 sources/0 = SubResource("TileSetAtlasSource_uppkp")
+sources/1 = SubResource("TileSetAtlasSource_bomba")
+sources/2 = SubResource("TileSetAtlasSource_areia")
 
 [node name="GameManager" type="Node2D" unique_id=380485723]
 script = ExtResource("1_oismu")
@@ -43,11 +60,17 @@ reliquias_iniciais = Array[ExtResource("3_wjvaw")]([ExtResource("5_la0xn")])
 
 [node name="TabuleiroTileMap" type="TileMapLayer" parent="." unique_id=1250284640]
 z_index = 2
+texture_filter = 1
 position = Vector2(709, 136)
 scale = Vector2(1.28, 1.28)
 tile_map_data = PackedByteArray("AAAAAAAAAAAHAAAAAAAAAAEAAAAHAAAAAAAAAAIAAAAHAAAAAAAAAAMAAAAHAAAAAAAAAAQAAAAHAAAAAAAAAAUAAAAHAAAAAAAAAAYAAAAHAAAAAAAAAAcAAAAHAAAAAAAAAAgAAAAHAAAAAAAAAAkAAAAHAAAAAAAAAAoAAAAHAAAAAAAAAAsAAAAHAAAAAAAAAAwAAAAHAAAAAAAAAA0AAAAHAAAAAAAAAA4AAAAHAAAAAAAAAA8AAAAHAAAAAAAAABAAAAAHAAAAAAAAABEAAAAHAAAAAAAAABIAAAAHAAAAAAAAABMAAAAHAAAAAAAAABQAAAAHAAAAAAAAABUAAAAHAAAAAAABAAAAAAAHAAAAAAABABUAAAAHAAAAAAACAAAAAAAHAAAAAAACABUAAAAHAAAAAAADAAAAAAAHAAAAAAADABUAAAAHAAAAAAAEAAAAAAAHAAAAAAAEABUAAAAHAAAAAAAFAAAAAAAHAAAAAAAFABUAAAAHAAAAAAAGAAAAAAAHAAAAAAAGABUAAAAHAAAAAAAHAAAAAAAHAAAAAAAHABUAAAAHAAAAAAAIAAAAAAAHAAAAAAAIABUAAAAHAAAAAAAJAAAAAAAHAAAAAAAJABUAAAAHAAAAAAAKAAAAAAAHAAAAAAAKABUAAAAHAAAAAAALAAAAAAAHAAAAAAALAAEAAAAHAAAAAAALAAIAAAAHAAAAAAALAAMAAAAHAAAAAAALAAQAAAAHAAAAAAALAAUAAAAHAAAAAAALAAYAAAAHAAAAAAALAAcAAAAHAAAAAAALAAgAAAAHAAAAAAALAAkAAAAHAAAAAAALAAoAAAAHAAAAAAALAAsAAAAHAAAAAAALAAwAAAAHAAAAAAALAA0AAAAHAAAAAAALAA4AAAAHAAAAAAALAA8AAAAHAAAAAAALABAAAAAHAAAAAAALABEAAAAHAAAAAAALABIAAAAHAAAAAAALABMAAAAHAAAAAAALABQAAAAHAAAAAAALABUAAAAHAAAAAAABABQAAAADAAAAAAACABQAAAADAAAAAAABABMAAAADAAAAAAACABMAAAADAAAAAAADABMAAAADAAAAAAAIABMAAAADAAAAAAAJABQAAAADAAAAAAAJABMAAAADAAAAAAAKABMAAAADAAAAAAAKABQAAAADAAAAAAAHABMAAAADAAAAAAAEABMAAAADAAAAAAADABQAAAADAAAAAAAEABQAAAADAAAAAAABABIAAAADAAAAAAACABIAAAADAAAAAAADABIAAAADAAAAAAAEABIAAAADAAAAAAAEABEAAAADAAAAAAADABEAAAADAAAAAAACABEAAAADAAAAAAABABEAAAADAAAAAAAGABEAAAADAAAAAAAHABEAAAADAAAAAAAIABEAAAADAAAAAAAJABEAAAADAAAAAAAKABEAAAADAAAAAAAJABIAAAADAAAAAAAIABIAAAADAAAAAAAHABIAAAADAAAAAAAKABIAAAADAAAAAAAHABQAAAADAAAAAAAIABQAAAADAAAAAAABABAAAAADAAAAAAACABAAAAADAAAAAAADABAAAAADAAAAAAAEABAAAAADAAAAAAAGABAAAAADAAAAAAAHABAAAAADAAAAAAAIABAAAAADAAAAAAAJABAAAAADAAAAAAAKABAAAAADAAAAAAAFABIAAAADAAAAAAABAA8AAAADAAAAAAACAA8AAAADAAAAAAADAA8AAAADAAAAAAAEAA8AAAADAAAAAAAGAA8AAAADAAAAAAAHAA8AAAADAAAAAAAIAA8AAAADAAAAAAAJAA8AAAADAAAAAAAKAA8AAAADAAAAAAA=")
 tile_set = SubResource("TileSet_wvnxi")
 script = ExtResource("2_uppkp")
-pecas = Array[ExtResource("9_kier8")]([ExtResource("10_2j0jo"), ExtResource("11_q0ki0"), ExtResource("12_ftrd0"), ExtResource("14_aril8"), ExtResource("15_noosx"), ExtResource("16_jtwxc"), ExtResource("13_wjatw"), ExtResource("16_kier8")])
+pecas = Array[ExtResource("9_kier8")]([ExtResource("10_2j0jo"), ExtResource("11_q0ki0"), ExtResource("12_ftrd0"), ExtResource("14_aril8"), ExtResource("15_noosx"), ExtResource("16_jtwxc"), ExtResource("13_wjatw"), ExtResource("16_kier8"), ExtResource("17_bomba"), ExtResource("19_fantasma"), ExtResource("20_areia")])
+
+[node name="PecaFantasma" type="TileMapLayer" parent="TabuleiroTileMap" unique_id=1155423316]
+z_index = 1
+texture_filter = 1
+tile_set = SubResource("TileSet_wvnxi")
 
 [node name="HUD" parent="TabuleiroTileMap" unique_id=1894945411 instance=ExtResource("3_yo8nm")]

@@ -7,6 +7,9 @@
 [ext_resource type="Resource" uid="uid://cq88sffr85rka" path="res://entities/reliquias/resources/teste_reliquia_camaleao.tres" id="5_gmud1"]
 [ext_resource type="Resource" uid="uid://dnlkfvxu7q45c" path="res://entities/reliquias/resources/teste_reliquia_mult_spin.tres" id="6_xshj6"]
 [ext_resource type="Resource" uid="uid://bwadiqljpft21" path="res://entities/reliquias/resources/teste_reliquia_combo.tres" id="7_gmud1"]
+[ext_resource type="Texture2D" uid="uid://chy1h8jd6be03" path="res://entities/pecas/tetrominoes.png" id="8_tiles"]
+[ext_resource type="Texture2D" path="res://entities/pecas/bomba.png" id="9_bomba_tiles"]
+[ext_resource type="Texture2D" path="res://entities/pecas/areia.svg" id="10_areia_tiles"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_06g6o"]
 bg_color = Color(0.2, 0.21960784, 0.30588236, 1)
@@ -30,7 +33,7 @@ bg_color = Color(0.2530101, 0.69875896, 0.468336, 1)
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ibkw7"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_7aupu"]
-texture = ExtResource("3_11rbf")
+texture = ExtResource("8_tiles")
 texture_region_size = Vector2i(32, 32)
 7:0/0 = 0
 0:0/0 = 0
@@ -44,9 +47,21 @@ texture_region_size = Vector2i(32, 32)
 9:0/0 = 0
 10:0/0 = 0
 
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_bomba"]
+texture = ExtResource("9_bomba_tiles")
+texture_region_size = Vector2i(32, 32)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_areia"]
+texture = ExtResource("10_areia_tiles")
+texture_region_size = Vector2i(32, 32)
+0:0/0 = 0
+
 [sub_resource type="TileSet" id="TileSet_7aupu"]
 tile_size = Vector2i(32, 32)
-sources/1 = SubResource("TileSetAtlasSource_7aupu")
+sources/0 = SubResource("TileSetAtlasSource_7aupu")
+sources/1 = SubResource("TileSetAtlasSource_bomba")
+sources/2 = SubResource("TileSetAtlasSource_areia")
 
 [node name="HUD" type="CanvasLayer" unique_id=1894945411]
 script = ExtResource("1_itb64")
@@ -219,11 +234,13 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="ProximaPecaTileMap" type="TileMapLayer" parent="." unique_id=1709088603]
+texture_filter = 1
 position = Vector2(1379, 244.00002)
 scale = Vector2(1.025, 1.025)
 tile_set = SubResource("TileSet_7aupu")
 
 [node name="PecaArmazenadaTileMap" type="TileMapLayer" parent="." unique_id=52403636]
+texture_filter = 1
 position = Vector2(1327.0001, 552.00006)
 scale = Vector2(0.89, 0.89)
 tile_set = SubResource("TileSet_7aupu")
