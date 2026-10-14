@@ -30,6 +30,9 @@ core/tetris.gd  (extends TileMapLayer)
 	- o delay de fixação e o travamento da peça
 	- detecção e remoção de linhas completas
 	- detecção de spins (avaliar_spin)
+	- a quebra de blocos de vidro (Peca.eh_fragil): ao travar uma peça, todo vidro com um
+	  bloco NÃO frágil acima dele na mesma coluna é removido na hora e dispara o
+	  EfeitoQuebraVidro
 	- sorteio das peças (saco "pecas_disponiveis") e a peça armazenada (hold)
 	- receber os valores de jogabilidade via aplicar_regras(regras)
 
@@ -65,6 +68,14 @@ entities/pieces/tabela_srs.gd  (class_name SRS)
   Deve abrigar:
 	- somente dados e consulta das tabelas
 
+core/efeito_quebra_vidro.gd  (class_name EfeitoQuebraVidro, extends Sprite2D)
+  Função:
+	Animação curta de UM bloco de vidro quebrando: passa pelos frames de
+	Peca.atlas_por_estagio_de_dano (inteiro, rachado, mais rachado), some com fade e se
+	apaga sozinho. Chamado por EfeitoQuebraVidro.tocar(...) no tetris.gd.
+
+  NÃO deve abrigar:
+	- lógica de jogo: quando o efeito aparece, o bloco já saiu do tabuleiro
 
 gerador_de_pecas.gd  (@tool, extends TileMapLayer)
   Função:
