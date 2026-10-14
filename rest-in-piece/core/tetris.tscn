@@ -6,19 +6,26 @@
 [ext_resource type="Script" uid="uid://bmhjollnq5ugp" path="res://core/tetris.gd" id="2_uppkp"]
 [ext_resource type="Script" uid="uid://dof1c2f4yw6ko" path="res://entities/reliquias/scripts/reliquia.gd" id="3_wjvaw"]
 [ext_resource type="PackedScene" uid="uid://b8dp7yalnfjlr" path="res://ui/scenes/hud.tscn" id="3_yo8nm"]
-[ext_resource type="Resource" uid="uid://cq88sffr85rka" path="res://entities/reliquias/resources/teste_reliquia_camaleao.tres" id="4_kier8"]
+[ext_resource type="Resource" uid="uid://cq88sffr85rka" path="res://entities/reliquias/resources/para_o_teaser/reliquia_camaleao.tres" id="4_kier8"]
 [ext_resource type="Resource" uid="uid://bxmi5j2ksugcl" path="res://levels/fase_2.tres" id="4_noosx"]
 [ext_resource type="Resource" uid="uid://c240pcejcl51k" path="res://levels/fase_3.tres" id="5_jtwxc"]
-[ext_resource type="Resource" uid="uid://dnlkfvxu7q45c" path="res://entities/reliquias/resources/teste_reliquia_mult_spin.tres" id="5_la0xn"]
+[ext_resource type="Resource" uid="uid://dnlkfvxu7q45c" path="res://entities/reliquias/resources/para_o_teaser/reliquia_mult_spin.tres" id="5_la0xn"]
 [ext_resource type="Resource" uid="uid://xl2ckxvf87vm" path="res://levels/fase_4.tres" id="6_tij57"]
+[ext_resource type="Resource" uid="uid://cu6v6lcljefk4" path="res://entities/reliquias/resources/para_o_teaser/reliquia_bonus_hard_drop.tres" id="8_mvxeb"]
+[ext_resource type="Resource" uid="uid://cumlgnc1ll0iq" path="res://entities/reliquias/resources/para_o_teaser/reliquia_buff_peca_armazenada.tres" id="9_2kqy1"]
 [ext_resource type="Script" uid="uid://bpwodnk3jua2h" path="res://entities/pecas/peca.gd" id="9_kier8"]
 [ext_resource type="Resource" uid="uid://dguon0fxwequy" path="res://entities/pecas/peca_i.tres" id="10_2j0jo"]
 [ext_resource type="Resource" uid="uid://4lntf8xgftm2" path="res://levels/fase_1.tres" id="10_wlauo"]
 [ext_resource type="Resource" uid="uid://dfd5rsig2m2sk" path="res://entities/pecas/peca_j.tres" id="11_q0ki0"]
+[ext_resource type="Resource" uid="uid://bwadiqljpft21" path="res://entities/reliquias/resources/para_o_teaser/reliquia_combo.tres" id="11_vk4ph"]
 [ext_resource type="Resource" uid="uid://c688au05wdx4w" path="res://entities/pecas/peca_l.tres" id="12_ftrd0"]
+[ext_resource type="Resource" uid="uid://b2ljiy0rkhadw" path="res://entities/reliquias/resources/para_o_teaser/reliquia_mult_por_altura.tres" id="12_qkqby"]
 [ext_resource type="Resource" uid="uid://ckbdb2osctv1d" path="res://entities/pecas/peca_o.tres" id="13_wjatw"]
 [ext_resource type="Resource" uid="uid://cc5u8vixjh3jd" path="res://entities/pecas/peca_s.tres" id="14_aril8"]
+[ext_resource type="Resource" uid="uid://i6w7ucq44g60" path="res://entities/reliquias/resources/para_o_teaser/reliquia_pecas_maximas_por_linhas.tres" id="14_jhpw1"]
+[ext_resource type="Resource" uid="uid://b1hcbuvsqv1gt" path="res://entities/reliquias/resources/para_o_teaser/reliquia_pontos_por_spin.tres" id="15_24u3u"]
 [ext_resource type="Resource" uid="uid://b3gt607mbqwgt" path="res://entities/pecas/peca_t.tres" id="15_noosx"]
+[ext_resource type="Resource" uid="uid://bug53qghwf2uq" path="res://entities/reliquias/resources/para_o_teaser/reliquia_torre_alta.tres" id="16_jqg6c"]
 [ext_resource type="Resource" uid="uid://c08uth3g2u3jr" path="res://entities/pecas/peca_z.tres" id="16_jtwxc"]
 [ext_resource type="Resource" uid="uid://cek1lfbokxf5q" path="res://entities/pecas/peca_vidro_o.tres" id="16_kier8"]
 [ext_resource type="Resource" path="res://entities/pecas/peca_bomba.tres" id="17_bomba"]
@@ -83,7 +90,7 @@ sources/2 = SubResource("TileSetAtlasSource_areia")
 [node name="GameManager" type="Node2D" unique_id=380485723]
 script = ExtResource("1_oismu")
 fases = Array[ExtResource("2_aril8")]([ExtResource("10_wlauo"), ExtResource("4_noosx"), ExtResource("5_jtwxc"), ExtResource("6_tij57")])
-reliquias_disponiveis = Array[ExtResource("3_wjvaw")]([ExtResource("4_kier8"), ExtResource("5_la0xn"), ExtResource("5_la0xn")])
+reliquias_disponiveis = Array[ExtResource("3_wjvaw")]([ExtResource("8_mvxeb"), ExtResource("9_2kqy1"), ExtResource("4_kier8"), ExtResource("11_vk4ph"), ExtResource("12_qkqby"), ExtResource("5_la0xn"), ExtResource("14_jhpw1"), ExtResource("15_24u3u"), ExtResource("16_jqg6c")])
 
 [node name="HUD" parent="." unique_id=1894945411 instance=ExtResource("3_yo8nm")]
 unique_name_in_owner = true

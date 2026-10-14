@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ReliquiaBonusHardDrop" format=3 uid="uid://cu6v6lcljefk4"]
+
+[ext_resource type="Script" uid="uid://dprihij3ff4rc" path="res://entities/reliquias/scripts/reliquia_bonus_hard_drop.gd" id="1_02xme"]
+[ext_resource type="Texture2D" uid="uid://c1eit30l7ytm5" path="res://entities/reliquias/texturas/vou_usar/Icon44.png" id="2_yp2le"]
+
+[resource]
+script = ExtResource("1_02xme")
+nome = "Âncora Dourada"
+descricao = "Ao usar a queda rápida, a peça recebe 1 ponto extra para cada casa percorrida"
+textura = ExtResource("2_yp2le")
+metadata/_custom_type_script = "uid://dprihij3ff4rc"

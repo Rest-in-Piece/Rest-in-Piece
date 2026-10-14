@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ReliquiaBuffPecaArmazenada" format=3 uid="uid://cumlgnc1ll0iq"]
+
+[ext_resource type="Script" uid="uid://coh8gs5tsho78" path="res://entities/reliquias/scripts/reliquia_buff_peca_armazenada.gd" id="1_gx5ny"]
+[ext_resource type="Texture2D" uid="uid://b734og08ma0h6" path="res://entities/reliquias/texturas/vou_usar/Icon50_1_2.png" id="2_8kwbk"]
+
+[resource]
+script = ExtResource("1_gx5ny")
+pontos_por_peca_por_nivel = Array[int]([5, 10, 15])
+nome = "Balança do Conhecimento"
+descricao = "Para as 3 primeiras peças que segurar, a cada turno que estiverem armazenadas aumenta permanentemente sua pontuação em 5"
+textura = ExtResource("2_8kwbk")
+metadata/_custom_type_script = "uid://coh8gs5tsho78"

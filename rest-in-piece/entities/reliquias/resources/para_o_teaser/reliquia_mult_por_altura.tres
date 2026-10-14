@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ReliquiaMultiplicadorPorAltura" format=3 uid="uid://b2ljiy0rkhadw"]
+
+[ext_resource type="Script" uid="uid://ckukjya1jm6ae" path="res://entities/reliquias/scripts/reliquia_mult_por_altura.gd" id="1_qy24p"]
+[ext_resource type="Texture2D" uid="uid://b6nffbt2wqcb1" path="res://entities/reliquias/texturas/vou_usar/Icon94_1_2.png" id="2_6xkf3"]
+
+[resource]
+script = ExtResource("1_qy24p")
+nome = "Pena de Cocatrice"
+descricao = "Ao pontuar, aumenta em 0,05 o modificador para cada quadrado de distância em relação ao chão"
+textura = ExtResource("2_6xkf3")
+metadata/_custom_type_script = "uid://ckukjya1jm6ae"

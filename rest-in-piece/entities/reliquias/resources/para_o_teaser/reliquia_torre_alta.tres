@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ReliquiaTorreAlta" format=3 uid="uid://bug53qghwf2uq"]
+
+[ext_resource type="Script" uid="uid://d0n1k7yerjoch" path="res://entities/reliquias/scripts/reliquia_torre_alta.gd" id="1_talqb"]
+[ext_resource type="Texture2D" uid="uid://bdhmyu0g1nfb1" path="res://entities/reliquias/texturas/vou_usar/Icon111_1_2.png" id="2_ab7tn"]
+
+[resource]
+script = ExtResource("1_talqb")
+multiplicador_bonus_por_nivel = Array[float]([2.0, 3.0, 4.0])
+nome = "O Olho que Tudo Vê"
+descricao = "Linhas pontuadas em altura 8 ou superior recebem +2 de multiplicador. Porém, as 3 primeiras linhas inferiores do tabuleiro nunca concedem pontos"
+textura = ExtResource("2_ab7tn")
+metadata/_custom_type_script = "uid://d0n1k7yerjoch"

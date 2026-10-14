@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ReliquiaPontosPorSpin" format=3 uid="uid://b1hcbuvsqv1gt"]
+
+[ext_resource type="Script" uid="uid://bf335q4b8vyu8" path="res://entities/reliquias/scripts/reliquia_pontos_por_spin.gd" id="1_xasu6"]
+[ext_resource type="Texture2D" uid="uid://dkg2lhh86wr0s" path="res://entities/reliquias/texturas/vou_usar/Icon20.png" id="2_upc2t"]
+
+[resource]
+script = ExtResource("1_xasu6")
+nome = "Compasso do Giro Eterno"
+descricao = "Realizar um Spin concede imediatamente 50 pontos"
+textura = ExtResource("2_upc2t")
+metadata/_custom_type_script = "uid://bf335q4b8vyu8"

@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ReliquiaPecasMaximasPorLinhas" format=3 uid="uid://i6w7ucq44g60"]
+
+[ext_resource type="Script" uid="uid://c2q7c1pj5g8a8" path="res://entities/reliquias/scripts/reliquia_pecas_maximas_por_linha.gd" id="1_hnpt2"]
+[ext_resource type="Texture2D" uid="uid://bvs53xf0qg456" path="res://entities/reliquias/texturas/vou_usar/Icon11.png" id="2_bwdmi"]
+
+[resource]
+script = ExtResource("1_hnpt2")
+linhas_por_peca_por_nivel = Array[int]([4, 3, 2])
+nome = "Bússola Mágica"
+descricao = "A cada 4 linhas completadas, aumenta em 1 o número máximo de peças da fase atual"
+textura = ExtResource("2_bwdmi")
+metadata/_custom_type_script = "uid://c2q7c1pj5g8a8"

@@ -1,7 +1,7 @@
 
 
-# "após o primeiro hold, a peça armazenada ganha pontos permanentemente a cada peça que
-# cai. No segundo hold, para de incrementar"
+# para as três primeiras peças que segurar, a cada turno que estiverem armazenadas,
+# aumenta permanentemente o n° de pontos da peça
 class_name ReliquiaBuffPecaArmazenada
 extends Reliquia
 
@@ -13,7 +13,7 @@ func ao_armazenar_peca(_peca_armazenada: Peca) -> void:
 	armazenamentos_realizados += 1
 
 func ao_pontuar(contexto: ContextoPontuacao) -> void:
-	if armazenamentos_realizados != 1 or contexto.peca_armazenada == null:
+	if armazenamentos_realizados > 3 or contexto.peca_armazenada == null:
 		return
 	
 	var pontos_por_peca: int = escolher_por_nivel(pontos_por_peca_por_nivel)
