@@ -29,12 +29,6 @@
 [ext_resource type="Resource" uid="uid://c08uth3g2u3jr" path="res://entities/pecas/peca_z.tres" id="16_jtwxc"]
 [ext_resource type="Resource" uid="uid://cek1lfbokxf5q" path="res://entities/pecas/peca_vidro_o.tres" id="16_kier8"]
 [ext_resource type="Resource" path="res://entities/pecas/peca_bomba.tres" id="17_bomba"]
-<<<<<<< Updated upstream
-[ext_resource type="Texture2D" uid="uid://ddx0dx670dsgb" path="res://entities/pecas/texturas/bomba.png" id="18_bomba_tiles"]
-[ext_resource type="Resource" path="res://entities/pecas/peca_fantasma.tres" id="19_fantasma"]
-[ext_resource type="Resource" path="res://entities/pecas/peca_areia.tres" id="20_areia"]
-[ext_resource type="Texture2D" uid="uid://cn33xnpa65hkj" path="res://entities/pecas/texturas/areia.svg" id="21_areia_tiles"]
-=======
 [ext_resource type="Texture2D" uid="uid://ddx0dx670dsgb" path="res://entities/pecas/bomba.png" id="18_bomba_tiles"]
 [ext_resource type="Resource" uid="uid://d4cy1jwxxnq42" path="res://entities/pecas/peca_fantasma_t.tres" id="19_fantasma"]
 [ext_resource type="Resource" uid="uid://4n65y11lei8v" path="res://entities/pecas/peca_areia_l.tres" id="20_areia"]
@@ -54,7 +48,6 @@
 [ext_resource type="Resource" uid="uid://dym5t30y36u1h" path="res://entities/pecas/peca_fantasma_o.tres" id="39_uouo2"]
 [ext_resource type="Resource" uid="uid://bdqmre7t5opjs" path="res://entities/pecas/peca_fantasma_s.tres" id="40_i5juf"]
 [ext_resource type="Resource" uid="uid://b6pl1uk4oajat" path="res://entities/pecas/peca_fantasma_z.tres" id="41_o3x0j"]
->>>>>>> Stashed changes
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_uppkp"]
 texture = ExtResource("1_uppkp")
