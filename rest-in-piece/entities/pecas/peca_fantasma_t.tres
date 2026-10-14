@@ -1,11 +1,10 @@
-[gd_resource type="Resource" script_class="Peca" format=3]
+[gd_resource type="Resource" script_class="Peca" format=3 uid="uid://d4cy1jwxxnq42"]
 
-[ext_resource type="Script" path="res://entities/pecas/peca.gd" id="1_peca"]
+[ext_resource type="Script" uid="uid://bpwodnk3jua2h" path="res://entities/pecas/peca.gd" id="1_peca"]
 
 [resource]
 script = ExtResource("1_peca")
-nome = "Fantasma"
-coords_no_atlas = Vector2i(0, 0)
+nome = "Fantasma_t"
 atravessa_blocos = true
 tipo_peca = "T"
 angulo_0 = Array[Vector2i]([Vector2i(-1, 0), Vector2i(0, 0), Vector2i(0, -1), Vector2i(1, 0)])

@@ -1,15 +1,16 @@
-[gd_resource type="Resource" script_class="Peca" format=3]
+[gd_resource type="Resource" script_class="Peca" format=3 uid="uid://brl4o8rx0wu4t"]
 
-[ext_resource type="Script" path="res://entities/pecas/peca.gd" id="1_peca"]
+[ext_resource type="Script" uid="uid://bpwodnk3jua2h" path="res://entities/pecas/peca.gd" id="1_qgmuj"]
 
 [resource]
-script = ExtResource("1_peca")
-nome = "Areia"
-coords_no_atlas = Vector2i(0, 0)
-id_fonte_tiles = 2
-cai_em_blocos_ao_travar = true
+script = ExtResource("1_qgmuj")
+nome = "Vidro_L"
+coords_no_atlas = Vector2i(8, 0)
+multiplicador_por_bloco = 1.5
+eh_fragil = true
 tipo_peca = "L"
 angulo_0 = Array[Vector2i]([Vector2i(-1, 0), Vector2i(0, 0), Vector2i(1, 0), Vector2i(1, -1)])
 angulo_90 = Array[Vector2i]([Vector2i(0, -1), Vector2i(0, 0), Vector2i(0, 1), Vector2i(1, 1)])
 angulo_180 = Array[Vector2i]([Vector2i(-1, 1), Vector2i(-1, 0), Vector2i(0, 0), Vector2i(1, 0)])
 angulo_270 = Array[Vector2i]([Vector2i(-1, -1), Vector2i(0, -1), Vector2i(0, 0), Vector2i(0, 1)])
+metadata/_custom_type_script = "uid://bpwodnk3jua2h"

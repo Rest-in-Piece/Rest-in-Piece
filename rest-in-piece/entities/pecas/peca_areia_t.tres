@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="Peca" format=3 uid="uid://pcr1vjpmb36"]
+
+[ext_resource type="Script" uid="uid://bpwodnk3jua2h" path="res://entities/pecas/peca.gd" id="1_dac2p"]
+
+[resource]
+script = ExtResource("1_dac2p")
+nome = "Areia_t"
+id_fonte_tiles = 2
+cai_em_blocos_ao_travar = true
+tipo_peca = "T"
+angulo_0 = Array[Vector2i]([Vector2i(-1, 0), Vector2i(0, 0), Vector2i(0, -1), Vector2i(1, 0)])
+angulo_90 = Array[Vector2i]([Vector2i(0, -1), Vector2i(0, 0), Vector2i(0, 1), Vector2i(1, 0)])
+angulo_180 = Array[Vector2i]([Vector2i(-1, 0), Vector2i(0, 0), Vector2i(1, 0), Vector2i(0, 1)])
+angulo_270 = Array[Vector2i]([Vector2i(0, -1), Vector2i(0, 0), Vector2i(0, 1), Vector2i(-1, 0)])
+metadata/_custom_type_script = "uid://bpwodnk3jua2h"

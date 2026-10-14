@@ -20,12 +20,34 @@
 [ext_resource type="Resource" uid="uid://cc5u8vixjh3jd" path="res://entities/pecas/peca_s.tres" id="14_aril8"]
 [ext_resource type="Resource" uid="uid://b3gt607mbqwgt" path="res://entities/pecas/peca_t.tres" id="15_noosx"]
 [ext_resource type="Resource" uid="uid://c08uth3g2u3jr" path="res://entities/pecas/peca_z.tres" id="16_jtwxc"]
-[ext_resource type="Resource" uid="uid://cek1lfbokxf5q" path="res://entities/pecas/peca_vidro.tres" id="16_kier8"]
+[ext_resource type="Resource" uid="uid://cek1lfbokxf5q" path="res://entities/pecas/peca_vidro_o.tres" id="16_kier8"]
 [ext_resource type="Resource" path="res://entities/pecas/peca_bomba.tres" id="17_bomba"]
+<<<<<<< Updated upstream
 [ext_resource type="Texture2D" uid="uid://ddx0dx670dsgb" path="res://entities/pecas/texturas/bomba.png" id="18_bomba_tiles"]
 [ext_resource type="Resource" path="res://entities/pecas/peca_fantasma.tres" id="19_fantasma"]
 [ext_resource type="Resource" path="res://entities/pecas/peca_areia.tres" id="20_areia"]
 [ext_resource type="Texture2D" uid="uid://cn33xnpa65hkj" path="res://entities/pecas/texturas/areia.svg" id="21_areia_tiles"]
+=======
+[ext_resource type="Texture2D" uid="uid://ddx0dx670dsgb" path="res://entities/pecas/bomba.png" id="18_bomba_tiles"]
+[ext_resource type="Resource" uid="uid://d4cy1jwxxnq42" path="res://entities/pecas/peca_fantasma_t.tres" id="19_fantasma"]
+[ext_resource type="Resource" uid="uid://4n65y11lei8v" path="res://entities/pecas/peca_areia_l.tres" id="20_areia"]
+[ext_resource type="Texture2D" uid="uid://cn33xnpa65hkj" path="res://entities/pecas/areia.svg" id="21_areia_tiles"]
+[ext_resource type="Resource" uid="uid://l02b6fdwtjps" path="res://entities/pecas/peca_i_vidro.tres" id="27_be5gn"]
+[ext_resource type="Resource" uid="uid://83hrxo4n6a1b" path="res://entities/pecas/peca_vidro_s.tres" id="28_mvxeb"]
+[ext_resource type="Resource" uid="uid://h880f1iuhun8" path="res://entities/pecas/peca_vidro_j.tres" id="29_2kqy1"]
+[ext_resource type="Resource" uid="uid://brl4o8rx0wu4t" path="res://entities/pecas/peca_vidro_l.tres" id="30_vk4ph"]
+[ext_resource type="Resource" uid="uid://b6m474k8o3pxc" path="res://entities/pecas/peca_vidro_t.tres" id="31_qkqby"]
+[ext_resource type="Resource" uid="uid://bsm7i5otrpne2" path="res://entities/pecas/peca_vidro_z.tres" id="32_jhpw1"]
+[ext_resource type="Resource" uid="uid://bo4axfoyhkolh" path="res://entities/pecas/peca_areia_j.tres" id="33_2kqy1"]
+[ext_resource type="Resource" uid="uid://bprgixrwd7rqt" path="res://entities/pecas/peca_areia_o.tres" id="34_vk4ph"]
+[ext_resource type="Resource" uid="uid://pcr1vjpmb36" path="res://entities/pecas/peca_areia_t.tres" id="35_jhpw1"]
+[ext_resource type="Resource" uid="uid://gfb14ldcmiph" path="res://entities/pecas/peca_areia_z.tres" id="36_24u3u"]
+[ext_resource type="Resource" uid="uid://bl12c7b4jkiqr" path="res://entities/pecas/peca_areia_s.tres" id="37_jqg6c"]
+[ext_resource type="Resource" uid="uid://cnkvho2uyvvef" path="res://entities/pecas/peca_fantasma_j.tres" id="38_k8mt6"]
+[ext_resource type="Resource" uid="uid://dym5t30y36u1h" path="res://entities/pecas/peca_fantasma_o.tres" id="39_uouo2"]
+[ext_resource type="Resource" uid="uid://bdqmre7t5opjs" path="res://entities/pecas/peca_fantasma_s.tres" id="40_i5juf"]
+[ext_resource type="Resource" uid="uid://b6pl1uk4oajat" path="res://entities/pecas/peca_fantasma_z.tres" id="41_o3x0j"]
+>>>>>>> Stashed changes
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_uppkp"]
 texture = ExtResource("1_uppkp")
@@ -74,7 +96,7 @@ scale = Vector2(1.28, 1.28)
 tile_map_data = PackedByteArray("AAAAAAAAAAAHAAAAAAAAAAEAAAAHAAAAAAAAAAIAAAAHAAAAAAAAAAMAAAAHAAAAAAAAAAQAAAAHAAAAAAAAAAUAAAAHAAAAAAAAAAYAAAAHAAAAAAAAAAcAAAAHAAAAAAAAAAgAAAAHAAAAAAAAAAkAAAAHAAAAAAAAAAoAAAAHAAAAAAAAAAsAAAAHAAAAAAAAAAwAAAAHAAAAAAAAAA0AAAAHAAAAAAAAAA4AAAAHAAAAAAAAAA8AAAAHAAAAAAAAABAAAAAHAAAAAAAAABEAAAAHAAAAAAAAABIAAAAHAAAAAAAAABMAAAAHAAAAAAAAABQAAAAHAAAAAAAAABUAAAAHAAAAAAABAAAAAAAHAAAAAAABABUAAAAHAAAAAAACAAAAAAAHAAAAAAACABUAAAAHAAAAAAADAAAAAAAHAAAAAAADABUAAAAHAAAAAAAEAAAAAAAHAAAAAAAEABUAAAAHAAAAAAAFAAAAAAAHAAAAAAAFABUAAAAHAAAAAAAGAAAAAAAHAAAAAAAGABUAAAAHAAAAAAAHAAAAAAAHAAAAAAAHABUAAAAHAAAAAAAIAAAAAAAHAAAAAAAIABUAAAAHAAAAAAAJAAAAAAAHAAAAAAAJABUAAAAHAAAAAAAKAAAAAAAHAAAAAAAKABUAAAAHAAAAAAALAAAAAAAHAAAAAAALAAEAAAAHAAAAAAALAAIAAAAHAAAAAAALAAMAAAAHAAAAAAALAAQAAAAHAAAAAAALAAUAAAAHAAAAAAALAAYAAAAHAAAAAAALAAcAAAAHAAAAAAALAAgAAAAHAAAAAAALAAkAAAAHAAAAAAALAAoAAAAHAAAAAAALAAsAAAAHAAAAAAALAAwAAAAHAAAAAAALAA0AAAAHAAAAAAALAA4AAAAHAAAAAAALAA8AAAAHAAAAAAALABAAAAAHAAAAAAALABEAAAAHAAAAAAALABIAAAAHAAAAAAALABMAAAAHAAAAAAALABQAAAAHAAAAAAALABUAAAAHAAAAAAABABQAAAADAAAAAAACABQAAAADAAAAAAABABMAAAADAAAAAAACABMAAAADAAAAAAADABMAAAADAAAAAAAIABMAAAADAAAAAAAJABQAAAADAAAAAAAJABMAAAADAAAAAAAKABMAAAADAAAAAAAKABQAAAADAAAAAAAHABMAAAADAAAAAAAEABMAAAADAAAAAAADABQAAAADAAAAAAAEABQAAAADAAAAAAABABIAAAADAAAAAAACABIAAAADAAAAAAADABIAAAADAAAAAAAEABIAAAADAAAAAAAEABEAAAADAAAAAAADABEAAAADAAAAAAACABEAAAADAAAAAAABABEAAAADAAAAAAAGABEAAAADAAAAAAAHABEAAAADAAAAAAAIABEAAAADAAAAAAAJABEAAAADAAAAAAAKABEAAAADAAAAAAAJABIAAAADAAAAAAAIABIAAAADAAAAAAAHABIAAAADAAAAAAAKABIAAAADAAAAAAAHABQAAAADAAAAAAAIABQAAAADAAAAAAABABAAAAADAAAAAAACABAAAAADAAAAAAADABAAAAADAAAAAAAEABAAAAADAAAAAAAGABAAAAADAAAAAAAHABAAAAADAAAAAAAIABAAAAADAAAAAAAJABAAAAADAAAAAAAKABAAAAADAAAAAAAFABIAAAADAAAAAAABAA8AAAADAAAAAAACAA8AAAADAAAAAAADAA8AAAADAAAAAAAEAA8AAAADAAAAAAAGAA8AAAADAAAAAAAHAA8AAAADAAAAAAAIAA8AAAADAAAAAAAJAA8AAAADAAAAAAAKAA8AAAADAAAAAAA=")
 tile_set = SubResource("TileSet_wvnxi")
 script = ExtResource("2_uppkp")
-pecas = Array[ExtResource("9_kier8")]([ExtResource("10_2j0jo"), ExtResource("11_q0ki0"), ExtResource("12_ftrd0"), ExtResource("14_aril8"), ExtResource("15_noosx"), ExtResource("16_jtwxc"), ExtResource("13_wjatw"), ExtResource("16_kier8"), ExtResource("17_bomba"), ExtResource("19_fantasma"), ExtResource("20_areia")])
+pecas = Array[ExtResource("9_kier8")]([ExtResource("10_2j0jo"), ExtResource("11_q0ki0"), ExtResource("12_ftrd0"), ExtResource("14_aril8"), ExtResource("15_noosx"), ExtResource("16_jtwxc"), ExtResource("13_wjatw"), ExtResource("16_kier8"), ExtResource("17_bomba"), ExtResource("19_fantasma"), ExtResource("20_areia"), ExtResource("27_be5gn"), ExtResource("28_mvxeb"), ExtResource("29_2kqy1"), ExtResource("30_vk4ph"), ExtResource("31_qkqby"), ExtResource("32_jhpw1"), ExtResource("33_2kqy1"), ExtResource("34_vk4ph"), ExtResource("35_jhpw1"), ExtResource("36_24u3u"), ExtResource("37_jqg6c"), ExtResource("38_k8mt6"), ExtResource("39_uouo2"), ExtResource("40_i5juf"), ExtResource("41_o3x0j"), ExtResource("19_fantasma")])
 
 [node name="PecaFantasma" type="TileMapLayer" parent="TabuleiroTileMap" unique_id=1155423316]
 z_index = 1

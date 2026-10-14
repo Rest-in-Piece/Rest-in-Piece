@@ -723,10 +723,40 @@ func _quebrar_blocos_frageis_com_peso_acima():
 		blocos_quebrados.emit(quebrados.size())
 
 
-# a linha 1 é o topo, então "acima" significa y menor
+# a linha 1 é o topo, então "acima" significa y menor.
+# Sobe a coluna a partir do bloco e PARA na primeira casa vazia: só conta peso que
+# está encostado no vidro (direto, ou através de uma pilha contínua de blocos)
 func _tem_bloco_solido_acima(posicao: Vector2i) -> bool:
-	for y in range(1, posicao.y):
-		var outro: BlocoFixado = blocos_fixados.get(Vector2i(posicao.x, y))
-		if outro != null and not outro.eh_fragil:
+	var y: int = posicao.y - 1
+	while y >= 1:
+		var posicao_acima := Vector2i(posicao.x, y)
+		
+		# casa vazia: a pilha acima foi interrompida, então não há peso
+		if get_cell_source_id(posicao_acima) == -1:
+			return false
+		
+		# tile sem dados (BlocoFixado nulo) é tratado como bloco sólido
+		var outro: BlocoFixado = blocos_fixados.get(posicao_acima)
+		if outro == null or not outro.eh_fragil:
 			return true
+		
+		# outro vidro: continua subindo, pois o peso passa por ele
+		y -= 1
+	
 	return false
+
+
+
+
+
+
+
+
+
+
+
+# colocar retorno visual visual na peça caindo de acordo com
+# as relíquias equipadas
+
+# # dinamismo. Tempo é pequeno. Sentou, se divertiu
+# não precisa ser jogo com rejogabilidade infinita (20 min)
