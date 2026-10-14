@@ -25,7 +25,7 @@
 [ext_resource type="Texture2D" uid="uid://ddx0dx670dsgb" path="res://entities/pecas/bomba.png" id="18_bomba_tiles"]
 [ext_resource type="Resource" path="res://entities/pecas/peca_fantasma.tres" id="19_fantasma"]
 [ext_resource type="Resource" path="res://entities/pecas/peca_areia.tres" id="20_areia"]
-[ext_resource type="Texture2D" path="res://entities/pecas/areia.svg" id="21_areia_tiles"]
+[ext_resource type="Texture2D" uid="uid://cn33xnpa65hkj" path="res://entities/pecas/areia.svg" id="21_areia_tiles"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_uppkp"]
 texture = ExtResource("1_uppkp")
@@ -80,5 +80,3 @@ pecas = Array[ExtResource("9_kier8")]([ExtResource("10_2j0jo"), ExtResource("11_
 z_index = 1
 texture_filter = 1
 tile_set = SubResource("TileSet_wvnxi")
-
-[node name="HUD" parent="TabuleiroTileMap" unique_id=1894945411 instance=ExtResource("3_yo8nm")]
