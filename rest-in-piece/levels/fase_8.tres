@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="Fase" format=3 uid="uid://b4a0vh6pnv06d"]
+
+[ext_resource type="Script" uid="uid://dof1c2f4yw6ko" path="res://entities/reliquias/scripts/reliquia.gd" id="1_mm0r0"]
+[ext_resource type="Script" uid="uid://b103p3gbf0tcp" path="res://levels/fase.gd" id="2_5hegy"]
+
+[resource]
+script = ExtResource("2_5hegy")
+metadata/_custom_type_script = "uid://b103p3gbf0tcp"

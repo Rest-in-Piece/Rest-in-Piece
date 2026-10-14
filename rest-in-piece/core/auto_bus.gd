@@ -21,7 +21,7 @@ signal reliquia_ativada(reliquia: Reliquia)
 # emitido toda vez que uma peça trava, com ou sem pontos (ouvintes filtram pelo contexto)
 signal jogada_resolvida(contexto: ContextoPontuacao)
 
-# emitido quando o limite de peças acaba e a meta da fase foi atingida
+# emitido quando a pontuação atinge a meta da fase (o jogo fica parado até o jogador avançar)
 signal fase_concluida(pontuacao_final: int)
 
 # emitido quando o jogador perde (fim de jogo no tabuleiro, ou limite de peças sem atingir a meta)

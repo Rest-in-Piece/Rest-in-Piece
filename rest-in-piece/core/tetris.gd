@@ -114,7 +114,7 @@ func novo_jogo():
 	assert(not pecas_do_saco.is_empty(), "o GameManager precisa definir pecas_do_saco antes de novo_jogo")
 	
 	jogo_iniciado.emit()
-	#limpar_grid() # AQUI DESCOMENTAR
+	limpar_grid() # AQUI DESCOMENTAR
 	
 	saco_atual = pecas_do_saco.duplicate()
 	peca = seleciona_uma_peca()

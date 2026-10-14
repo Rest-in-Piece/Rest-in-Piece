@@ -6,19 +6,29 @@
 
 extends Node
 
-@export var fase: Fase
+## fases da partida, em ordem (1 - 2 - 3...). A primeira é a que começa
+@export var fases: Array[Fase]
+
+## relíquias que podem aparecer na tela de recompensas (quando a fase não define as suas)
+@export var reliquias_disponiveis: Array[Reliquia]
 
 ## relíquias que o jogador já começa a partida (útil pra testar no editor)
 @export var reliquias_iniciais: Array[Reliquia]
 
+const QUANTIDADE_DE_RECOMPENSAS: int = 3
+
 @onready var tabuleiro: TileMapLayer = $TabuleiroTileMap
-@onready var hud: CanvasLayer = $TabuleiroTileMap/HUD
+@onready var hud: CanvasLayer = %HUD
 
 # variáveis lógicas
 var pontuacao: int = 0
-var meta: int = 0
-var aumento_meta: bool = true
 var velocidade_atual: float = 1.0
+
+var indice_fase: int = 0
+# a fase em andamento. O resto do código lê "fase" normalmente
+var fase: Fase:
+	get:
+		return fases[indice_fase]
 
 var gerenciador_reliquias: GerenciadorDeReliquias = GerenciadorDeReliquias.new()
 
@@ -43,6 +53,8 @@ var linhas_pendentes: Array[LinhaPontuada] = []
 var tipo_spin_pendente: String = ""
 
 func _ready():
+	assert(not fases.is_empty(), "defina ao menos uma fase em 'fases' no GameManager")
+	
 	tabuleiro.linhas_destruidas.connect(_on_linhas_destruidas)
 	tabuleiro.fim_de_jogo.connect(_on_fim_de_jogo)
 	tabuleiro.proxima_peca_sorteada.connect(hud.atualizar_proxima_peca)
@@ -55,6 +67,8 @@ func _ready():
 	gerenciador_reliquias.reliquias_alteradas.connect(_atualizar_hud_reliquias)
 	
 	hud.solicitou_novo_jogo.connect(iniciar_novo_jogo)
+	hud.recompensa_reliquia_escolhida.connect(_on_recompensa_reliquia_escolhida)
+	hud.transicao_de_fase_concluida.connect(_avancar_para_proxima_fase)
 	
 	iniciar_novo_jogo()
 
@@ -84,16 +98,9 @@ func _aplicar_substituicao_de_peca(contexto: ContextoDeTempo):
 			return
 
 
+# começa uma PARTIDA do zero: volta pra primeira fase e reseta bolsa de peças e relíquias
 func iniciar_novo_jogo():
-	pontuacao = 0
-	meta = fase.meta
-	velocidade_atual = fase.velocidade_inicial
-	aumento_meta = true
-	linhas_pendentes = []
-	tipo_spin_pendente = ""
-	peca_armazenada = null
-	pecas_posicionadas = 0
-	pecas_extras_da_partida = 0
+	indice_fase = 0
 	
 	# a bolsa precisa ser resetada antes das relíquias, que disparam o recálculo
 	bolsa_de_pecas.clear()
@@ -104,15 +111,48 @@ func iniciar_novo_jogo():
 	for reliquia in reliquias_iniciais:
 		gerenciador_reliquias.adquirir(reliquia)
 	
+	_iniciar_fase()
+
+
+# começa uma FASE: zera o que é da fase (pontuação, limite de peças, velocidade, tabuleiro)
+# e mantém o que é da partida (bolsa de peças e relíquias)
+func _iniciar_fase():
+	pontuacao = 0
+	velocidade_atual = fase.velocidade_inicial
+	linhas_pendentes = []
+	tipo_spin_pendente = ""
+	peca_armazenada = null
+	pecas_posicionadas = 0
+	pecas_extras_da_partida = 0
+	
 	# o HUD reseta os visuais (o contador de peças é atualizado em _aplicar_regras)
 	hud.atualizar_pontuacao(pontuacao)
-	hud.atualizar_meta(meta)
+	hud.atualizar_meta(fase.meta)
 	hud.esconder_telas_de_fim()
 	hud.limpar_peca_armazenada()
 	
 	# dá início ao tabuleiro
 	_aplicar_regras()
 	tabuleiro.novo_jogo()
+
+
+# chamado pelo HUD quando a vitória e a recompensa terminaram de ser exibidas
+func _avancar_para_proxima_fase():
+	if not _existe_proxima_fase():
+		return
+	
+	indice_fase += 1
+	_iniciar_fase()
+
+
+func _existe_proxima_fase() -> bool:
+	return indice_fase + 1 < fases.size()
+
+
+func _obter_nome_da_fase() -> String:
+	if fase.nome.is_empty():
+		return "Fase %d" % (indice_fase + 1)
+	return fase.nome
 
 
 # monta as regras em vigor (Fase + relíquias) e entrega pro tabuleiro
@@ -192,17 +232,19 @@ func _on_peca_travada(peca: Peca, casas_hard_drop: int):
 	var pontos: int = contexto.obter_pontuacao_final()
 	if pontos > 0:
 		pontuacao += pontos
-		_verificar_meta()
 		hud.atualizar_pontuacao(pontuacao)
-		hud.atualizar_meta(meta)
 	
 	# o limite é verificado DEPOIS da pontuação, que pode conceder peças extras
 	pecas_posicionadas += 1
 	pecas_extras_da_partida += contexto.pecas_extras
 	_atualizar_hud_pecas()
 	
-	if pecas_posicionadas >= obter_pecas_maximas():
-		_resolver_fim_do_limite_de_pecas()
+	# a meta vence a fase NA HORA. Ela tem prioridade sobre o limite: se a última peça
+	# atingiu a meta, é vitória
+	if pontuacao >= fase.meta:
+		_concluir_fase()
+	elif pecas_posicionadas >= obter_pecas_maximas():
+		_perder_partida()
 
 
 # todo spin concede um bônus base, com ou sem relíquias e com ou sem linhas destruídas.
@@ -215,35 +257,77 @@ func _aplicar_bonus_base_de_spin(contexto: ContextoPontuacao):
 	contexto.adicionar_multiplicador(regras_atuais.multiplicador_base_spin)
 
 
-# com multiplicadores, uma única jogada pode passar de várias metas, por isso o while
-func _verificar_meta():
-	while pontuacao >= meta:
-		var fator: float = 2.0 if aumento_meta else 2.5
-		meta = int(meta * fator)
-		aumento_meta = not aumento_meta
-
-
 func _on_fim_de_jogo():
 	_perder_partida()
 
 
-# o limite de peças acabou e todas as pontuações já foram resolvidas. A fase é vencida se
-# a meta DA FASE foi atingida (a variável "meta" dobra durante a partida, então não serve
-# pra essa comparação). Caso contrário, é derrota
-func _resolver_fim_do_limite_de_pecas():
-	print("LIMITE: posicionadas=", pecas_posicionadas, " maximas=", obter_pecas_maximas(), " pontuacao=", pontuacao, " meta_fase=", fase.meta)
-	tabuleiro.parar_jogo()
-	
-	if pontuacao >= fase.meta:
-		_concluir_fase()
-	else:
-		_perder_partida()
-
-
+# pausa o jogo e entrega a sequência de vitória e recompensas ao HUD. O jogo só continua
+# quando o HUD avisa (transicao_de_fase_concluida)
 func _concluir_fase():
-	hud.mostrar_tela_vitoria()
+	tabuleiro.parar_jogo()
 	AutoBus.fase_concluida.emit(pontuacao)
+	
+	if _existe_proxima_fase():
+		hud.mostrar_vitoria_da_fase(_obter_nome_da_fase(), _obter_reliquias_de_recompensa())
+	else:
+		hud.mostrar_vitoria_final(_obter_nome_da_fase())
+
+
+# as recompensas definidas na Fase (escolha manual, pra teaser) vêm primeiro, na ordem. O que
+# faltar pra completar QUANTIDADE_DE_RECOMPENSAS é sorteado do pool, sem repetir. Se o pool
+# não tiver relíquias diferentes o bastante, repete relíquias pra sempre oferecer 3 opções
+func _obter_reliquias_de_recompensa() -> Array[Reliquia]:
+	var oferecidas: Array[Reliquia] = []
+	
+	for reliquia in fase.recompensas_fixas:
+		if reliquia != null and oferecidas.size() < QUANTIDADE_DE_RECOMPENSAS:
+			oferecidas.append(reliquia)
+	
+	var pool: Array[Reliquia] = _obter_pool_de_reliquias()
+	
+	var sorteaveis: Array[Reliquia] = []
+	for reliquia in pool:
+		if not oferecidas.has(reliquia):
+			sorteaveis.append(reliquia)
+	sorteaveis.shuffle()
+	
+	while oferecidas.size() < QUANTIDADE_DE_RECOMPENSAS and not sorteaveis.is_empty():
+		oferecidas.append(sorteaveis.pop_back())
+	
+	if oferecidas.size() >= QUANTIDADE_DE_RECOMPENSAS:
+		return oferecidas
+	
+	# o pool é pequeno demais: repete relíquias pra manter sempre 3 opções
+	var repetiveis: Array[Reliquia] = pool
+	if repetiveis.is_empty():
+		repetiveis = oferecidas.duplicate()
+	
+	if repetiveis.is_empty():
+		push_warning("recompensas: nenhuma relíquia disponível. Preencha 'reliquias_disponiveis' no GameManager")
+		return oferecidas
+	
+	push_warning("recompensas: só há %d relíquia(s) diferente(s) disponível(is). Repetindo pra completar %d opções. Adicione mais relíquias em 'reliquias_disponiveis'" % [oferecidas.size() + sorteaveis.size(), QUANTIDADE_DE_RECOMPENSAS])
+	while oferecidas.size() < QUANTIDADE_DE_RECOMPENSAS:
+		oferecidas.append(repetiveis.pick_random())
+	
+	return oferecidas
+
+
+# o pool sem os elementos vazios do inspetor
+func _obter_pool_de_reliquias() -> Array[Reliquia]:
+	var pool: Array[Reliquia] = []
+	for reliquia in reliquias_disponiveis:
+		if reliquia != null:
+			pool.append(reliquia)
+	return pool
+
+
+func _on_recompensa_reliquia_escolhida(reliquia: Reliquia):
+	if not gerenciador_reliquias.adquirir(reliquia):
+		push_warning("limite de relíquias atingido: a recompensa foi descartada")
+
 
 func _perder_partida():
+	tabuleiro.parar_jogo()
 	hud.mostrar_tela_derrota()
 	AutoBus.partida_perdida.emit(pontuacao)

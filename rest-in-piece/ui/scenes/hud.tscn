@@ -7,6 +7,8 @@
 [ext_resource type="Resource" uid="uid://cq88sffr85rka" path="res://entities/reliquias/resources/teste_reliquia_camaleao.tres" id="5_gmud1"]
 [ext_resource type="Resource" uid="uid://dnlkfvxu7q45c" path="res://entities/reliquias/resources/teste_reliquia_mult_spin.tres" id="6_xshj6"]
 [ext_resource type="Resource" uid="uid://bwadiqljpft21" path="res://entities/reliquias/resources/teste_reliquia_combo.tres" id="7_gmud1"]
+[ext_resource type="PackedScene" uid="uid://bp5y3loag8irt" path="res://ui/scenes/painel_recompensas.tscn" id="8_ex61b"]
+[ext_resource type="Script" uid="uid://bwdhplobdt3o7" path="res://ui/scenes/painel_recompensas.gd" id="9_2avf4"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_06g6o"]
 bg_color = Color(0.2, 0.21960784, 0.30588236, 1)
@@ -30,7 +32,6 @@ bg_color = Color(0.2530101, 0.69875896, 0.468336, 1)
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ibkw7"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_7aupu"]
-texture = ExtResource("3_11rbf")
 texture_region_size = Vector2i(32, 32)
 7:0/0 = 0
 0:0/0 = 0
@@ -50,6 +51,15 @@ sources/1 = SubResource("TileSetAtlasSource_7aupu")
 
 [node name="HUD" type="CanvasLayer" unique_id=1894945411]
 script = ExtResource("1_itb64")
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=223934983]
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0.24313726, 0.30980393, 1)
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1432215097]
 visible = false
@@ -100,6 +110,7 @@ mouse_filter = 2
 [node name="LabelNomeReliquia" type="Label" parent="PainelInfoReliquia/Margem/Textos" unique_id=303560424]
 unique_name_in_owner = true
 layout_mode = 2
+horizontal_alignment = 1
 
 [node name="LabelDescricaoReliquia" type="Label" parent="PainelInfoReliquia/Margem/Textos" unique_id=980300327]
 unique_name_in_owner = true
@@ -227,3 +238,31 @@ tile_set = SubResource("TileSet_7aupu")
 position = Vector2(1327.0001, 552.00006)
 scale = Vector2(0.89, 0.89)
 tile_set = SubResource("TileSet_7aupu")
+
+[node name="PainelRecompensas" parent="." unique_id=820066549 instance=ExtResource("8_ex61b")]
+unique_name_in_owner = true
+visible = false
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -625.0
+offset_top = -320.5
+offset_right = 625.0
+offset_bottom = 320.5
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("9_2avf4")
+
+[node name="LabelVocePassouDeFase" type="Label" parent="." unique_id=330233249]
+unique_name_in_owner = true
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 6
+size_flags_vertical = 6
+horizontal_alignment = 1
+vertical_alignment = 1

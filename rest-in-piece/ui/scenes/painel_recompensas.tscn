@@ -1,10 +1,6 @@
 [gd_scene format=3 uid="uid://bp5y3loag8irt"]
 
-[ext_resource type="Texture2D" uid="uid://c8njktthjsjpe" path="res://entities/reliquias/texturas/Magic_Items_01_Pack_FREE/Magic_Items_01_pack_FREE-16x16.png" id="1_rbch1"]
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_tx8t6"]
-atlas = ExtResource("1_rbch1")
-region = Rect2(64, 48, 16, 16)
+[ext_resource type="PackedScene" uid="uid://mwk0m1csaiof" path="res://ui/scenes/recompensa_card.tscn" id="1_tx8t6"]
 
 [node name="PainelRecompensas" type="PanelContainer" unique_id=820066549]
 offset_right = 1250.0
@@ -21,143 +17,11 @@ theme_override_constants/margin_bottom = 70
 layout_mode = 2
 theme_override_constants/separation = 83
 
-[node name="Recompensa1" type="Control" parent="Margem/Recompensas" unique_id=840498214]
+[node name="Recompensa" parent="Margem/Recompensas" unique_id=55657980 instance=ExtResource("1_tx8t6")]
 layout_mode = 2
-size_flags_horizontal = 3
 
-[node name="Fundo1" type="Panel" parent="Margem/Recompensas/Recompensa1" unique_id=1454150207]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="Textura1" type="TextureRect" parent="Margem/Recompensas/Recompensa1" unique_id=1427983632]
-custom_minimum_size = Vector2(128, 128)
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -63.5
-offset_top = -187.5
-offset_right = 64.5
-offset_bottom = -59.5
-grow_horizontal = 2
-grow_vertical = 2
-size_flags_horizontal = 3
-texture = SubResource("AtlasTexture_tx8t6")
-
-[node name="Nome1" type="Label" parent="Margem/Recompensas/Recompensa1" unique_id=1467751921]
-layout_mode = 0
-offset_left = 89.0
-offset_top = 26.0
-offset_right = 223.0
-offset_bottom = 49.0
-text = "Nome da relíquia"
-
-[node name="Descricao1" type="Label" parent="Margem/Recompensas/Recompensa1" unique_id=905251274]
-custom_maximum_size = Vector2(240, 200)
-layout_mode = 0
-offset_left = 31.0
-offset_top = 232.0
-offset_right = 271.0
-offset_bottom = 432.0
-text = "Descrição descrição descrição descrição descrição descrição descrição descrição descrição descrição descrição descrição descrição Descrição descrição descrição descrição descrição descrição descrição descrição descrição descrição descrição descrição descrição Descrição descrição descrição descrição descrição descrição descrição descrição descrição descrição descrição descrição descrição"
-autowrap_mode = 2
-
-[node name="Recompensa2" type="Control" parent="Margem/Recompensas" unique_id=751692393]
+[node name="Recompensa2" parent="Margem/Recompensas" unique_id=860359387 instance=ExtResource("1_tx8t6")]
 layout_mode = 2
-size_flags_horizontal = 3
 
-[node name="Fundo1" type="Panel" parent="Margem/Recompensas/Recompensa2" unique_id=31793880]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="Textura1" type="TextureRect" parent="Margem/Recompensas/Recompensa2" unique_id=783494918]
-custom_minimum_size = Vector2(128, 128)
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -63.5
-offset_top = -187.5
-offset_right = 64.5
-offset_bottom = -59.5
-grow_horizontal = 2
-grow_vertical = 2
-size_flags_horizontal = 3
-texture = SubResource("AtlasTexture_tx8t6")
-
-[node name="Nome1" type="Label" parent="Margem/Recompensas/Recompensa2" unique_id=1491457206]
-layout_mode = 0
-offset_left = 89.0
-offset_top = 26.0
-offset_right = 223.0
-offset_bottom = 49.0
-text = "Nome da relíquia"
-
-[node name="Descricao1" type="Label" parent="Margem/Recompensas/Recompensa2" unique_id=1464132332]
-custom_maximum_size = Vector2(240, 200)
-layout_mode = 0
-offset_left = 31.0
-offset_top = 232.0
-offset_right = 271.0
-offset_bottom = 432.0
-text = "Descrição descrição descrição descrição descrição descrição descrição descrição descrição descrição descrição descrição descrição Descrição descrição descrição descrição descrição descrição descrição descrição descrição descrição descrição descrição descrição Descrição descrição descrição descrição descrição descrição descrição descrição descrição descrição descrição descrição descrição"
-autowrap_mode = 2
-
-[node name="Recompensa3" type="Control" parent="Margem/Recompensas" unique_id=1111622006]
+[node name="Recompensa3" parent="Margem/Recompensas" unique_id=364673992 instance=ExtResource("1_tx8t6")]
 layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="Fundo1" type="Panel" parent="Margem/Recompensas/Recompensa3" unique_id=2143634840]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="Textura1" type="TextureRect" parent="Margem/Recompensas/Recompensa3" unique_id=1710642473]
-custom_minimum_size = Vector2(128, 128)
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -63.5
-offset_top = -187.5
-offset_right = 64.5
-offset_bottom = -59.5
-grow_horizontal = 2
-grow_vertical = 2
-size_flags_horizontal = 3
-texture = SubResource("AtlasTexture_tx8t6")
-
-[node name="Nome1" type="Label" parent="Margem/Recompensas/Recompensa3" unique_id=2081485804]
-layout_mode = 0
-offset_left = 89.0
-offset_top = 26.0
-offset_right = 223.0
-offset_bottom = 49.0
-text = "Nome da relíquia"
-
-[node name="Descricao1" type="Label" parent="Margem/Recompensas/Recompensa3" unique_id=707884529]
-custom_maximum_size = Vector2(240, 200)
-layout_mode = 0
-offset_left = 31.0
-offset_top = 232.0
-offset_right = 271.0
-offset_bottom = 432.0
-text = "Descrição descrição descrição descrição descrição descrição descrição descrição descrição descrição descrição descrição descrição Descrição descrição descrição descrição descrição descrição descrição descrição descrição descrição descrição descrição descrição Descrição descrição descrição descrição descrição descrição descrição descrição descrição descrição descrição descrição descrição"
-autowrap_mode = 2
