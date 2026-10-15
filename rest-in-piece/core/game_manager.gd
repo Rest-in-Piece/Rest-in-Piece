@@ -15,10 +15,15 @@ extends Node
 ## relíquias que o jogador já começa a partida (útil pra testar no editor)
 @export var reliquias_iniciais: Array[Reliquia]
 
+@export_category("Efeitos sonoros")
+@export var som_completar_linha: Array[AudioStreamMP3]
+@export var som_passar_fase: Array[AudioStreamMP3]
+
 const QUANTIDADE_DE_RECOMPENSAS: int = 3
 
 @onready var tabuleiro: TileMapLayer = $TabuleiroTileMap
 @onready var hud: CanvasLayer = %HUD
+@onready var audio: AudioStreamPlayer2D = $Audio
 
 # variáveis lógicas
 var pontuacao: int = 0
@@ -193,6 +198,10 @@ func _atualizar_hud_pecas():
 
 
 func _on_linhas_destruidas(linhas: Array[LinhaPontuada]):
+	if not som_completar_linha.is_empty():
+		audio.stream = som_completar_linha.pick_random()
+		audio.play()
+	
 	# a pontuação é calculada em _on_peca_travada, aqui só guardamos a informação
 	linhas_pendentes.append_array(linhas)
 	
@@ -269,6 +278,10 @@ func _on_fim_de_jogo():
 # pausa o jogo e entrega a sequência de vitória e recompensas ao HUD. O jogo só continua
 # quando o HUD avisa (transicao_de_fase_concluida)
 func _concluir_fase():
+	if not som_passar_fase.is_empty():
+		audio.stream = som_passar_fase.pick_random()
+		audio.play()
+	
 	tabuleiro.parar_jogo()
 	AutoBus.fase_concluida.emit(pontuacao)
 	

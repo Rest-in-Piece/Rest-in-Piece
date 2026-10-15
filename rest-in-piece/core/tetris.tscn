@@ -29,10 +29,13 @@
 [ext_resource type="Resource" uid="uid://c08uth3g2u3jr" path="res://entities/pecas/peca_z.tres" id="16_jtwxc"]
 [ext_resource type="Resource" uid="uid://cek1lfbokxf5q" path="res://entities/pecas/peca_vidro_o.tres" id="16_kier8"]
 [ext_resource type="Resource" path="res://entities/pecas/peca_bomba.tres" id="17_bomba"]
-[ext_resource type="Texture2D" uid="uid://ddx0dx670dsgb" path="res://entities/pecas/bomba.png" id="18_bomba_tiles"]
+[ext_resource type="AudioStream" uid="uid://b4oawd1l8tw7" path="res://assets/audio/sound_fx/tetrazz_tetris.mp3" id="17_kt7iu"]
+[ext_resource type="Texture2D" uid="uid://ddx0dx670dsgb" path="res://entities/pecas/texturas/bomba.png" id="18_bomba_tiles"]
+[ext_resource type="AudioStream" uid="uid://bcn57ap23s3rv" path="res://assets/audio/sound_fx/tetris_single_line.mp3" id="18_qbs7a"]
 [ext_resource type="Resource" uid="uid://d4cy1jwxxnq42" path="res://entities/pecas/peca_fantasma_t.tres" id="19_fantasma"]
+[ext_resource type="AudioStream" uid="uid://dfmsy7hppdj40" path="res://assets/audio/sound_fx/slumber.mp3" id="19_kknpv"]
 [ext_resource type="Resource" uid="uid://4n65y11lei8v" path="res://entities/pecas/peca_areia_l.tres" id="20_areia"]
-[ext_resource type="Texture2D" uid="uid://cn33xnpa65hkj" path="res://entities/pecas/areia.svg" id="21_areia_tiles"]
+[ext_resource type="Texture2D" uid="uid://cn33xnpa65hkj" path="res://entities/pecas/texturas/areia.svg" id="21_areia_tiles"]
 [ext_resource type="Resource" uid="uid://l02b6fdwtjps" path="res://entities/pecas/peca_i_vidro.tres" id="27_be5gn"]
 [ext_resource type="Resource" uid="uid://83hrxo4n6a1b" path="res://entities/pecas/peca_vidro_s.tres" id="28_mvxeb"]
 [ext_resource type="Resource" uid="uid://h880f1iuhun8" path="res://entities/pecas/peca_vidro_j.tres" id="29_2kqy1"]
@@ -84,6 +87,8 @@ sources/2 = SubResource("TileSetAtlasSource_areia")
 script = ExtResource("1_oismu")
 fases = Array[ExtResource("2_aril8")]([ExtResource("10_wlauo"), ExtResource("4_noosx"), ExtResource("5_jtwxc"), ExtResource("6_tij57")])
 reliquias_disponiveis = Array[ExtResource("3_wjvaw")]([ExtResource("8_mvxeb"), ExtResource("9_2kqy1"), ExtResource("4_kier8"), ExtResource("11_vk4ph"), ExtResource("12_qkqby"), ExtResource("5_la0xn"), ExtResource("14_jhpw1"), ExtResource("15_24u3u"), ExtResource("16_jqg6c")])
+som_completar_linha = Array[AudioStreamMP3]([ExtResource("17_kt7iu"), ExtResource("18_qbs7a")])
+som_passar_fase = Array[AudioStreamMP3]([ExtResource("19_kknpv")])
 
 [node name="HUD" parent="." unique_id=1894945411 instance=ExtResource("3_yo8nm")]
 unique_name_in_owner = true
@@ -102,3 +107,5 @@ pecas = Array[ExtResource("9_kier8")]([ExtResource("10_2j0jo"), ExtResource("11_
 z_index = 1
 texture_filter = 1
 tile_set = SubResource("TileSet_wvnxi")
+
+[node name="Audio" type="AudioStreamPlayer2D" parent="." unique_id=1562634289]
