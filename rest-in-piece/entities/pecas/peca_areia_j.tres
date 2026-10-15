@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1_61jm5")
 nome = "Areia_j"
-coords_no_atlas = Vector2i(6, 0)
+coords_no_atlas = Vector2i(0, 0)
 id_fonte_tiles = 2
 cai_em_blocos_ao_travar = true
 tipo_peca = "J"

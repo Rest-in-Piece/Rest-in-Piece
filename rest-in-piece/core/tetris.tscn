@@ -103,6 +103,14 @@ tile_set = SubResource("TileSet_wvnxi")
 script = ExtResource("2_uppkp")
 pecas = Array[ExtResource("9_kier8")]([ExtResource("10_2j0jo"), ExtResource("11_q0ki0"), ExtResource("12_ftrd0"), ExtResource("14_aril8"), ExtResource("15_noosx"), ExtResource("16_jtwxc"), ExtResource("13_wjatw"), ExtResource("16_kier8"), ExtResource("17_bomba"), ExtResource("19_fantasma"), ExtResource("20_areia"), ExtResource("27_be5gn"), ExtResource("28_mvxeb"), ExtResource("29_2kqy1"), ExtResource("30_vk4ph"), ExtResource("31_qkqby"), ExtResource("32_jhpw1"), ExtResource("33_2kqy1"), ExtResource("34_vk4ph"), ExtResource("35_jhpw1"), ExtResource("36_24u3u"), ExtResource("37_jqg6c"), ExtResource("38_k8mt6"), ExtResource("39_uouo2"), ExtResource("40_i5juf"), ExtResource("41_o3x0j"), ExtResource("19_fantasma")])
 
+[node name="ProjecaoPeca" type="TileMapLayer" parent="TabuleiroTileMap"]
+modulate = Color(1, 1, 1, 0.25)
+z_index = -1
+texture_filter = 1
+tile_set = SubResource("TileSet_wvnxi")
+collision_enabled = false
+navigation_enabled = false
+
 [node name="PecaFantasma" type="TileMapLayer" parent="TabuleiroTileMap" unique_id=1155423316]
 z_index = 1
 texture_filter = 1

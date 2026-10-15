@@ -19,6 +19,7 @@ signal blocos_quebrados(quantidade: int)
 
 @export var pecas: Array[Peca]
 @onready var camada_fantasma: TileMapLayer = $PecaFantasma
+@onready var camada_projecao: TileMapLayer = $ProjecaoPeca
 
 # variaveis da grade (tabuleiro)
 const COLUNAS : int = 10
@@ -28,6 +29,7 @@ const FPS_REFERENCIA: float = 60.0
 const DELTA_MAXIMO: float = 0.1
 const ETAPAS_QUEDA_RAPIDA: float = 10.0
 const ETAPAS_FIXACAO_QUEDA_RAPIDA: float = 5.0
+const OPACIDADE_PROJECAO: float = 0.25
 
 # variaveis de movimentação
 const total_etapas : int = 50
@@ -206,6 +208,7 @@ func _processar_inputs(passo_tempo: float):
 
 func parar_jogo():
 	jogo_rodando = false
+	camada_projecao.clear()
 	_parar_movimento_lateral()
 
 
@@ -282,6 +285,7 @@ func armazenar_peca_atual():
 func criar_peca():
 	turno_atual += 1
 	camada_fantasma.clear()
+	camada_projecao.clear()
 	etapas_queda = 0.0
 	etapas_fixacao = 0.0
 	resets_fixacao = 0
@@ -322,13 +326,57 @@ func desenhar_peca(peca_desenho, posicao, atlas):
 	for bloco in peca_desenho:
 		if posicao_esta_no_tabuleiro(posicao + bloco):
 			destino.set_cell(posicao + bloco, peca.id_fonte_tiles, atlas)
+	atualizar_projecao()
 
 func limpar_peca():
+	camada_projecao.clear()
 	if peca != null and peca.atravessa_blocos:
 		camada_fantasma.clear()
 		return
 	for i in peca_ativa:
 		erase_cell(pos_atual + i)
+
+
+func obter_posicao_de_aterrissagem() -> Vector2i:
+	var destino: Vector2i = pos_atual
+	if peca == null or peca_ativa.is_empty():
+		return destino
+	# Usa as colisoes do hard drop, sem mover a peca nem alterar o grid.
+	while pode_mover(destino - pos_atual + Vector2i.DOWN):
+		destino += Vector2i.DOWN
+	return destino
+
+
+func obter_posicoes_da_projecao() -> Array[Vector2i]:
+	var posicoes: Array[Vector2i] = []
+	if peca == null or peca_ativa.is_empty():
+		return posicoes
+	var destino: Vector2i = obter_posicao_de_aterrissagem()
+	for bloco in peca_ativa:
+		var posicao: Vector2i = destino + bloco
+		if _posicao_esta_livre_para_peca(posicao, false):
+			posicoes.append(posicao)
+	if peca.cai_em_blocos_ao_travar:
+		# Simula os graos da Areia de baixo para cima, apenas em memoria.
+		posicoes.sort_custom(func(a: Vector2i, b: Vector2i): return a.y > b.y)
+		var assentadas: Array[Vector2i] = []
+		for posicao in posicoes:
+			while _posicao_esta_livre_para_peca(posicao + Vector2i.DOWN, false) and not assentadas.has(posicao + Vector2i.DOWN):
+				posicao += Vector2i.DOWN
+			assentadas.append(posicao)
+		posicoes = assentadas
+	return posicoes
+
+
+func atualizar_projecao() -> void:
+	camada_projecao.clear()
+	if not jogo_rodando or peca == null:
+		return
+	camada_projecao.modulate = peca.obter_cor_visual()
+	camada_projecao.modulate.a *= OPACIDADE_PROJECAO
+	for posicao in obter_posicoes_da_projecao():
+		camada_projecao.set_cell(posicao, peca.id_fonte_tiles, peca_atlas)
+
 
 func zerar_rotacao():
 	indice_rotacao = 0
@@ -383,6 +431,7 @@ func materializar_fantasma():
 
 
 func travar_peca():
+	camada_projecao.clear()
 	avaliar_spin()
 	
 	# as relíquias podem guardar bônus nos quadradinhos antes de eles serem registrados
@@ -633,6 +682,7 @@ func deslocar_linhas(linha):
 
 
 func limpar_grid():
+	camada_projecao.clear()
 	blocos_fixados.clear()
 	for i in range(LINHAS):
 		for j in range(COLUNAS):
