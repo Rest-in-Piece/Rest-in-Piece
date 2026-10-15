@@ -1,11 +1,10 @@
-[gd_resource type="Resource" script_class="Peca" format=3]
+[gd_resource type="Resource" script_class="Peca" format=3 uid="uid://dutbciutp6sug"]
 
-[ext_resource type="Script" path="res://entities/pecas/peca.gd" id="1_peca"]
+[ext_resource type="Script" uid="uid://bpwodnk3jua2h" path="res://entities/pecas/peca.gd" id="1_peca"]
 
 [resource]
 script = ExtResource("1_peca")
 nome = "Bomba"
-coords_no_atlas = Vector2i(0, 0)
 id_fonte_tiles = 1
 explode_ao_travar = true
 tipo_peca = "BOMBA"

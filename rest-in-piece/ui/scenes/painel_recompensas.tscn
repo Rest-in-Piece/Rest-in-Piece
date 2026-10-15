@@ -1,21 +1,32 @@
 [gd_scene format=3 uid="uid://bp5y3loag8irt"]
 
 [ext_resource type="PackedScene" uid="uid://mwk0m1csaiof" path="res://ui/scenes/recompensa_card.tscn" id="1_tx8t6"]
+[ext_resource type="Theme" path="res://ui/themes/rest_in_piece.tres" id="2_tema"]
 
 [node name="PainelRecompensas" type="PanelContainer" unique_id=820066549]
+theme = ExtResource("2_tema")
+theme_type_variation = &"Modal"
 offset_right = 1250.0
 offset_bottom = 641.0
 
+[node name="Titulo" type="Label" parent="."]
+layout_mode = 2
+size_flags_vertical = 0
+mouse_filter = 2
+theme_type_variation = &"TituloClaro"
+text = "RECOMPENSAS"
+horizontal_alignment = 1
+
 [node name="Margem" type="MarginContainer" parent="." unique_id=537281415]
 layout_mode = 2
-theme_override_constants/margin_left = 100
-theme_override_constants/margin_top = 70
-theme_override_constants/margin_right = 100
-theme_override_constants/margin_bottom = 70
+theme_override_constants/margin_left = 0
+theme_override_constants/margin_top = 40
+theme_override_constants/margin_right = 0
+theme_override_constants/margin_bottom = 0
 
 [node name="Recompensas" type="HBoxContainer" parent="Margem" unique_id=401476153]
 layout_mode = 2
-theme_override_constants/separation = 83
+theme_override_constants/separation = 24
 
 [node name="Recompensa" parent="Margem/Recompensas" unique_id=55657980 instance=ExtResource("1_tx8t6")]
 layout_mode = 2

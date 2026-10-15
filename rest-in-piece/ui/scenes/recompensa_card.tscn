@@ -1,6 +1,8 @@
 [gd_scene format=3 uid="uid://mwk0m1csaiof"]
 
 [ext_resource type="Script" uid="uid://bq3oo5vgb5ibe" path="res://ui/scenes/recompensa_card.gd" id="1_562l8"]
+[ext_resource type="Theme" path="res://ui/themes/rest_in_piece.tres" id="3_tema"]
+[ext_resource type="Script" path="res://ui/cor_paleta.gd" id="4_cor"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_tx8t6"]
 region = Rect2(64, 48, 16, 16)
@@ -10,6 +12,7 @@ custom_minimum_size = Vector2(350, 500)
 layout_mode = 3
 anchors_preset = 0
 size_flags_horizontal = 3
+theme = ExtResource("3_tema")
 script = ExtResource("1_562l8")
 
 [node name="Fundo*" type="ColorRect" parent="." unique_id=1677216792]
@@ -20,38 +23,58 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.2, 0.21960784, 0.30588236, 1)
+script = ExtResource("4_cor")
+cor_da_paleta = &"ardosia"
 
 [node name="Textura*" type="TextureRect" parent="." unique_id=513806834]
 custom_minimum_size = Vector2(128, 128)
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
-anchor_top = 0.5
+anchor_top = 0.0
 anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -63.5
-offset_top = -187.5
-offset_right = 64.5
-offset_bottom = -59.5
+anchor_bottom = 0.0
+offset_left = -64.0
+offset_top = 112.0
+offset_right = 64.0
+offset_bottom = 240.0
 grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 3
-texture = SubResource("AtlasTexture_tx8t6")
 
 [node name="Nome*" type="Label" parent="." unique_id=416946821]
-layout_mode = 0
-offset_left = 89.0
-offset_top = 26.0
-offset_right = 223.0
-offset_bottom = 49.0
+layout_mode = 1
+anchor_right = 1.0
+offset_left = 24.0
+offset_top = 24.0
+offset_right = -24.0
+offset_bottom = 92.0
+theme_type_variation = &"TituloClaro"
 text = "Nome da relíquia"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
 
 [node name="Descricao*" type="Label" parent="." unique_id=465952595]
-custom_maximum_size = Vector2(240, 200)
-layout_mode = 0
-offset_left = 31.0
-offset_top = 232.0
-offset_right = 271.0
-offset_bottom = 432.0
+layout_mode = 1
+anchor_right = 1.0
+offset_left = 24.0
+offset_top = 272.0
+offset_right = -24.0
+offset_bottom = 476.0
+theme_type_variation = &"Claro"
+theme_override_font_sizes/font_size = 22
 text = "Descrição descrição descrição descrição descrição descrição descrição descrição descrição descrição descrição descrição descrição Descrição descrição descrição descrição descrição descrição descrição descrição descrição descrição descrição descrição descrição Descrição descrição descrição descrição descrição descrição descrição descrição descrição descrição descrição descrição descrição"
-autowrap_mode = 2
+autowrap_mode = 3
+horizontal_alignment = 1
+clip_text = true
+max_lines_visible = 7
+
+[node name="Destaque" type="ColorRect" parent="."]
+layout_mode = 1
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -3.0
+mouse_filter = 2
+script = ExtResource("4_cor")

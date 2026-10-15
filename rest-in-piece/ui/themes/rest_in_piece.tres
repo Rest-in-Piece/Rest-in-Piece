@@ -1,0 +1,241 @@
+[gd_resource type="Theme" format=3]
+
+[sub_resource type="SystemFont" id="Font_corpo"]
+font_names = PackedStringArray("Segoe UI", "Noto Sans", "DejaVu Sans")
+font_weight = 400
+
+[sub_resource type="SystemFont" id="Font_destaque"]
+font_names = PackedStringArray("Bahnschrift", "Segoe UI", "Noto Sans", "DejaVu Sans")
+font_weight = 600
+
+[sub_resource type="SystemFont" id="Font_retro"]
+font_names = PackedStringArray("Unispace", "Ubuntu Mono", "Consolas", "DejaVu Sans Mono")
+font_weight = 700
+antialiasing = 0
+subpixel_positioning = 0
+oversampling = 1.0
+
+[sub_resource type="StyleBoxFlat" id="Superficie"]
+bg_color = Color(0.952, 0.9532, 0.9584, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.4, 0.196078, 0.298039, 0.35)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_left = 6
+corner_radius_bottom_right = 6
+content_margin_left = 20.0
+content_margin_top = 20.0
+content_margin_right = 20.0
+content_margin_bottom = 20.0
+
+[sub_resource type="StyleBoxFlat" id="Fundo"]
+bg_color = Color(0, 0.243137, 0.309804, 1)
+
+[sub_resource type="StyleBoxFlat" id="Moldura"]
+bg_color = Color(0.2, 0.219608, 0.305882, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.4, 0.196078, 0.298039, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_left = 4
+corner_radius_bottom_right = 4
+
+[sub_resource type="StyleBoxFlat" id="Slot"]
+bg_color = Color(0.2, 0.219608, 0.305882, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.6, 0.172549, 0.294118, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_left = 4
+corner_radius_bottom_right = 4
+content_margin_left = 4.0
+content_margin_top = 4.0
+content_margin_right = 4.0
+content_margin_bottom = 4.0
+
+[sub_resource type="StyleBoxFlat" id="Faixa_reliquias"]
+bg_color = Color(0.2, 0.219608, 0.305882, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_left = 6
+corner_radius_bottom_right = 6
+content_margin_left = 12.0
+content_margin_top = 4.0
+content_margin_right = 12.0
+content_margin_bottom = 4.0
+
+[sub_resource type="StyleBoxFlat" id="Modal"]
+bg_color = Color(0.2, 0.219608, 0.305882, 1)
+border_width_top = 3
+border_color = Color(0.8, 0.14902, 0.286275, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_left = 6
+corner_radius_bottom_right = 6
+content_margin_left = 32.0
+content_margin_top = 32.0
+content_margin_right = 32.0
+content_margin_bottom = 32.0
+
+[sub_resource type="StyleBoxFlat" id="Veu"]
+bg_color = Color(0, 0.243137, 0.309804, 0.94)
+
+[sub_resource type="StyleBoxFlat" id="Botao"]
+bg_color = Color(0.2, 0.219608, 0.305882, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_left = 6
+corner_radius_bottom_right = 6
+content_margin_left = 24.0
+content_margin_top = 14.0
+content_margin_right = 24.0
+content_margin_bottom = 14.0
+
+[sub_resource type="StyleBoxFlat" id="Botao_hover"]
+bg_color = Color(0.4, 0.196078, 0.298039, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_left = 6
+corner_radius_bottom_right = 6
+content_margin_left = 24.0
+content_margin_top = 14.0
+content_margin_right = 24.0
+content_margin_bottom = 14.0
+
+[sub_resource type="StyleBoxFlat" id="Botao_pressionado"]
+bg_color = Color(0.6, 0.172549, 0.294118, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_left = 6
+corner_radius_bottom_right = 6
+content_margin_left = 24.0
+content_margin_top = 14.0
+content_margin_right = 24.0
+content_margin_bottom = 14.0
+
+[sub_resource type="StyleBoxFlat" id="Primario"]
+bg_color = Color(0.8, 0.14902, 0.286275, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_left = 6
+corner_radius_bottom_right = 6
+content_margin_left = 24.0
+content_margin_top = 14.0
+content_margin_right = 24.0
+content_margin_bottom = 14.0
+
+[sub_resource type="StyleBoxFlat" id="Foco"]
+bg_color = Color(0, 0, 0, 0)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.8, 0.14902, 0.286275, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_left = 6
+corner_radius_bottom_right = 6
+expand_margin_left = 3.0
+expand_margin_top = 3.0
+expand_margin_right = 3.0
+expand_margin_bottom = 3.0
+
+[resource]
+default_font = SubResource("Font_corpo")
+default_font_size = 24
+Paleta/colors/fundo = Color(0, 0.243137, 0.309804, 1)
+Paleta/colors/ardosia = Color(0.2, 0.219608, 0.305882, 1)
+Paleta/colors/ameixa = Color(0.4, 0.196078, 0.298039, 1)
+Paleta/colors/bordo = Color(0.6, 0.172549, 0.294118, 1)
+Paleta/colors/destaque = Color(0.8, 0.14902, 0.286275, 1)
+Paleta/colors/superficie = Color(0.952, 0.9532, 0.9584, 1)
+Paleta/colors/claro = Color(0.98, 0.98, 0.99, 1)
+Paleta/colors/suave = Color(0.8, 0.805, 0.831, 1)
+Label/colors/font_color = Color(0, 0.243137, 0.309804, 1)
+Label/constants/line_spacing = 4
+Titulo/base_type = &"Label"
+Titulo/fonts/font = SubResource("Font_destaque")
+Titulo/font_sizes/font_size = 24
+Titulo/colors/font_color = Color(0.4, 0.196078, 0.298039, 1)
+Numero/base_type = &"Label"
+Numero/fonts/font = SubResource("Font_destaque")
+Numero/font_sizes/font_size = 72
+Contador/base_type = &"Label"
+Contador/fonts/font = SubResource("Font_destaque")
+Contador/font_sizes/font_size = 32
+Marca/base_type = &"Label"
+Marca/fonts/font = SubResource("Font_destaque")
+Marca/font_sizes/font_size = 44
+Marca/colors/font_color = Color(0.98, 0.98, 0.99, 1)
+TituloMenu/base_type = &"Label"
+TituloMenu/fonts/font = SubResource("Font_destaque")
+TituloMenu/font_sizes/font_size = 72
+TituloMenu/colors/font_color = Color(0.98, 0.98, 0.99, 1)
+Claro/base_type = &"Label"
+Claro/colors/font_color = Color(0.98, 0.98, 0.99, 1)
+Secundario/base_type = &"Label"
+Secundario/font_sizes/font_size = 20
+Secundario/colors/font_color = Color(0.8, 0.805, 0.831, 1)
+TituloClaro/base_type = &"Label"
+TituloClaro/fonts/font = SubResource("Font_destaque")
+TituloClaro/font_sizes/font_size = 28
+TituloClaro/colors/font_color = Color(0.98, 0.98, 0.99, 1)
+Resultado/base_type = &"Label"
+Resultado/fonts/font = SubResource("Font_destaque")
+Resultado/font_sizes/font_size = 48
+Resultado/colors/font_color = Color(0.98, 0.98, 0.99, 1)
+Panel/styles/panel = SubResource("Superficie")
+PanelContainer/styles/panel = SubResource("Superficie")
+FundoInterface/base_type = &"Panel"
+FundoInterface/styles/panel = SubResource("Fundo")
+MolduraTabuleiro/base_type = &"Panel"
+MolduraTabuleiro/styles/panel = SubResource("Moldura")
+FaixaReliquias/base_type = &"PanelContainer"
+FaixaReliquias/styles/panel = SubResource("Faixa_reliquias")
+SlotReliquia/base_type = &"PanelContainer"
+SlotReliquia/styles/panel = SubResource("Slot")
+Modal/base_type = &"PanelContainer"
+Modal/styles/panel = SubResource("Modal")
+ModalPlano/base_type = &"Panel"
+ModalPlano/styles/panel = SubResource("Modal")
+Veu/base_type = &"Panel"
+Veu/styles/panel = SubResource("Veu")
+VBoxContainer/constants/separation = 12
+HBoxContainer/constants/separation = 12
+Button/fonts/font = SubResource("Font_destaque")
+Button/font_sizes/font_size = 24
+Button/colors/font_color = Color(0.98, 0.98, 0.99, 1)
+Button/colors/font_hover_color = Color(0.98, 0.98, 0.99, 1)
+Button/colors/font_pressed_color = Color(0.98, 0.98, 0.99, 1)
+Button/styles/normal = SubResource("Botao")
+Button/styles/hover = SubResource("Botao_hover")
+Button/styles/pressed = SubResource("Botao_pressionado")
+Button/styles/focus = SubResource("Foco")
+Button/styles/disabled = SubResource("Botao")
+Primario/base_type = &"Button"
+Primario/styles/normal = SubResource("Primario")
+Primario/styles/hover = SubResource("Botao_pressionado")
+Primario/styles/pressed = SubResource("Botao_hover")
+TituloPixel/base_type = &"Titulo"
+TituloPixel/fonts/font = SubResource("Font_retro")
+NumeroPixel/base_type = &"Numero"
+NumeroPixel/fonts/font = SubResource("Font_retro")
+ContadorPixel/base_type = &"Contador"
+ContadorPixel/fonts/font = SubResource("Font_retro")
+SecundarioPixel/base_type = &"Secundario"
+SecundarioPixel/fonts/font = SubResource("Font_retro")
+TextoPixel/base_type = &"Label"
+TextoPixel/fonts/font = SubResource("Font_retro")
+ResultadoPixel/base_type = &"Resultado"
+ResultadoPixel/fonts/font = SubResource("Font_retro")
+PrimarioPixel/base_type = &"Primario"
+PrimarioPixel/fonts/font = SubResource("Font_retro")

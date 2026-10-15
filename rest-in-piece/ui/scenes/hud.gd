@@ -33,6 +33,10 @@ const PAUSA_APOS_VOO_RELIQUIA: float = 0.35
 @onready var painel_info_reliquia: Control = %PainelInfoReliquia
 @onready var label_nome_reliquia: Label = %LabelNomeReliquia
 @onready var label_descricao_reliquia: Label = %LabelDescricaoReliquia
+@onready var area_proxima_peca: Control = %AreaProximaPeca
+@onready var area_peca_armazenada: Control = %AreaPecaArmazenada
+@onready var reserva_vazia: Label = %ReservaVazia
+@onready var label_fase_atual: Label = %LabelFaseAtual
 
 
 func _ready() -> void:
@@ -42,15 +46,25 @@ func _ready() -> void:
 	painel_recompensas.reliquia_escolhida.connect(_on_reliquia_escolhida_no_painel)
 	esconder_info_reliquia()
 	label_fase_vencida.hide()
+	area_proxima_peca.resized.connect(centralizar_previas)
+	area_peca_armazenada.resized.connect(centralizar_previas)
+	label_pontuacao.resized.connect(ajustar_valores_numericos)
+	label_meta.resized.connect(ajustar_valores_numericos)
 
 func _on_botao_novo_jogo_pressed():
 	solicitou_novo_jogo.emit()
 
 func atualizar_pontuacao(valor: int):
 	label_pontuacao.text = str(valor)
+	ajustar_valores_numericos.call_deferred()
 
 func atualizar_meta(valor: int):
 	label_meta.text = str(valor)
+	ajustar_valores_numericos.call_deferred()
+	var indice = get_parent().get("indice_fase")
+	var fases = get_parent().get("fases")
+	if indice != null and fases is Array:
+		label_fase_atual.text = "FASE %02d / %02d" % [indice + 1, fases.size()]
 
 func atualizar_pecas(posicionadas: int, maximas: int):
 	label_pecas.text = "%d / %d" % [posicionadas, maximas]
@@ -170,16 +184,19 @@ func atualizar_proxima_peca(peca: Peca, atlas_coords: Vector2i):
 	var pos_central = Vector2i(0, 0)
 	for bloco in peca.angulos["0"]:
 		tile_map_proxima_peca.set_cell(pos_central + bloco, peca.id_fonte_tiles, atlas_coords)
+	centralizar_previas.call_deferred()
 
 
 func atualizar_peca_armazenada(peca: Peca, atlas_coords: Vector2i):
 	tile_map_peca_armazenada.clear()
 	tile_map_peca_armazenada.modulate = peca.obter_cor_visual() if peca != null else Color.WHITE
 	if peca == null:
+		centralizar_previas.call_deferred()
 		return
 	var pos_central = Vector2i(0, 0)
 	for bloco in peca.angulos["0"]:
 		tile_map_peca_armazenada.set_cell(pos_central + bloco, peca.id_fonte_tiles, atlas_coords)
+	centralizar_previas.call_deferred()
 
 
 func atualizar_reliquias(reliquias: Array[Reliquia]):
@@ -189,6 +206,7 @@ func mostrar_info_reliquia(reliquia: Reliquia):
 	label_nome_reliquia.text = reliquia.nome
 	label_descricao_reliquia.text = reliquia.descricao
 	painel_info_reliquia.show()
+	painel_info_reliquia.reset_size()
 
 func esconder_info_reliquia():
 	painel_info_reliquia.hide()
@@ -196,3 +214,27 @@ func esconder_info_reliquia():
 
 func limpar_peca_armazenada():
 	tile_map_peca_armazenada.clear()
+	centralizar_previas.call_deferred()
+
+
+func centralizar_previas() -> void:
+	_centralizar_previa(tile_map_proxima_peca, area_proxima_peca)
+	_centralizar_previa(tile_map_peca_armazenada, area_peca_armazenada)
+	reserva_vazia.visible = tile_map_peca_armazenada.get_used_cells().is_empty()
+
+
+func _centralizar_previa(mapa: TileMapLayer, area: Control) -> void:
+	var limites: Rect2i = mapa.get_used_rect()
+	if limites.size == Vector2i.ZERO:
+		return
+	var centro: Vector2 = mapa.map_to_local(limites.position) + Vector2(limites.size - Vector2i.ONE) * Vector2(mapa.tile_set.tile_size) / 2.0
+	mapa.position = area.get_global_rect().get_center() - centro * mapa.scale
+
+
+func ajustar_valores_numericos() -> void:
+	for label in [label_pontuacao, label_meta]:
+		var fonte: Font = label.get_theme_font("font")
+		var tamanho: int = 72
+		while tamanho > 24 and fonte.get_string_size(label.text, HORIZONTAL_ALIGNMENT_LEFT, -1, tamanho).x > label.size.x:
+			tamanho -= 2
+		label.add_theme_font_size_override("font_size", tamanho)
