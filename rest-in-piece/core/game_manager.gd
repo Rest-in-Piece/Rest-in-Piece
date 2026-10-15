@@ -15,6 +15,14 @@ extends Node
 ## relíquias que o jogador já começa a partida (útil pra testar no editor)
 @export var reliquias_iniciais: Array[Reliquia]
 
+@export_category("Pecas adicionais")
+## Uma peca de cada lista e adicionada ao saco no inicio da partida.
+@export var pecas_sorteaveis: Array[Peca]
+@export var pecas_sorteaveis_2: Array[Peca]
+@export var pecas_sorteaveis_3: Array[Peca]
+## Adicionada uma unica vez, depois de concluir a primeira fase.
+@export var peca_extra: Peca
+
 @export_category("Efeitos sonoros")
 @export var som_completar_linha: Array[AudioStreamMP3]
 @export var som_passar_fase: Array[AudioStreamMP3]
@@ -45,6 +53,8 @@ var regras_atuais: RegrasJogo
 var bolsa_de_pecas: Array[Peca] = []
 # a bolsa depois de as relíquias alterarem uma cópia (de onde o tabuleiro sorteia)
 var pecas_do_saco_atual: Array[Peca] = []
+
+var _peca_extra_adicionada: bool = false
 
 var peca_armazenada: Peca
 
@@ -107,6 +117,7 @@ func _aplicar_substituicao_de_peca(contexto: ContextoDeTempo):
 # começa uma PARTIDA do zero: volta pra primeira fase e reseta bolsa de peças e relíquias
 func iniciar_novo_jogo():
 	indice_fase = 0
+	_peca_extra_adicionada = false
 	
 	# a bolsa precisa ser resetada antes das relíquias, que disparam o recálculo
 	bolsa_de_pecas.clear()
@@ -114,6 +125,7 @@ func iniciar_novo_jogo():
 		bolsa_de_pecas.append(peca_inicial.criar_copia())
 	
 	gerenciador_reliquias.limpar()
+	adicionar_pecas_aleatorias_ao_saco()
 	for reliquia in reliquias_iniciais:
 		gerenciador_reliquias.adquirir(reliquia)
 	
@@ -173,6 +185,17 @@ func _aplicar_regras():
 	
 	# o limite pode ter mudado (relíquias), então o HUD é atualizado junto
 	_atualizar_hud_pecas()
+
+
+func adicionar_pecas_aleatorias_ao_saco():
+	# AQUI TEMPORÁRIO
+	for grupo in [pecas_sorteaveis, pecas_sorteaveis_2, pecas_sorteaveis_3]:
+		var candidatas: Array[Peca] = []
+		for candidata in grupo:
+			if candidata != null:
+				candidatas.append(candidata)
+		if not candidatas.is_empty():
+			adicionar_peca_a_bolsa(candidatas.pick_random())
 
 
 # usada por recompensas de fim de batalha e lojas. Cada cópia é uma peça independente
@@ -283,6 +306,9 @@ func _concluir_fase():
 		audio.play()
 	
 	tabuleiro.parar_jogo()
+	if indice_fase == 0 and peca_extra != null and not _peca_extra_adicionada:
+		_peca_extra_adicionada = true
+		adicionar_peca_a_bolsa(peca_extra)
 	AutoBus.fase_concluida.emit(pontuacao)
 	
 	if _existe_proxima_fase():
