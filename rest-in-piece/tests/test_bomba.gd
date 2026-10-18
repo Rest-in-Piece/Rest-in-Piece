@@ -21,6 +21,7 @@ func _executar():
 		_teste_bonus_dos_blocos, _teste_explosao_com_linha_completa,
 		_teste_linha_normal, _teste_hard_drop_com_delay,
 		_teste_hold_e_rotacao, _teste_bolsa, _teste_sprite,
+		_teste_raio_configuravel, _teste_efeito_da_bomba,
 	]
 	for teste in testes:
 		_preparar_jogo()
@@ -200,7 +201,7 @@ func _teste_hard_drop_com_delay():
 func _teste_hold_e_rotacao():
 	_ativar_peca(Vector2i(5, 2))
 	tabuleiro.armazenar_peca_atual()
-	_verificar(tabuleiro.peca_armazenada.explode_ao_travar and jogo.pontuacao == 0, "Hold deve guardar o efeito da bomba sem explodir.")
+	_verificar(tabuleiro.peca_armazenada.tem_efeito(EfeitoExplosao) and jogo.pontuacao == 0, "Hold deve guardar o efeito da bomba sem explodir.")
 	tabuleiro.pode_armazenar = true
 	tabuleiro.armazenar_peca_atual()
 	tabuleiro.rotacionar_peca(1)
@@ -214,11 +215,11 @@ func _teste_hold_e_rotacao():
 func _teste_bolsa():
 	var quantidade: int = 0
 	for peca_da_bolsa in jogo.bolsa_de_pecas:
-		if peca_da_bolsa.explode_ao_travar:
+		if peca_da_bolsa.tem_efeito(EfeitoExplosao):
 			quantidade += 1
 	_verificar(quantidade == 1, "A bolsa inicial deve conter uma bomba.")
 	var copia := BOMBA.criar_copia()
-	_verificar(copia.explode_ao_travar, "Copias da bomba devem manter o efeito.")
+	_verificar(copia.tem_efeito(EfeitoExplosao), "Copias da bomba devem manter o efeito.")
 	var contexto := ContextoPontuacao.new()
 	var parcial := LinhaPontuada.new()
 	parcial.completa = false
@@ -246,3 +247,27 @@ func _teste_sprite():
 	_verificar(jogo.hud.tile_map_peca_armazenada.get_cell_source_id(Vector2i.ZERO) == 1, "O hold deve usar o sprite da bomba.")
 	_ativar_peca(Vector2i(5, 10), PECA_O)
 	_verificar(tabuleiro.get_cell_source_id(Vector2i(5, 10)) == 0, "As pecas normais devem continuar usando o atlas original.")
+
+
+# o alcance da explosao e um parametro do efeito, nao do tabuleiro
+func _teste_raio_configuravel():
+	var efeito := EfeitoExplosao.new()
+	efeito.raio = 2
+	var grande := BOMBA.criar_copia()
+	grande.efeitos.assign([efeito])
+	var centro := Vector2i(5, 10)
+	for y in range(8, 13):
+		for x in range(3, 8):
+			if Vector2i(x, y) != centro:
+				_fixar_bloco(Vector2i(x, y))
+	_fixar_bloco(Vector2i(8, 10))
+	_ativar_peca(centro, grande)
+	tabuleiro.travar_peca()
+	_verificar(jogo.pontuacao == 240, "Raio 2 deve destruir e pontuar os 24 vizinhos. Pontos: %d" % jogo.pontuacao)
+	_verificar(tabuleiro.blocos_fixados.size() == 1 and tabuleiro.blocos_fixados.has(Vector2i(8, 10)), "Somente o bloco fora do alcance deve sobreviver.")
+	_contexto()
+
+
+func _teste_efeito_da_bomba():
+	_verificar(BOMBA.obter_tipo_tabela_srs() == "O", "A bomba usa a tabela SRS sem deslocamentos (campo tabela_srs).")
+	_verificar(BOMBA.efeitos.size() == 1 and BOMBA.efeitos[0] is EfeitoExplosao and not BOMBA.atravessa_blocos() and not BOMBA.fixa_ao_apoiar(), "A bomba so tem o efeito de explosao.")

@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="EfeitoFantasma" format=3]
+
+[ext_resource type="Script" path="res://entities/pecas/efeitos/efeito_fantasma.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+nome = "Fantasma"
+descricao = "Atravessa os blocos enquanto houver espaço vazio abaixo nas colunas da peça. Sem espaço, fixa sozinha, preenchendo só as células livres"

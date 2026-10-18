@@ -134,7 +134,7 @@ func _teste_copias_independentes():
 	var terceira: Peca = jogo.bolsa_de_pecas[quantidade_base + 2]
 	_verificar(primeira != original and primeira != segunda and segunda != terceira and primeira != terceira, "Candidatas repetidas devem gerar copias independentes em cada grupo.")
 	for copia in [primeira, segunda, terceira]:
-		_verificar(copia.atravessa_blocos and copia.pontos_extras == 7 and copia.multiplicador_extra == 0.5, "Copias devem preservar habilidades e bonus do recurso sorteado.")
+		_verificar(copia.atravessa_blocos() and copia.pontos_extras == 7 and copia.multiplicador_extra == 0.5, "Copias devem preservar habilidades e bonus do recurso sorteado.")
 	primeira.pontos_extras = 99
 	_verificar(original.pontos_extras == 7 and segunda.pontos_extras == 7 and terceira.pontos_extras == 7, "Alterar uma copia nao pode modificar o recurso exportado nem outras copias.")
 
@@ -153,7 +153,7 @@ func _teste_extra_na_primeira_vitoria():
 	jogo._concluir_fase()
 	_verificar_tamanho(quantidade_base + 4)
 	var extra: Peca = jogo.bolsa_de_pecas.back()
-	_verificar(extra != BOMBA and extra.explode_ao_travar, "A primeira vitoria deve adicionar uma copia da peca extra com seu efeito.")
+	_verificar(extra != BOMBA and extra.tem_efeito(EfeitoExplosao), "A primeira vitoria deve adicionar uma copia da peca extra com seu efeito.")
 	_verificar(not jogo.tabuleiro.jogo_rodando, "A peca extra nao deve retomar o jogo durante a recompensa.")
 	jogo._concluir_fase()
 	_verificar_tamanho(quantidade_base + 4)

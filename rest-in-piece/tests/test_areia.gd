@@ -1,9 +1,13 @@
 extends SceneTree
 
-const AREIA: Peca = preload("res://entities/pecas/peca_areia.tres")
+const AREIA: Peca = preload("res://entities/pecas/peca_areia_l.tres")
 const PECA_L: Peca = preload("res://entities/pecas/peca_l.tres")
 const PECA_O: Peca = preload("res://entities/pecas/peca_o.tres")
+const PECA_I: Peca = preload("res://entities/pecas/peca_i.tres")
 const BOMBA: Peca = preload("res://entities/pecas/peca_bomba.tres")
+const VIDRO_O: Peca = preload("res://entities/pecas/peca_vidro_o.tres")
+const EFEITO_AREIA: EfeitoAreia = preload("res://entities/pecas/efeitos/efeito_areia.tres")
+const EFEITO_FANTASMA: EfeitoFantasma = preload("res://entities/pecas/efeitos/efeito_fantasma.tres")
 const FORMATOS: Array[Peca] = [
 	preload("res://entities/pecas/peca_i.tres"), PECA_O,
 	preload("res://entities/pecas/peca_t.tres"), PECA_L,
@@ -29,13 +33,15 @@ func _executar():
 		_teste_bonus_hard_drop, _teste_dados_e_bonus, _teste_linha, _teste_duas_linhas,
 		_teste_bordas, _teste_formatos, _teste_substituicao, _teste_bolsa_e_sprite,
 		_teste_limite_da_fase, _teste_fantasma_com_areia, _teste_bomba_apos_areia,
+		_teste_gravidade_apos_linha_abaixo, _teste_cascata_de_linhas, _teste_bomba_libera_areia,
+		_teste_vidro_e_areia, _teste_blocos_comuns_nao_caem, _teste_efeito_compartilhado,
 	]
 	for teste in testes:
 		_preparar_jogo()
 		teste.call()
 		jogo.free()
 	if falhas.is_empty():
-		print("AREIA: %d testes passaram (incluindo 7 formatos e 4 rotacoes)." % testes.size())
+		print("AREIA: %d testes passaram (incluindo 7 formatos, 4 rotacoes e gravidade continua)." % testes.size())
 		quit(0)
 	else:
 		for falha in falhas:
@@ -87,9 +93,17 @@ func _fixar(posicao: Vector2i) -> BlocoFixado:
 	return bloco
 
 
+# coloca um grao de areia ja fixado (como se tivesse travado antes)
+func _semear_areia(posicao: Vector2i) -> BlocoFixado:
+	tabuleiro.set_cell(posicao, AREIA.id_fonte_tiles, AREIA.coords_no_atlas)
+	var bloco := BlocoFixado.criar_a_partir_da_peca(AREIA, TravamentoDePeca.new())
+	tabuleiro.blocos_fixados[posicao] = bloco
+	return bloco
+
+
 func _versao_areia(formato: Peca) -> Peca:
 	var copia := formato.criar_copia()
-	copia.cai_em_blocos_ao_travar = true
+	copia.efeitos.assign(AREIA.efeitos)
 	copia.id_fonte_tiles = AREIA.id_fonte_tiles
 	copia.coords_no_atlas = AREIA.coords_no_atlas
 	return copia
@@ -100,12 +114,9 @@ func _contexto() -> ContextoPontuacao:
 	return contextos.back() if not contextos.is_empty() else ContextoPontuacao.new()
 
 
+# a Areia e identificada pelo DADO do bloco (efeito), nao pela textura
 func _posicoes_areia() -> Array[Vector2i]:
-	var posicoes: Array[Vector2i] = []
-	for posicao in tabuleiro.blocos_fixados:
-		if tabuleiro.get_cell_source_id(posicao) == AREIA.id_fonte_tiles:
-			posicoes.append(posicao)
-	return posicoes
+	return tabuleiro.posicoes_com_efeito(EFEITO_AREIA)
 
 
 func _verificar_posicoes(esperadas: Array[Vector2i]):
@@ -202,10 +213,10 @@ func _teste_hold_e_rotacao():
 	tabuleiro.rotacionar_peca(1)
 	_verificar(tabuleiro.indice_rotacao == 1 and tabuleiro.blocos_fixados.is_empty(), "A Areia deve girar normalmente, sem se fixar.")
 	tabuleiro.armazenar_peca_atual()
-	_verificar(tabuleiro.peca_armazenada.cai_em_blocos_ao_travar and jogo.pecas_posicionadas == 0, "Hold deve guardar o efeito sem assentar a Areia.")
+	_verificar(tabuleiro.peca_armazenada.tem_efeito(EfeitoAreia) and jogo.pecas_posicionadas == 0, "Hold deve guardar o efeito sem assentar a Areia.")
 	tabuleiro.pode_armazenar = true
 	tabuleiro.armazenar_peca_atual()
-	_verificar(tabuleiro.peca.cai_em_blocos_ao_travar and tabuleiro.peca.id_fonte_tiles == 2, "A Areia deve voltar do hold com efeito e textura.")
+	_verificar(tabuleiro.peca.tem_efeito(EfeitoAreia) and tabuleiro.peca.id_fonte_tiles == 2, "A Areia deve voltar do hold com efeito e textura.")
 	tabuleiro.cair_imediatamente(true)
 	_verificar(_posicoes_areia().size() == 4 and jogo.pecas_posicionadas == 1, "O travamento imediato da Areia armazenada deve conservar os quatro graos.")
 
@@ -225,15 +236,15 @@ func _teste_dados_e_bonus():
 	var recurso := AREIA.criar_copia()
 	recurso.pontos_extras = 7
 	recurso.multiplicador_extra = 0.5
-	recurso.resistencia_ao_peso_por_bloco = 10
 	tabuleiro.peca_travando.connect(func(travamento: TravamentoDePeca):
 		travamento.adicionar_pontos_por_bloco(3)
 		travamento.adicionar_multiplicador_por_bloco(0.25))
 	_ativar(Vector2i(4, 10), recurso)
 	tabuleiro.travar_peca()
+	_verificar(_posicoes_areia().size() == 4, "Os quatro graos devem existir depois de cair.")
 	for posicao in _posicoes_areia():
 		var bloco: BlocoFixado = tabuleiro.blocos_fixados[posicao]
-		_verificar(bloco.pontos == 20 and bloco.multiplicador == 1.75 and bloco.resistencia == 10, "A movimentacao individual deve preservar todos os dados do bloco.")
+		_verificar(bloco.pontos == 20 and bloco.multiplicador == 1.75 and bloco.tem_efeito(EFEITO_AREIA), "A movimentacao individual deve preservar todos os dados do bloco.")
 	for deslocamento in recurso.angulo_0:
 		_verificar(not tabuleiro.blocos_fixados.has(Vector2i(4, 10) + deslocamento), "Os metadados das posicoes antigas devem ser removidos.")
 
@@ -303,20 +314,20 @@ func _teste_formatos():
 
 func _teste_substituicao():
 	_ativar(Vector2i(4, 10), PECA_L)
-	_verificar(tabuleiro.substituir_peca_atual(AREIA) and tabuleiro.peca.cai_em_blocos_ao_travar, "A substituicao por reliquia deve ativar o efeito da Areia.")
+	_verificar(tabuleiro.substituir_peca_atual(AREIA) and tabuleiro.peca.tem_efeito(EfeitoAreia), "A substituicao por reliquia deve ativar o efeito da Areia.")
 	_verificar(tabuleiro.get_cell_source_id(Vector2i(4, 10)) == 2, "A substituicao tambem deve atualizar a textura.")
-	_verificar(tabuleiro.substituir_peca_atual(PECA_L) and not tabuleiro.peca.cai_em_blocos_ao_travar, "Trocar de volta por L comum deve remover o efeito.")
+	_verificar(tabuleiro.substituir_peca_atual(PECA_L) and not tabuleiro.peca.tem_efeito(EfeitoAreia), "Trocar de volta por L comum deve remover o efeito.")
 	_verificar(tabuleiro.blocos_fixados.is_empty(), "Substituir a peca ativa nao deve assentar graos prematuramente.")
 
 
 func _teste_bolsa_e_sprite():
 	var quantidade: int = 0
 	for recurso in jogo.bolsa_de_pecas:
-		if recurso.cai_em_blocos_ao_travar:
+		if recurso.tem_efeito(EfeitoAreia):
 			quantidade += 1
 	_verificar(quantidade == 1, "O saco inicial deve conter exatamente uma Areia.")
 	var copia := AREIA.criar_copia()
-	_verificar(copia != AREIA and copia.cai_em_blocos_ao_travar and copia.obter_tipo_tabela_srs() == "PADRAO", "Copias devem preservar o efeito e a tabela SRS do L.")
+	_verificar(copia != AREIA and copia.tem_efeito(EfeitoAreia) and copia.obter_tipo_tabela_srs() == "PADRAO", "Copias devem preservar o efeito e a tabela SRS do L.")
 	var fonte: TileSetAtlasSource = tabuleiro.tile_set.get_source(2)
 	var fonte_hud: TileSetAtlasSource = jogo.hud.tile_map_proxima_peca.tile_set.get_source(2)
 	_verificar(fonte != fonte_hud and fonte.texture.get_image().get_size() == Vector2i(32, 32), "A grade e o HUD devem ter fontes independentes da textura de 32x32.")
@@ -340,12 +351,12 @@ func _teste_fantasma_com_areia():
 		_fixar(posicao)
 	var originais: Dictionary = tabuleiro.blocos_fixados.duplicate()
 	var recurso := _versao_areia(PECA_O)
-	recurso.atravessa_blocos = true
+	recurso.efeitos.append(EFEITO_FANTASMA)
 	_ativar(Vector2i(5, 10), recurso)
-	tabuleiro.materializar_fantasma()
+	tabuleiro.fixar_manualmente()
 	_preservar_originais(originais)
 	_verificar_posicoes([Vector2i(5, 20)])
-	_verificar(tabuleiro.camada_fantasma.get_used_cells().is_empty(), "Mesmo combinando flags, somente os graos novos podem cair.")
+	_verificar(tabuleiro.camada_fantasma.get_used_cells().is_empty(), "Mesmo combinando efeitos, somente os graos novos podem cair.")
 	_contexto()
 
 
@@ -356,3 +367,80 @@ func _teste_bomba_apos_areia():
 	tabuleiro.travar_peca()
 	_verificar(_posicoes_areia().is_empty() and jogo.pontuacao == 40, "Uma Bomba deve destruir e pontuar os quatro graos com seus dados nas posicoes finais.")
 	_verificar(contextos.size() == 2 and contextos.back().linhas_destruidas == 0, "A explosao dos graos continua contando como linhas parciais.")
+
+
+# --- gravidade ao longo da partida ---
+
+func _teste_gravidade_apos_linha_abaixo():
+	# linha 19 so falta o x=10; linha 20 tem buraco embaixo da coluna 5
+	for x in range(1, 10):
+		_fixar(Vector2i(x, 19))
+	for x in range(1, 5):
+		_fixar(Vector2i(x, 20))
+	_semear_areia(Vector2i(5, 18))
+	# o grao esta apoiado: uma peca que nao mexe nele nao o faz cair
+	_ativar(Vector2i(1, 3), PECA_O)
+	tabuleiro.travar_peca()
+	_verificar(tabuleiro.blocos_fixados.has(Vector2i(5, 18)) and jogo.linhas_pendentes.is_empty(), "Um grao apoiado nao deve cair.")
+	contextos.clear()
+	# a peca completa a linha 19: a linha some e a areia fica sem apoio
+	_ativar(Vector2i(10, 18), PECA_I, 1)
+	tabuleiro.travar_peca()
+	var contexto := _contexto()
+	_verificar(contexto.linhas_destruidas == 1, "A linha 19 deveria ter sido completada e destruida.")
+	_verificar(tabuleiro.blocos_fixados.has(Vector2i(5, 20)) and tabuleiro.blocos_fixados[Vector2i(5, 20)].tem_efeito(EFEITO_AREIA), "A areia deve cair ate o fundo quando a linha abaixo dela some.")
+	var graos: Array[Vector2i] = _posicoes_areia()
+	_verificar(graos.size() == 1 and graos[0] == Vector2i(5, 20), "Deve existir exatamente um grao, em (5,20). Atuais: %s" % [graos])
+
+
+func _teste_cascata_de_linhas():
+	# a areia que cai completa a linha 20; a linha limpa e o que esta acima desce
+	for x in range(1, 11):
+		if x != 5:
+			_fixar(Vector2i(x, 20))
+	_semear_areia(Vector2i(5, 10))
+	_ativar(Vector2i(2, 3), PECA_O)
+	tabuleiro.travar_peca()
+	var contexto := _contexto()
+	_verificar(contexto.linhas_destruidas == 1, "A areia caindo deve completar e destruir a linha 20.")
+	_verificar(jogo.pontuacao == 100, "A linha completada pela queda da areia deve pontuar. Pontos: %d" % jogo.pontuacao)
+	_verificar(_posicoes_areia().is_empty(), "O grao fazia parte da linha e deve sumir com ela.")
+	_verificar(tabuleiro.blocos_fixados.has(Vector2i(1, 4)) and tabuleiro.blocos_fixados.has(Vector2i(2, 4)), "As pecas comuns acima da linha devem descer um nivel.")
+
+
+func _teste_bomba_libera_areia():
+	for posicao in [Vector2i(4, 18), Vector2i(5, 18), Vector2i(6, 18), Vector2i(4, 19), Vector2i(6, 19), Vector2i(4, 20), Vector2i(5, 20), Vector2i(6, 20)]:
+		_fixar(posicao)
+	_semear_areia(Vector2i(5, 17))
+	_ativar(Vector2i(5, 19), BOMBA)
+	tabuleiro.travar_peca()
+	_verificar(tabuleiro.blocos_fixados.size() == 1 and tabuleiro.blocos_fixados.has(Vector2i(5, 20)), "A areia deve cair no buraco aberto pela explosao. Restam: %s" % [tabuleiro.blocos_fixados.keys()])
+	_verificar(_contexto().linhas_destruidas == 0 and jogo.pontuacao == 80, "A explosao pontua so os oito vizinhos. Pontos: %d" % jogo.pontuacao)
+
+
+func _teste_vidro_e_areia():
+	tabuleiro.set_cell(Vector2i(5, 20), VIDRO_O.id_fonte_tiles, VIDRO_O.coords_no_atlas)
+	tabuleiro.blocos_fixados[Vector2i(5, 20)] = BlocoFixado.criar_a_partir_da_peca(VIDRO_O, TravamentoDePeca.new())
+	_semear_areia(Vector2i(5, 19))
+	tabuleiro.estabilizar_tabuleiro()
+	_verificar(tabuleiro.blocos_fixados.size() == 1 and tabuleiro.blocos_fixados.has(Vector2i(5, 20)), "O vidro quebra com o peso da areia, que depois cai no lugar dele. Restam: %s" % [tabuleiro.blocos_fixados.keys()])
+	_verificar(tabuleiro.blocos_fixados[Vector2i(5, 20)].tem_efeito(EFEITO_AREIA), "O bloco que sobra deve ser a areia.")
+
+
+func _teste_blocos_comuns_nao_caem():
+	for x in range(1, 5):
+		_fixar(Vector2i(x, 20))
+	for x in range(1, 11):
+		_fixar(Vector2i(x, 19))
+	_fixar(Vector2i(5, 18))
+	tabuleiro.estabilizar_tabuleiro()
+	_verificar(tabuleiro.blocos_fixados.has(Vector2i(5, 19)) and not tabuleiro.blocos_fixados.has(Vector2i(5, 20)), "Um bloco comum so desce junto com a linha, sem gravidade propria.")
+
+
+func _teste_efeito_compartilhado():
+	var a := AREIA.criar_copia()
+	var b := AREIA.criar_copia()
+	_verificar(a.efeitos[0] == b.efeitos[0], "O efeito (sem estado) e compartilhado entre as copias.")
+	a.efeitos.clear()
+	_verificar(b.tem_efeito(EfeitoAreia) and AREIA.tem_efeito(EfeitoAreia), "A lista de efeitos de cada copia deve ser independente.")
+	_verificar(not PECA_L.tem_efeito(EfeitoAreia) and PECA_L.efeitos.is_empty(), "Pecas comuns nao possuem efeitos.")

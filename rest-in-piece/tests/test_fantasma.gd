@@ -1,8 +1,10 @@
 extends SceneTree
 
-const FANTASMA: Peca = preload("res://entities/pecas/peca_fantasma.tres")
+const FANTASMA: Peca = preload("res://entities/pecas/peca_fantasma_t.tres")
 const PECA_O: Peca = preload("res://entities/pecas/peca_o.tres")
 const PECA_I: Peca = preload("res://entities/pecas/peca_i.tres")
+const EFEITO_FANTASMA: EfeitoFantasma = preload("res://entities/pecas/efeitos/efeito_fantasma.tres")
+const EFEITO_VIDRO: EfeitoVidro = preload("res://entities/pecas/efeitos/efeito_vidro.tres")
 const FORMATOS: Array[Peca] = [
 	PECA_I, PECA_O, preload("res://entities/pecas/peca_t.tres"),
 	preload("res://entities/pecas/peca_l.tres"), preload("res://entities/pecas/peca_j.tres"),
@@ -30,6 +32,9 @@ func _executar():
 		_teste_limite_de_pecas, _teste_visual, _teste_reinicio,
 		_teste_queda_imediata_direta, _teste_inputs_na_proxima_peca,
 		_teste_fundo_parcial_automatico, _teste_fundo_vazio_automatico,
+		_teste_para_na_celula_vazia_mais_funda, _teste_gravidade_fixa_na_celula_mais_funda,
+		_teste_atravessa_enquanto_ha_espaco, _teste_sem_espaco_fixa_na_hora,
+		_teste_um_bloco_com_espaco_basta, _teste_efeitos_da_fantasma,
 	]
 	for teste in testes:
 		_preparar_jogo()
@@ -37,7 +42,7 @@ func _executar():
 		teste.call()
 		jogo.free()
 	if falhas.is_empty():
-		print("FANTASMA: %d testes passaram (incluindo 7 formatos e 4 rotacoes)." % testes.size())
+		print("FANTASMA: %d testes passaram (incluindo 7 formatos, 4 rotacoes e a queda limitada pelo espaco vazio)." % testes.size())
 		quit(0)
 	else:
 		for falha in falhas:
@@ -68,7 +73,7 @@ func _verificar(condicao: bool, mensagem: String):
 
 func _versao_fantasma(formato: Peca) -> Peca:
 	var copia := formato.criar_copia()
-	copia.atravessa_blocos = true
+	copia.efeitos.assign(FANTASMA.efeitos)
 	copia.coords_no_atlas = FANTASMA.coords_no_atlas
 	return copia
 
@@ -97,6 +102,15 @@ func _fixar(posicao: Vector2i) -> BlocoFixado:
 	bloco.multiplicador = 2.0
 	tabuleiro.blocos_fixados[posicao] = bloco
 	return bloco
+
+
+# duas colunas (4 e 5) cheias do fundo ate a linha 12, com um buraco em cada:
+# (4,15) e (5,18). Os buracos sao os unicos espacos vazios abaixo da pilha
+func _montar_pilha_com_buracos():
+	for y in range(12, 21):
+		for x in [4, 5]:
+			if Vector2i(x, y) not in [Vector2i(4, 15), Vector2i(5, 18)]:
+				_fixar(Vector2i(x, y))
 
 
 func _contexto() -> ContextoPontuacao:
@@ -181,7 +195,7 @@ func _teste_gravidade():
 	tabuleiro.etapas_queda = tabuleiro.total_etapas
 	tabuleiro.etapas_fixacao = tabuleiro.total_etapas_fixacao
 	tabuleiro._process(1.0 / 60.0)
-	_verificar(tabuleiro.pos_atual == Vector2i(5, 11) and jogo.pecas_posicionadas == 0, "A gravidade deve atravessar a pilha sem travar.")
+	_verificar(tabuleiro.pos_atual == Vector2i(5, 11) and jogo.pecas_posicionadas == 0, "A gravidade deve atravessar a pilha sem travar enquanto houver espaco abaixo.")
 	_verificar(contextos.is_empty(), "Tocar blocos fixos nao materializa a Fantasma.")
 	_preservado(Vector2i(5, 11), original)
 	_ativar(Vector2i(5, 19), _versao_fantasma(PECA_O))
@@ -197,12 +211,12 @@ func _teste_materializacao_parcial():
 	for posicao in [Vector2i(4, 9), Vector2i(5, 9), Vector2i(4, 10)]:
 		originais[posicao] = _fixar(posicao)
 	_ativar(Vector2i(5, 10), _versao_fantasma(PECA_O))
-	tabuleiro.materializar_fantasma()
+	tabuleiro.fixar_manualmente()
 	for posicao in originais:
 		_preservado(posicao, originais[posicao])
 	_verificar(tabuleiro.blocos_fixados.size() == 4 and tabuleiro.blocos_fixados.has(Vector2i(5, 10)), "No exemplo ##/#., somente a celula vazia deve ser materializada.")
 	_verificar(tabuleiro.blocos_fixados[Vector2i(5, 10)].pontos == 10, "O bloco materializado deve receber os valores da Fantasma.")
-	_verificar(jogo.pecas_posicionadas == 1 and not tabuleiro.peca.atravessa_blocos, "Materializar deve encerrar o turno e criar a proxima peca.")
+	_verificar(jogo.pecas_posicionadas == 1 and not tabuleiro.peca.atravessa_blocos(), "Materializar deve encerrar o turno e criar a proxima peca.")
 	_verificar(tabuleiro.camada_fantasma.get_used_cells().is_empty() and _contexto().linhas.is_empty(), "A sobreposicao deve desaparecer sem pontuar celulas descartadas.")
 
 
@@ -211,13 +225,14 @@ func _teste_materializacao_vazia():
 		_fixar(Vector2i(x, 12))
 	for deslocamento in PECA_O.angulo_0:
 		_fixar(Vector2i(5, 10) + deslocamento)
+	# vidro com peso acima: se o tabuleiro fosse estabilizado, ele quebraria
 	var fragil := _fixar(Vector2i(8, 15))
-	fragil.resistencia = 1
+	fragil.efeitos.append(EFEITO_VIDRO)
 	_fixar(Vector2i(8, 14))
 	var originais: Dictionary = tabuleiro.blocos_fixados.duplicate()
 	_ativar(Vector2i(5, 10), _versao_fantasma(PECA_O))
-	tabuleiro.materializar_fantasma()
-	_verificar(tabuleiro.blocos_fixados == originais and fragil.pressao == 0, "Sem celulas livres, o tabuleiro deve ficar intacto, incluindo linhas e vidro.")
+	tabuleiro.fixar_manualmente()
+	_verificar(tabuleiro.blocos_fixados == originais and tabuleiro.blocos_fixados.has(Vector2i(8, 15)), "Sem celulas livres, o tabuleiro deve ficar intacto, incluindo linhas e vidro.")
 	_verificar(jogo.pontuacao == 0 and _contexto().linhas.is_empty(), "Descartar toda a Fantasma nao limpa linhas nem concede pontos base.")
 	_verificar(jogo.pecas_posicionadas == 1, "Mesmo uma materializacao vazia consome o turno.")
 
@@ -230,7 +245,7 @@ func _teste_materializacao_total_e_bonus():
 		travamento.adicionar_pontos_por_bloco(3)
 		travamento.adicionar_multiplicador_por_bloco(0.25))
 	_ativar(Vector2i(5, 10), fantasma)
-	tabuleiro.materializar_fantasma()
+	tabuleiro.fixar_manualmente()
 	_verificar(tabuleiro.blocos_fixados.size() == 4, "Em uma area vazia, as quatro celulas devem se fixar.")
 	for deslocamento in fantasma.angulo_0:
 		var bloco: BlocoFixado = tabuleiro.blocos_fixados.get(Vector2i(5, 10) + deslocamento)
@@ -244,12 +259,12 @@ func _teste_fora_dos_limites():
 		if not tabuleiro.posicao_esta_no_tabuleiro(posicao):
 			borda[posicao] = tabuleiro.get_cell_atlas_coords(posicao)
 	_ativar(Vector2i(1, 1), _versao_fantasma(PECA_O))
-	tabuleiro.materializar_fantasma()
+	tabuleiro.fixar_manualmente()
 	_verificar(tabuleiro.blocos_fixados.size() == 1 and tabuleiro.blocos_fixados.has(Vector2i(1, 1)), "Celulas invalidas sao descartadas individualmente.")
 	for posicao in borda:
 		_verificar(tabuleiro.get_cell_atlas_coords(posicao) == borda[posicao], "A materializacao nao pode escrever sobre a borda.")
 	_ativar(Vector2i(-5, -5), _versao_fantasma(PECA_O))
-	tabuleiro.materializar_fantasma()
+	tabuleiro.fixar_manualmente()
 	_verificar(tabuleiro.blocos_fixados.size() == 1 and jogo.pecas_posicionadas == 2, "Uma Fantasma totalmente fora da grade apenas encerra o turno.")
 
 
@@ -258,7 +273,7 @@ func _teste_linha():
 		if x != 5:
 			_fixar(Vector2i(x, 20))
 	_ativar(Vector2i(5, 20), _versao_fantasma(PECA_O))
-	tabuleiro.materializar_fantasma()
+	tabuleiro.fixar_manualmente()
 	var contexto := _contexto()
 	_verificar(contexto.linhas_destruidas == 1 and contexto.linhas[0].blocos.size() == 10, "A materializacao parcial deve completar e pontuar linhas normalmente.")
 	_verificar(jogo.pontuacao > 0 and jogo.linhas_pendentes.is_empty(), "O GameManager deve consumir a pontuacao da linha sem duplicacao.")
@@ -297,7 +312,7 @@ func _teste_queda_imediata():
 	Input.action_press("cair_imediatamente")
 	tabuleiro._process(0.0)
 	Input.action_release("cair_imediatamente")
-	_verificar(jogo.pecas_posicionadas == 1 and tabuleiro.pos_atual == tabuleiro.pos_inicial, "Space/E deve atravessar a pilha e materializar no fundo sem F.")
+	_verificar(jogo.pecas_posicionadas == 1 and tabuleiro.pos_atual == tabuleiro.pos_inicial, "Space/E deve atravessar a pilha e materializar na celula mais funda sem F.")
 	_verificar(_contexto().casas_hard_drop == 18, "A distancia de hard drop deve ser registrada antes de criar a proxima peca.")
 	_verificar(tabuleiro.blocos_fixados.size() == 4, "Somente as tres celulas livres devem ser acrescentadas ao bloco existente.")
 	_preservado(Vector2i(5, 19), original)
@@ -325,10 +340,10 @@ func _teste_hold():
 	_ativar(Vector2i(5, 10))
 	tabuleiro.armazenar_peca_atual()
 	_preservado(Vector2i(5, 10), original)
-	_verificar(tabuleiro.peca_armazenada.atravessa_blocos and jogo.pecas_posicionadas == 0, "Hold deve preservar o efeito sem materializar nem consumir uma peca.")
+	_verificar(tabuleiro.peca_armazenada.atravessa_blocos() and jogo.pecas_posicionadas == 0, "Hold deve preservar o efeito sem materializar nem consumir uma peca.")
 	tabuleiro.pode_armazenar = true
 	tabuleiro.armazenar_peca_atual()
-	_verificar(tabuleiro.peca.atravessa_blocos and tabuleiro.pos_atual == tabuleiro.pos_inicial, "A Fantasma deve voltar do hold com o efeito ativo.")
+	_verificar(tabuleiro.peca.atravessa_blocos() and tabuleiro.pos_atual == tabuleiro.pos_inicial, "A Fantasma deve voltar do hold com o efeito ativo.")
 	_verificar(tabuleiro.camada_fantasma.get_used_cells().size() == 4, "O retorno do hold deve redesenhar a Fantasma sem materializar no topo.")
 
 
@@ -338,7 +353,7 @@ func _teste_substituicao():
 			_fixar(Vector2i(x, y))
 	_ativar(Vector2i(5, 10))
 	_verificar(not tabuleiro.substituir_peca_atual(PECA_O), "Uma reliquia nao pode trocar Fantasma por peca comum dentro de blocos fixos.")
-	_verificar(tabuleiro.peca.atravessa_blocos and tabuleiro.blocos_fixados.size() == 40, "Uma troca impossivel nao altera a Fantasma nem os blocos existentes.")
+	_verificar(tabuleiro.peca.atravessa_blocos() and tabuleiro.blocos_fixados.size() == 40, "Uma troca impossivel nao altera a Fantasma nem os blocos existentes.")
 	tabuleiro.limpar_peca()
 	tabuleiro.limpar_grid()
 	tabuleiro.peca_ativa = []
@@ -351,11 +366,11 @@ func _teste_substituicao():
 func _teste_bolsa_e_regras():
 	var quantidade: int = 0
 	for recurso in jogo.bolsa_de_pecas:
-		if recurso.atravessa_blocos:
+		if recurso.atravessa_blocos():
 			quantidade += 1
 	_verificar(quantidade == 1, "A bolsa inicial deve conter uma Fantasma.")
 	var copia := FANTASMA.criar_copia()
-	_verificar(copia != FANTASMA and copia.atravessa_blocos and copia.tipo_peca == "T", "A Fantasma inicial deve ser uma copia independente no formato T.")
+	_verificar(copia != FANTASMA and copia.atravessa_blocos() and copia.tipo_peca == "T", "A Fantasma inicial deve ser uma copia independente no formato T.")
 	var fase: Fase = jogo.fase.duplicate()
 	fase.total_etapas_fixacao = 100000.0
 	var regras := RegrasJogo.criar_a_partir_da_fase(fase, fase.velocidade_inicial)
@@ -449,3 +464,78 @@ func _teste_fundo_vazio_automatico():
 	_verificar(tabuleiro.blocos_fixados == originais and jogo.pontuacao == 0, "Uma Fantasma sem celulas livres deve desaparecer sem alterar o tabuleiro, mesmo automaticamente.")
 	_verificar(jogo.pecas_posicionadas == 1 and tabuleiro.jogo_rodando, "Uma materializacao vazia no fundo deve continuar para a proxima peca.")
 	_verificar(_contexto().linhas.is_empty(), "Uma materializacao vazia nao deve limpar linhas que ja existiam.")
+
+
+# --- nova regra de queda: limitada pelo espaco vazio das colunas ---
+
+func _teste_para_na_celula_vazia_mais_funda():
+	_montar_pilha_com_buracos()
+	var antes: int = tabuleiro.blocos_fixados.size()
+	_ativar(Vector2i(5, 2), _versao_fantasma(PECA_O))
+	tabuleiro.cair_imediatamente(false)
+	_verificar(tabuleiro.blocos_fixados.size() == antes + 1 and tabuleiro.blocos_fixados.has(Vector2i(5, 18)), "A peca desce INTEIRA ate o bloco mais fundo alcancar a celula vazia mais profunda (5,18).")
+	_verificar(not tabuleiro.blocos_fixados.has(Vector2i(4, 15)), "A coluna 4 nao cai de forma independente: o buraco dela, mais acima, nao e preenchido.")
+	_verificar(jogo.pecas_posicionadas == 1 and _contexto().casas_hard_drop == 17, "O hard drop da Fantasma fixa sozinho; o bloco de cima do O e quem alcanca o buraco. Casas: %d" % _contexto().casas_hard_drop)
+
+
+func _teste_gravidade_fixa_na_celula_mais_funda():
+	_montar_pilha_com_buracos()
+	var antes: int = tabuleiro.blocos_fixados.size()
+	_ativar(Vector2i(5, 2), _versao_fantasma(PECA_O))
+	var quadros: int = 0
+	while jogo.pecas_posicionadas == 0 and quadros < 5000:
+		tabuleiro.etapas_queda = tabuleiro.total_etapas
+		tabuleiro._process(1.0 / 60.0)
+		quadros += 1
+	_verificar(jogo.pecas_posicionadas == 1, "A Fantasma deve fixar sozinha quando nao houver mais espaco vazio abaixo.")
+	_verificar(tabuleiro.blocos_fixados.size() == antes + 1 and tabuleiro.blocos_fixados.has(Vector2i(5, 18)), "Pela gravidade ela termina no mesmo lugar do hard drop: (5,18).")
+	_contexto()
+
+
+func _teste_atravessa_enquanto_ha_espaco():
+	# linha 20 cheia (menos x=5) e uma pilha nas colunas 4, 5 e 6 por cima dela
+	for x in range(1, 11):
+		if x != 5:
+			_fixar(Vector2i(x, 20))
+	for y in range(8, 20):
+		for x in [4, 5, 6]:
+			_fixar(Vector2i(x, y))
+	_ativar(Vector2i(5, 2))
+	tabuleiro.etapas_queda = tabuleiro.total_etapas
+	tabuleiro._process(1.0 / 60.0)
+	_verificar(jogo.pecas_posicionadas == 0 and tabuleiro.pos_atual == Vector2i(5, 3), "Ainda ha um espaco vazio no fundo da coluna 5: a Fantasma continua caindo e atravessando.")
+	tabuleiro.cair_imediatamente(false)
+	_verificar(jogo.pecas_posicionadas == 1, "O hard drop fixa a peca ao chegar na unica celula vazia.")
+	_verificar(_contexto().linhas_destruidas == 1, "Preencher a ultima celula livre da linha 20 completa a linha.")
+
+
+func _teste_sem_espaco_fixa_na_hora():
+	for y in range(1, 21):
+		for x in [4, 5, 6]:
+			_fixar(Vector2i(x, y))
+	var antes: int = tabuleiro.blocos_fixados.size()
+	_ativar(Vector2i(5, 5))
+	_verificar(not tabuleiro.pode_mover(Vector2i.DOWN), "Sem nenhuma celula vazia nas colunas da peca, ela nao pode descer.")
+	tabuleiro._process(1.0 / 60.0)
+	_verificar(jogo.pecas_posicionadas == 1 and tabuleiro.blocos_fixados.size() == antes, "A Fantasma fixa na hora e o tabuleiro continua igual.")
+	_verificar(tabuleiro.camada_fantasma.get_used_cells().is_empty() or tabuleiro.pos_atual == tabuleiro.pos_inicial, "A proxima peca assume o lugar.")
+	_contexto()
+
+
+func _teste_um_bloco_com_espaco_basta():
+	# a coluna 6 esta cheia, mas a 4 e a 5 ainda tem espaco no fundo
+	for y in range(1, 21):
+		_fixar(Vector2i(6, y))
+	_ativar(Vector2i(5, 5))
+	_verificar(tabuleiro.pode_mover(Vector2i.DOWN), "Basta um bloco da peca ter espaco vazio na coluna dele para ela continuar descendo.")
+	tabuleiro.cair_imediatamente(false)
+	_verificar(jogo.pecas_posicionadas == 1, "Ao chegar ao fundo, fixa.")
+	_verificar(tabuleiro.blocos_fixados.has(Vector2i(4, 20)) and tabuleiro.blocos_fixados.has(Vector2i(5, 20)) and tabuleiro.blocos_fixados.has(Vector2i(5, 19)), "As celulas livres sao preenchidas; a da coluna cheia e descartada.")
+	_verificar(tabuleiro.blocos_fixados[Vector2i(6, 20)].multiplicador == 2.0, "O bloco original da coluna cheia nao e substituido.")
+
+
+func _teste_efeitos_da_fantasma():
+	_verificar(FANTASMA.efeitos.size() == 1 and FANTASMA.efeitos[0] == EFEITO_FANTASMA, "A Fantasma e a peca T com o efeito compartilhado.")
+	_verificar(FANTASMA.atravessa_blocos() and FANTASMA.fixa_ao_apoiar() and FANTASMA.permite_fixar_manualmente(), "O efeito liga travessia, fixacao automatica e fixacao manual.")
+	_verificar(not PECA_O.atravessa_blocos() and not PECA_O.fixa_ao_apoiar() and not PECA_O.permite_fixar_manualmente(), "Pecas comuns nao herdam nada disso.")
+	_verificar(FANTASMA.obter_cor_visual().a < 1.0 and PECA_O.obter_cor_visual() == Color.WHITE, "A cor vem do efeito.")

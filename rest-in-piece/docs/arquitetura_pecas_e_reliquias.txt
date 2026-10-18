@@ -1,0 +1,101 @@
+ARQUITETURA: PEÇAS ESPECIAIS E RELÍQUIAS
+=========================================
+
+PRINCÍPIO
+Todo comportamento especial é um Resource com hooks, e quem o dispara só chama os hooks.
+Uma classe base com hooks vazios; cada subclasse sobrescreve apenas os que precisa.
+
+	Relíquia (Reliquia)   -> mexe na PONTUAÇÃO e nas REGRAS da partida
+	Efeito   (EfeitoDePeca) -> mexe na FÍSICA e no TABULEIRO
+
+					  RELÍQUIA                      EFEITO DE PEÇA
+  Classe base         reliquia.gd                   efeito_de_peca.gd
+  Fica em             GerenciadorDeReliquias        Peca (lista "efeitos")
+  Quem chama          game_manager / gerenciador    tetris.gd (tabuleiro)
+  Fala com o jogo por Contextos (ContextoPontuacao, Só pelas primitivas públicas do
+					  TravamentoDePeca, ...)        tabuleiro (celula_vazia, mover_bloco...)
+  Estado              Pode ter (é duplicada ao      NUNCA (o .tres é compartilhado)
+					  ser adquirida)
+  Níveis              Sim (escolher_por_nivel)      Não; parâmetros são @export
+
+RESPONSABILIDADES (quem NÃO pode saber de quê)
+  Peca / .tres        Só dados: formato, visual, pontos, lista de efeitos.
+  EfeitoDePeca        Não sabe de pontuação, HUD, GameManager, nem de outros efeitos.
+  Reliquia            Não toca no tabuleiro. Pede mudanças pelos contextos.
+  tetris.gd           Não sabe "o que é areia/bomba/vidro". Só oferece primitivas e
+					  chama hooks. Não calcula pontos.
+  game_manager.gd     Pontuação, fases, relíquias. Não mexe em física nem em UI.
+  hud.gd              Só interface.
+  BlocoFixado         Dados de UM bloco no grid + os efeitos da peça que o criou.
+
+HOOKS DE EfeitoDePeca (todos opcionais)
+  Consultas (a Peca combina as respostas dos efeitos)
+	atravessa_blocos()                     ignora blocos fixos, desenha em camada própria
+	fixa_ao_apoiar()                       fixa sem atraso; hard drop sempre fixa
+	permite_fixar_manualmente()            tecla "materializar_fantasma"
+	permite_descer(tab, forma, posicao)    veto para DESCER (todos precisam permitir)
+	cor_visual()                           multiplicada entre efeitos
+  Ciclo da peça
+	filtrar_posicoes_para_registro(...)    quais células viram bloco (também na projeção)
+	ao_travar(tab, posicoes)               logo após o registro (ex: explosão)
+	ao_projetar(tab, posicoes, ignoradas)  onde os blocos acabariam (sombra)
+  Ciclo do tabuleiro (agem nos BLOCOS que carregam o efeito, a qualquer momento)
+	ao_assentar_tabuleiro(tab) -> bool     FÍSICA (gravidade). Antes das linhas
+	ao_resolver_tabuleiro(tab) -> bool     REGRAS (quebrar/transformar). Depois das linhas
+	(retorne true se mudou algo; o tabuleiro repete até estabilizar)
+
+PIPELINE DO TRAVAMENTO (tetris.gd: travar_peca)
+  1. avalia spin
+  2. relíquias recebem TravamentoDePeca e guardam bônus nos blocos
+  3. registra os blocos (efeitos podem filtrar posições) e cada BlocoFixado guarda os efeitos
+  4. peca.ao_travar(...)
+  5. estabilizar_tabuleiro(), em loop até nada mudar:
+	   gravidade (ao_assentar) -> linhas completas -> regras (ao_resolver)
+  6. peca_travada -> GameManager calcula a pontuação -> próxima peça
+  Cascatas (areia completa linha, vidro quebra e solta areia) são resolvidas no passo 5.
+
+ESTADO
+  Efeito: sem estado. Precisa de dado por peça? Vai na Peca (como pontos_extras).
+		  Precisa de dado por bloco? Vai no BlocoFixado.
+  Relíquia: estado em variáveis sem @export (cada cópia começa zerada).
+  Peca.criar_copia() copia buffs e a LISTA de efeitos (os efeitos em si são compartilhados).
+
+COMO CRIAR UMA PEÇA ESPECIAL
+  1. Crie entities/pecas/efeitos/efeito_xxx.gd (class_name EfeitoXxx, extends EfeitoDePeca)
+	 sobrescrevendo só os hooks necessários. Parâmetros viram @export.
+  2. Crie efeito_xxx.tres apontando para o script.
+  3. Em cada peca_xxx_*.tres, coloque o efeito em "efeitos". Combinar comportamentos é
+	 colocar mais de um efeito na lista (ex: Areia + Vidro).
+  4. Se o efeito precisar de algo que o tabuleiro ainda não oferece, adicione uma
+	 PRIMITIVA genérica em tetris.gd (seção "primitivas para os efeitos"), nunca um
+	 "if peca é X". Se precisar de um momento novo no ciclo, adicione um HOOK na base.
+  5. Relíquias podem mirar um efeito: peca.tem_efeito(EfeitoAreia).
+
+COMO CRIAR UMA RELÍQUIA
+  1. reliquia_xxx.gd (class_name, extends Reliquia), valores como Array "..._por_nivel".
+  2. Sobrescreva só os hooks de que precisa (ao_pontuar, ao_pontuar_bloco, ao_travar_peca...).
+  3. Fale com o jogo apenas pelos contextos recebidos.
+  4. Crie o .tres (nome, descrição, textura).
+
+ARMADILHAS
+  - Não guarde estado em EfeitoDePeca (vale para todas as peças que usam o .tres).
+  - Não teste tipo/nome de peça no tabuleiro: use um hook ou uma consulta.
+  - tipo_peca é o FORMATO (T, S, Z, J, L, I, O, BOMBA); o comportamento é o efeito.
+  - Peça comum não tem efeitos: lista vazia e nenhum custo.
+  - O tabuleiro tem duas fontes de verdade (TileMap e blocos_fixados): para mover/remover
+	blocos use mover_bloco / remover_bloco, que mantêm as duas sincronizadas.
+
+TESTES (res://tests, rodar com: godot --headless --path . --script res://tests/test_xxx.gd)
+  test_areia / test_bomba / test_fantasma / test_projecao / test_pecas_sorteaveis
+  Identifique peças pelo EFEITO (peca.tem_efeito(EfeitoAreia), tabuleiro.posicoes_com_efeito),
+  nunca pela textura. Para montar um bloco com efeito:
+	BlocoFixado.criar_a_partir_da_peca(peca, TravamentoDePeca.new())
+  Para forçar a estabilização sem travar peça: tabuleiro.estabilizar_tabuleiro().
+  Todo efeito novo deve ganhar: um teste de comportamento, um de combinação com outro efeito
+  e um de projeção igual ao resultado real (se mexer em posições).
+
+MIGRAÇÃO DE .tres ANTIGOS (flags -> efeitos)
+  godot --headless --path . --script res://tools/migrar_pecas.gd -- --simular   (só relata)
+  godot --headless --path . --script res://tools/migrar_pecas.gd                (migra)
+  Idempotente. Commite antes. Peças comuns são ignoradas; nomes que sugerem um efeito sem
+  a flag correspondente geram AVISO (não são alterados).

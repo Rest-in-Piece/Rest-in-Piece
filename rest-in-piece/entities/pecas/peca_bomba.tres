@@ -1,12 +1,15 @@
 [gd_resource type="Resource" script_class="Peca" format=3 uid="uid://dutbciutp6sug"]
 
 [ext_resource type="Script" uid="uid://bpwodnk3jua2h" path="res://entities/pecas/peca.gd" id="1_peca"]
+[ext_resource type="Script" path="res://entities/pecas/efeitos/efeito_de_peca.gd" id="2_base"]
+[ext_resource type="Resource" path="res://entities/pecas/efeitos/efeito_explosao.tres" id="3_efeito"]
 
 [resource]
 script = ExtResource("1_peca")
 nome = "Bomba"
 id_fonte_tiles = 1
-explode_ao_travar = true
+efeitos = Array[ExtResource("2_base")]([ExtResource("3_efeito")])
+tabela_srs = "O"
 tipo_peca = "BOMBA"
 angulo_0 = Array[Vector2i]([Vector2i(0, 0)])
 angulo_90 = Array[Vector2i]([Vector2i(0, 0)])

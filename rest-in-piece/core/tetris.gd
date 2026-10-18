@@ -1,8 +1,11 @@
 
-
 # esse script SÓ deve tratar a física e a movimentação das peças na grade.
 # A peça colidiu? Uma linha foi preenchida? O tetris.gd atualiza o tabuleiro. 
 # Questões de pontuação e avanço de meta devem ser tratadas no GameManager.
+#
+# Comportamentos de peças especiais (areia, bomba, vidro, fantasma...) NÃO ficam aqui:
+# ficam em EfeitoDePeca. Este script oferece as primitivas do tabuleiro (seção
+# "primitivas para os efeitos") e chama os hooks, sem saber qual efeito é qual.
 
 extends TileMapLayer
 
@@ -30,6 +33,8 @@ const DELTA_MAXIMO: float = 0.1
 const ETAPAS_QUEDA_RAPIDA: float = 10.0
 const ETAPAS_FIXACAO_QUEDA_RAPIDA: float = 5.0
 const OPACIDADE_PROJECAO: float = 0.25
+# trava de segurança do loop que estabiliza o tabuleiro (gravidade -> linhas -> regras)
+const MAX_ITERACOES_ESTABILIZACAO: int = 100
 
 # variaveis de movimentação
 const total_etapas : int = 50
@@ -86,8 +91,9 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	if not jogo_rodando:
 		return
-	if peca.atravessa_blocos and not pode_mover(Vector2i.DOWN):
-		materializar_fantasma()
+	# peças que fixam sozinhas (ex: fantasma) não esperam o atraso de fixação
+	if peca.fixa_ao_apoiar() and not pode_mover(Vector2i.DOWN):
+		travar_peca()
 		return
 	
 	var delta_limitado: float = minf(delta, DELTA_MAXIMO)
@@ -101,8 +107,8 @@ func _process(delta: float) -> void:
 	if not jogo_rodando or turno_atual != turno_antes_dos_inputs:
 		return
 
-	if peca.atravessa_blocos:
-		_processar_fantasma(passo_tempo)
+	if peca.fixa_ao_apoiar():
+		_processar_queda_sem_atraso(passo_tempo)
 		return
 
 	if not pode_mover(Vector2i.DOWN):
@@ -118,9 +124,10 @@ func _process(delta: float) -> void:
 		etapas_queda -= total_etapas
 
 
-func _processar_fantasma(passo_tempo: float):
+# queda das peças que fixam sozinhas: assim que não podem mais descer, travam
+func _processar_queda_sem_atraso(passo_tempo: float):
 	if not pode_mover(Vector2i.DOWN):
-		materializar_fantasma()
+		travar_peca()
 		return
 
 	etapas_queda += velocidade * passo_tempo
@@ -128,7 +135,7 @@ func _processar_fantasma(passo_tempo: float):
 		mover_peca(Vector2i.DOWN)
 		etapas_queda -= total_etapas
 		if not pode_mover(Vector2i.DOWN):
-			materializar_fantasma()
+			travar_peca()
 
 
 func novo_jogo():
@@ -175,14 +182,14 @@ func obter_rotacoes(peca: Peca) -> Array:
 
 
 func _processar_inputs(passo_tempo: float):
-	if peca.atravessa_blocos and Input.is_action_just_pressed("materializar_fantasma"):
-		materializar_fantasma()
+	if peca.permite_fixar_manualmente() and Input.is_action_just_pressed("materializar_fantasma"):
+		fixar_manualmente()
 		return
 
 	var turno_dos_inputs: int = turno_atual
 	if Input.is_action_pressed("acelerar_queda"):
 		etapas_queda += ETAPAS_QUEDA_RAPIDA * passo_tempo
-		if not peca.atravessa_blocos and not pode_mover(Vector2i.DOWN):
+		if not peca.fixa_ao_apoiar() and not pode_mover(Vector2i.DOWN):
 			etapas_fixacao += ETAPAS_FIXACAO_QUEDA_RAPIDA * passo_tempo
 	if Input.is_action_just_pressed("cair_imediatamente"):
 		cair_imediatamente(false)
@@ -313,15 +320,16 @@ func pode_criar_peca():
 		var posicao = pos_atual + bloco
 		if not posicao_esta_no_tabuleiro(posicao):
 			return false
-		if not peca.atravessa_blocos and get_cell_source_id(posicao) != -1:
+		if not peca.atravessa_blocos() and get_cell_source_id(posicao) != -1:
 			return false
 	return true
 
 
-# A Fantasma usa outra camada para nunca substituir os tiles fixos.
+# Peças que atravessam blocos usam outra camada para nunca substituir os tiles fixos.
 func desenhar_peca(peca_desenho, posicao, atlas):
-	var destino: TileMapLayer = camada_fantasma if peca.atravessa_blocos else self
-	if peca.atravessa_blocos:
+	var atravessa: bool = peca.atravessa_blocos()
+	var destino: TileMapLayer = camada_fantasma if atravessa else self
+	if atravessa:
 		camada_fantasma.modulate = peca.obter_cor_visual()
 	for bloco in peca_desenho:
 		if posicao_esta_no_tabuleiro(posicao + bloco):
@@ -330,7 +338,7 @@ func desenhar_peca(peca_desenho, posicao, atlas):
 
 func limpar_peca():
 	camada_projecao.clear()
-	if peca != null and peca.atravessa_blocos:
+	if peca != null and peca.atravessa_blocos():
 		camada_fantasma.clear()
 		return
 	for i in peca_ativa:
@@ -347,25 +355,25 @@ func obter_posicao_de_aterrissagem() -> Vector2i:
 	return destino
 
 
+# onde os blocos da peça acabariam se ela fosse fixada no ponto de aterrissagem. Usa os
+# MESMOS hooks do travamento real (filtro de posições e efeitos de projeção)
 func obter_posicoes_da_projecao() -> Array[Vector2i]:
 	var posicoes: Array[Vector2i] = []
 	if peca == null or peca_ativa.is_empty():
 		return posicoes
+	
 	var destino: Vector2i = obter_posicao_de_aterrissagem()
 	for bloco in peca_ativa:
-		var posicao: Vector2i = destino + bloco
-		if _posicao_esta_livre_para_peca(posicao, false):
-			posicoes.append(posicao)
-	if peca.cai_em_blocos_ao_travar:
-		# Simula os graos da Areia de baixo para cima, apenas em memoria.
-		posicoes.sort_custom(func(a: Vector2i, b: Vector2i): return a.y > b.y)
-		var assentadas: Array[Vector2i] = []
-		for posicao in posicoes:
-			while _posicao_esta_livre_para_peca(posicao + Vector2i.DOWN, false) and not assentadas.has(posicao + Vector2i.DOWN):
-				posicao += Vector2i.DOWN
-			assentadas.append(posicao)
-		posicoes = assentadas
-	return posicoes
+		posicoes.append(destino + bloco)
+	posicoes = peca.filtrar_posicoes_para_registro(self, posicoes)
+	
+	# a peça comum está desenhada na grade: suas células atuais contam como vazias
+	var ignoradas: Array[Vector2i] = []
+	if not peca.atravessa_blocos():
+		for bloco in peca_ativa:
+			ignoradas.append(pos_atual + bloco)
+	
+	return peca.projetar_posicoes(self, posicoes, ignoradas)
 
 
 func atualizar_projecao() -> void:
@@ -403,7 +411,7 @@ func rotacionar_peca(sentido: int):
 
 
 func pode_rotacionar(peca_teste: Array, offset: Vector2i, peca_alvo: Peca = null) -> bool:
-	var atravessa: bool = peca.atravessa_blocos if peca_alvo == null else peca_alvo.atravessa_blocos
+	var atravessa: bool = peca.atravessa_blocos() if peca_alvo == null else peca_alvo.atravessa_blocos()
 	for bloco in peca_teste:
 		if not _posicao_esta_livre_para_peca(pos_atual + bloco + offset, atravessa):
 			return false
@@ -425,11 +433,16 @@ func mover_peca(direcao):
 			tratar_reset_fixacao()
 
 
-func materializar_fantasma():
-	if jogo_rodando and peca.atravessa_blocos:
+# fixa a peça na hora, por pedido do jogador (só se algum efeito permitir)
+func fixar_manualmente():
+	if jogo_rodando and peca.permite_fixar_manualmente():
 		travar_peca()
 
 
+# PIPELINE DO TRAVAMENTO
+# 1. spin  2. relíquias guardam bônus nos blocos  3. blocos são registrados (os efeitos
+# podem filtrar posições)  4. ao_travar dos efeitos (ex: explosão)  5. estabilização:
+# gravidade -> linhas completas -> regras (ex: vidro), repetindo até nada mudar
 func travar_peca():
 	camada_projecao.clear()
 	avaliar_spin()
@@ -440,14 +453,12 @@ func travar_peca():
 	travamento.casas_hard_drop = casas_descidas_hard_drop
 	peca_travando.emit(travamento)
 	
-	var quantidade_fixada: int = registrar_blocos_da_peca(travamento)
+	var posicoes_registradas: Array[Vector2i] = registrar_blocos_da_peca(travamento)
 	camada_fantasma.clear()
 	# Uma materializacao sem celulas livres apenas encerra o turno.
-	if quantidade_fixada > 0:
-		if peca.explode_ao_travar and not peca.atravessa_blocos:
-			_explodir_bomba()
-		identificar_e_tratar_linhas_completas()
-		_quebrar_blocos_frageis_com_peso_acima()
+	if not posicoes_registradas.is_empty():
+		peca.ao_travar(self, posicoes_registradas)
+		estabilizar_tabuleiro()
 	
 	peca_travada.emit(peca, casas_descidas_hard_drop)
 	
@@ -465,74 +476,138 @@ func travar_peca():
 	
 
 
-func registrar_blocos_da_peca(travamento: TravamentoDePeca) -> int:
-	var posicoes_registradas: Array[Vector2i] = []
+func registrar_blocos_da_peca(travamento: TravamentoDePeca) -> Array[Vector2i]:
+	var candidatas: Array[Vector2i] = []
 	for deslocamento in peca_ativa:
-		var posicao: Vector2i = pos_atual + deslocamento
-		if peca.atravessa_blocos:
-			if not posicao_esta_no_tabuleiro(posicao) or get_cell_source_id(posicao) != -1:
-				continue
-			set_cell(posicao, peca.id_fonte_tiles, peca_atlas)
+		candidatas.append(pos_atual + deslocamento)
+	
+	var posicoes: Array[Vector2i] = peca.filtrar_posicoes_para_registro(self, candidatas)
+	for posicao in posicoes:
+		# peças comuns já estão desenhadas aqui; as que usam outra camada ainda não estão
+		set_cell(posicao, peca.id_fonte_tiles, peca_atlas)
 		blocos_fixados[posicao] = BlocoFixado.criar_a_partir_da_peca(peca, travamento)
-		posicoes_registradas.append(posicao)
-	if peca.cai_em_blocos_ao_travar:
-		_assentar_blocos_de_areia(posicoes_registradas)
-	return posicoes_registradas.size()
+	return posicoes
 
 
-func _assentar_blocos_de_areia(posicoes: Array[Vector2i]):
-	# Os de baixo caem primeiro, liberando espaco para os de cima na mesma coluna.
-	posicoes.sort_custom(func(a: Vector2i, b: Vector2i): return a.y > b.y)
-	for origem in posicoes:
-		var destino: Vector2i = origem
-		while posicao_esta_no_tabuleiro(destino + Vector2i.DOWN) and get_cell_source_id(destino + Vector2i.DOWN) == -1:
-			destino += Vector2i.DOWN
-		if destino == origem:
-			continue
+# deixa o tabuleiro em um estado estável depois de qualquer mudança. Cada volta:
+# 1. FÍSICA dos efeitos (gravidade da areia)  2. linhas completas  3. REGRAS dos efeitos
+# (quebra do vidro). Se algo mudou, repete: uma queda pode completar outra linha, uma
+# linha limpa pode deixar areia sem apoio, um vidro quebrado pode soltar areia...
+func estabilizar_tabuleiro() -> void:
+	for volta in range(MAX_ITERACOES_ESTABILIZACAO):
+		var mudou: bool = false
+		
+		for efeito in _obter_efeitos_no_tabuleiro():
+			if efeito.ao_assentar_tabuleiro(self):
+				mudou = true
+		
+		if identificar_e_tratar_linhas_completas():
+			mudou = true
+		
+		for efeito in _obter_efeitos_no_tabuleiro():
+			if efeito.ao_resolver_tabuleiro(self):
+				mudou = true
+		
+		if not mudou:
+			return
+	
+	push_warning("estabilizar_tabuleiro: limite de iteracoes atingido")
 
-		var fonte: int = get_cell_source_id(origem)
-		var atlas: Vector2i = get_cell_atlas_coords(origem)
-		erase_cell(origem)
-		set_cell(destino, fonte, atlas)
-		mover_dados_do_bloco(origem, destino)
-		blocos_fixados.erase(origem)
+
+# cada efeito distinto (instância) que algum bloco do grid carrega
+func _obter_efeitos_no_tabuleiro() -> Array[EfeitoDePeca]:
+	var vistos: Dictionary = {}
+	var efeitos: Array[EfeitoDePeca] = []
+	for bloco in blocos_fixados.values():
+		for efeito in bloco.efeitos:
+			if not vistos.has(efeito):
+				vistos[efeito] = true
+				efeitos.append(efeito)
+	return efeitos
 
 
-func _explodir_bomba():
+# ---------- primitivas para os efeitos ----------
+# Os EfeitoDePeca só mexem no tabuleiro por aqui. Cada uma mantém juntos o TileMap e o
+# dicionário blocos_fixados.
+
+# dentro dos limites e sem tile
+func celula_vazia(posicao: Vector2i) -> bool:
+	return posicao_esta_no_tabuleiro(posicao) and get_cell_source_id(posicao) == -1
+
+# a linha vazia mais funda da coluna (1 = topo, LINHAS = fundo). 0 se a coluna estiver cheia
+func linha_livre_mais_profunda(coluna: int) -> int:
+	for linha in range(LINHAS, 0, -1):
+		if get_cell_source_id(Vector2i(coluna, linha)) == -1:
+			return linha
+	return 0
+
+# posições dos blocos do grid que carregam exatamente este efeito
+func posicoes_com_efeito(efeito: EfeitoDePeca) -> Array[Vector2i]:
+	var posicoes: Array[Vector2i] = []
+	for posicao in blocos_fixados:
+		if blocos_fixados[posicao].tem_efeito(efeito):
+			posicoes.append(posicao)
+	return posicoes
+
+# move tile e dados de um bloco. O destino precisa estar vazio
+func mover_bloco(origem: Vector2i, destino: Vector2i) -> void:
+	var fonte: int = get_cell_source_id(origem)
+	var atlas: Vector2i = get_cell_atlas_coords(origem)
+	erase_cell(origem)
+	set_cell(destino, fonte, atlas)
+	mover_dados_do_bloco(origem, destino)
+	blocos_fixados.erase(origem)
+
+# apaga tile e dados SEM pontuar
+func remover_bloco(posicao: Vector2i) -> void:
+	erase_cell(posicao)
+	blocos_fixados.erase(posicao)
+
+# destrói tudo no alcance (distância de xadrez) das origens, limitado ao tabuleiro. As
+# origens (a própria peça) são apagadas sem pontuar; o resto vira linhas parciais.
+func explodir_area(origens: Array[Vector2i], raio: int) -> void:
+	if origens.is_empty():
+		return
+	
+	var area: Dictionary = {}
+	var linha_inicial: int = LINHAS
+	var linha_final: int = 1
+	for origem in origens:
+		for y in range(maxi(1, origem.y - raio), mini(LINHAS, origem.y + raio) + 1):
+			for x in range(maxi(1, origem.x - raio), mini(COLUNAS, origem.x + raio) + 1):
+				area[Vector2i(x, y)] = true
+				linha_inicial = mini(linha_inicial, y)
+				linha_final = maxi(linha_final, y)
+	
 	var linhas_explodidas: Array[LinhaPontuada] = []
-	var linha_inicial: int = maxi(1, pos_atual.y - 1)
-	var linha_final: int = mini(LINHAS, pos_atual.y + 1)
-	var coluna_inicial: int = maxi(1, pos_atual.x - 1)
-	var coluna_final: int = mini(COLUNAS, pos_atual.x + 1)
-
-	# A borda fica fora da explosao. A propria bomba e consumida, sem pontuar.
+	
+	# da linha de baixo pra cima, e da esquerda pra direita (ordem de leitura dos pontos)
 	for linha in range(linha_final, linha_inicial - 1, -1):
 		var linha_pontuada := LinhaPontuada.new()
 		linha_pontuada.indice_linha = linha
 		linha_pontuada.altura = LINHAS - linha + 1
 		linha_pontuada.completa = false
-
-		for coluna in range(coluna_inicial, coluna_final + 1):
+		
+		for coluna in range(1, COLUNAS + 1):
 			var posicao := Vector2i(coluna, linha)
-			if get_cell_source_id(posicao) == -1:
+			if not area.has(posicao) or get_cell_source_id(posicao) == -1:
 				continue
-
-			if not peca_ativa.has(posicao - pos_atual):
+			
+			if not origens.has(posicao):
 				var bloco_fixado: BlocoFixado = blocos_fixados.get(posicao)
 				linha_pontuada.blocos.append(BlocoPontuado.criar_a_partir_do_bloco_fixado(posicao, bloco_fixado))
-
-			erase_cell(posicao)
-			blocos_fixados.erase(posicao)
-
+			
+			remover_bloco(posicao)
+		
 		if not linha_pontuada.blocos.is_empty():
 			linhas_explodidas.append(linha_pontuada)
-
+	
 	if not linhas_explodidas.is_empty():
 		blocos_explodidos.emit(linhas_explodidas)
 
 
 func avaliar_spin():
-	if peca.atravessa_blocos or not ultima_acao_foi_rotacao:
+	if peca.atravessa_blocos() or not ultima_acao_foi_rotacao:
 		return
 		
 	if peca.tipo_peca == "T":
@@ -593,7 +668,7 @@ func avaliar_spin():
 
 
 func tratar_reset_fixacao():
-	if peca.atravessa_blocos:
+	if peca.fixa_ao_apoiar():
 		return
 	if not pode_mover(Vector2i.DOWN):
 		if resets_fixacao < max_resets_fixacao:
@@ -601,13 +676,15 @@ func tratar_reset_fixacao():
 			resets_fixacao += 1
 
 
-func pode_mover(direcao):
-	# verifica se tem espaço para se mover
-	var resposta = true
-	for i in peca_ativa:
-		if not posicao_esta_livre(i + pos_atual + direcao):
-			resposta = false
-	return resposta
+# "direcao" é um deslocamento a partir da posição atual. Para descer, os efeitos da peça
+# ainda podem vetar (ex: fantasma sem espaço vazio abaixo)
+func pode_mover(direcao: Vector2i) -> bool:
+	for bloco in peca_ativa:
+		if not posicao_esta_livre(bloco + pos_atual + direcao):
+			return false
+	if direcao.y > 0 and not peca.permite_descer(self, peca_ativa, pos_atual + direcao):
+		return false
+	return true
 
 
 func posicao_esta_no_tabuleiro(posicao: Vector2i) -> bool:
@@ -615,7 +692,7 @@ func posicao_esta_no_tabuleiro(posicao: Vector2i) -> bool:
 
 
 func posicao_esta_livre(posicao: Vector2i) -> bool:
-	return _posicao_esta_livre_para_peca(posicao, peca.atravessa_blocos)
+	return _posicao_esta_livre_para_peca(posicao, peca.atravessa_blocos())
 
 
 func _posicao_esta_livre_para_peca(posicao: Vector2i, atravessa: bool) -> bool:
@@ -625,7 +702,7 @@ func _posicao_esta_livre_para_peca(posicao: Vector2i, atravessa: bool) -> bool:
 		return true
 
 	# verifica se a posição pertence à peça atual
-	if not peca.atravessa_blocos:
+	if not peca.atravessa_blocos():
 		for bloco in peca_ativa:
 			if pos_atual + bloco == posicao:
 				return true
@@ -634,6 +711,7 @@ func _posicao_esta_livre_para_peca(posicao: Vector2i, atravessa: bool) -> bool:
 	return get_cell_source_id(posicao) == -1
 
 
+# desce a peça INTEIRA até onde pode_mover permitir. Peças que fixam sozinhas fixam aqui
 func cair_imediatamente(posicionar_imediatamente: bool):
 	while pode_mover(Vector2i.DOWN):
 		mover_peca(Vector2i.DOWN)
@@ -641,11 +719,12 @@ func cair_imediatamente(posicionar_imediatamente: bool):
 	
 	etapas_queda = 0.0
 	
-	if posicionar_imediatamente or peca.atravessa_blocos:
+	if posicionar_imediatamente or peca.fixa_ao_apoiar():
 		travar_peca()
 
 
-func identificar_e_tratar_linhas_completas():
+# devolve true se alguma linha foi limpa
+func identificar_e_tratar_linhas_completas() -> bool:
 	var linhas_completas: Array[LinhaPontuada] = []
 	
 	for linha in range(LINHAS, 0, -1):
@@ -657,6 +736,7 @@ func identificar_e_tratar_linhas_completas():
 	
 	if not linhas_completas.is_empty():
 		linhas_destruidas.emit(linhas_completas)
+	return not linhas_completas.is_empty()
 
 # desloca linhas para baixo a partir de uma linha (inclusive todas as linhas acima dela)
 func deslocar_linhas(linha):
@@ -746,52 +826,6 @@ func substituir_peca_atual(nova_peca: Peca) -> bool:
 		
 		ultima_acao_foi_rotacao = false
 		return true
-	
-	return false
-
-# todo bloco frágil (vidro) quebra NA HORA se existir um bloco NÃO frágil acima dele, na
-# mesma coluna. Quebra todos os que estiverem nessa situação, não só o mais próximo.
-# A célula é liberada imediatamente (a lógica não espera); só a animação dura um pouco
-func _quebrar_blocos_frageis_com_peso_acima():
-	var quebrados: Array[Vector2i] = []
-	
-	for posicao in blocos_fixados:
-		var bloco: BlocoFixado = blocos_fixados[posicao]
-		if bloco.eh_fragil and _tem_bloco_solido_acima(posicao):
-			quebrados.append(posicao)
-	
-	for posicao in quebrados:
-		var bloco: BlocoFixado = blocos_fixados[posicao]
-		# lidos ANTES de apagar a célula; assim não dependem de nenhuma variável do script
-		var id_fonte: int = get_cell_source_id(posicao)
-		var atlas_atual: Vector2i = get_cell_atlas_coords(posicao)
-		erase_cell(posicao)
-		blocos_fixados.erase(posicao)
-		EfeitoQuebraVidro.tocar(self, id_fonte, posicao, bloco.atlas_da_quebra, atlas_atual)
-	
-	if not quebrados.is_empty():
-		blocos_quebrados.emit(quebrados.size())
-
-
-# a linha 1 é o topo, então "acima" significa y menor.
-# Sobe a coluna a partir do bloco e PARA na primeira casa vazia: só conta peso que
-# está encostado no vidro (direto, ou através de uma pilha contínua de blocos)
-func _tem_bloco_solido_acima(posicao: Vector2i) -> bool:
-	var y: int = posicao.y - 1
-	while y >= 1:
-		var posicao_acima := Vector2i(posicao.x, y)
-		
-		# casa vazia: a pilha acima foi interrompida, então não há peso
-		if get_cell_source_id(posicao_acima) == -1:
-			return false
-		
-		# tile sem dados (BlocoFixado nulo) é tratado como bloco sólido
-		var outro: BlocoFixado = blocos_fixados.get(posicao_acima)
-		if outro == null or not outro.eh_fragil:
-			return true
-		
-		# outro vidro: continua subindo, pois o peso passa por ele
-		y -= 1
 	
 	return false
 

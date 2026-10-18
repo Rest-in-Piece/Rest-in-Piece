@@ -28,7 +28,7 @@
 [ext_resource type="Resource" uid="uid://bug53qghwf2uq" path="res://entities/reliquias/resources/para_o_teaser/reliquia_torre_alta.tres" id="16_jqg6c"]
 [ext_resource type="Resource" uid="uid://c08uth3g2u3jr" path="res://entities/pecas/peca_z.tres" id="16_jtwxc"]
 [ext_resource type="Resource" uid="uid://cek1lfbokxf5q" path="res://entities/pecas/peca_vidro_o.tres" id="16_kier8"]
-[ext_resource type="Resource" path="res://entities/pecas/peca_bomba.tres" id="17_bomba"]
+[ext_resource type="Resource" uid="uid://dutbciutp6sug" path="res://entities/pecas/peca_bomba.tres" id="17_bomba"]
 [ext_resource type="AudioStream" uid="uid://b4oawd1l8tw7" path="res://assets/audio/sound_fx/tetrazz_tetris.mp3" id="17_kt7iu"]
 [ext_resource type="Texture2D" uid="uid://ddx0dx670dsgb" path="res://entities/pecas/texturas/bomba.png" id="18_bomba_tiles"]
 [ext_resource type="AudioStream" uid="uid://bcn57ap23s3rv" path="res://assets/audio/sound_fx/tetris_single_line.mp3" id="18_qbs7a"]
@@ -103,7 +103,7 @@ tile_set = SubResource("TileSet_wvnxi")
 script = ExtResource("2_uppkp")
 pecas = Array[ExtResource("9_kier8")]([ExtResource("10_2j0jo"), ExtResource("11_q0ki0"), ExtResource("12_ftrd0"), ExtResource("14_aril8"), ExtResource("15_noosx"), ExtResource("16_jtwxc"), ExtResource("13_wjatw"), ExtResource("16_kier8"), ExtResource("17_bomba"), ExtResource("19_fantasma"), ExtResource("20_areia"), ExtResource("27_be5gn"), ExtResource("28_mvxeb"), ExtResource("29_2kqy1"), ExtResource("30_vk4ph"), ExtResource("31_qkqby"), ExtResource("32_jhpw1"), ExtResource("33_2kqy1"), ExtResource("34_vk4ph"), ExtResource("35_jhpw1"), ExtResource("36_24u3u"), ExtResource("37_jqg6c"), ExtResource("38_k8mt6"), ExtResource("39_uouo2"), ExtResource("40_i5juf"), ExtResource("41_o3x0j"), ExtResource("19_fantasma")])
 
-[node name="ProjecaoPeca" type="TileMapLayer" parent="TabuleiroTileMap"]
+[node name="ProjecaoPeca" type="TileMapLayer" parent="TabuleiroTileMap" unique_id=1962068956]
 modulate = Color(1, 1, 1, 0.25)
 z_index = -1
 texture_filter = 1

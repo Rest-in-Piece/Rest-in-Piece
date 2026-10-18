@@ -7,6 +7,7 @@ const PECA_L: Peca = preload("res://entities/pecas/peca_l.tres")
 const BOMBA: Peca = preload("res://entities/pecas/peca_bomba.tres")
 const AREIA: Peca = preload("res://entities/pecas/peca_areia_l.tres")
 const FANTASMA: Peca = preload("res://entities/pecas/peca_fantasma_t.tres")
+const FANTASMA_O: Peca = preload("res://entities/pecas/peca_fantasma_o.tres")
 
 var jogo: Node
 var tabuleiro: TileMapLayer
@@ -24,7 +25,8 @@ func _executar():
 		_teste_substituicao, _teste_bomba, _teste_areia, _teste_formatos_areia,
 		_teste_fantasma_parcial, _teste_fantasma_sem_espaco, _teste_reinicio_e_parada,
 		_teste_game_over, _teste_limpeza_e_ausencia_de_peca,
-		_teste_materializacao_manual,
+		_teste_materializacao_manual, _teste_fantasma_com_buracos,
+		_teste_fantasma_com_espaco_acima_do_fundo, _teste_areia_com_fantasma,
 	]
 	for teste in testes:
 		_preparar_jogo()
@@ -197,7 +199,7 @@ func _teste_hold():
 	_verificar_atualizada()
 	tabuleiro.pode_armazenar = true
 	tabuleiro.armazenar_peca_atual()
-	_verificar(tabuleiro.peca.explode_ao_travar and tabuleiro.camada_projecao.get_used_cells().size() == 1, "Retirar a Bomba da reserva deve atualizar formato e textura da projecao.")
+	_verificar(tabuleiro.peca.tem_efeito(EfeitoExplosao) and tabuleiro.camada_projecao.get_used_cells().size() == 1, "Retirar a Bomba da reserva deve atualizar formato e textura da projecao.")
 	_verificar_atualizada()
 
 
@@ -205,7 +207,7 @@ func _teste_substituicao():
 	_fixar(Vector2i(5, 14))
 	_ativar(PECA_L)
 	_verificar(tabuleiro.substituir_peca_atual(FANTASMA), "A substituicao pela Fantasma deve continuar funcionando.")
-	_verificar(tabuleiro.obter_posicao_de_aterrissagem().y == 20, "A projecao da Fantasma deve ignorar a pilha, assim como sua queda.")
+	_verificar(tabuleiro.obter_posicao_de_aterrissagem().y == 20, "A projecao da Fantasma deve ignorar a pilha enquanto houver espaco vazio, assim como sua queda.")
 	_verificar_atualizada()
 	_verificar(tabuleiro.substituir_peca_atual(BOMBA), "A substituicao pela Bomba deve continuar funcionando.")
 	_verificar(tabuleiro.camada_fantasma.get_used_cells().is_empty(), "Substituir a Fantasma deve limpar somente sua camada ativa.")
@@ -242,7 +244,7 @@ func _teste_areia():
 
 func _teste_formatos_areia():
 	for recurso in tabuleiro.pecas:
-		if not recurso.cai_em_blocos_ao_travar:
+		if not recurso.tem_efeito(EfeitoAreia):
 			continue
 		for rotacao in range(4):
 			_limpar_cenario()
@@ -277,12 +279,14 @@ func _teste_fantasma_parcial():
 
 
 func _teste_fantasma_sem_espaco():
-	for posicao in [Vector2i(4, 20), Vector2i(5, 20), Vector2i(5, 19), Vector2i(6, 20)]:
-		_fixar(posicao)
+	# colunas 4, 5 e 6 totalmente cheias: nao existe celula vazia para a Fantasma preencher
+	for y in range(1, 21):
+		for x in [4, 5, 6]:
+			_fixar(Vector2i(x, y))
 	_ativar(FANTASMA)
-	_verificar(tabuleiro.camada_projecao.get_used_cells().is_empty(), "Se nenhuma celula puder materializar no fundo, nao deve haver uma projecao sobre os blocos existentes.")
+	_verificar(tabuleiro.camada_projecao.get_used_cells().is_empty(), "Se nenhuma celula puder materializar, nao deve haver uma projecao sobre os blocos existentes.")
 	tabuleiro.cair_imediatamente(false)
-	_verificar(tabuleiro.blocos_fixados.size() == 4 and jogo.pecas_posicionadas == 1, "Uma materializacao vazia deve continuar encerrando somente um turno.")
+	_verificar(tabuleiro.blocos_fixados.size() == 60 and jogo.pecas_posicionadas == 1, "Uma materializacao vazia deve continuar encerrando somente um turno.")
 
 
 func _teste_reinicio_e_parada():
@@ -330,8 +334,52 @@ func _teste_materializacao_manual():
 	var original: BlocoFixado = tabuleiro.blocos_fixados[Vector2i(5, 5)]
 	_ativar(FANTASMA, Vector2i(5, 6))
 	_verificar(tabuleiro.camada_projecao.get_used_cells().size() == 4, "A projecao da Fantasma deve prever seu destino automatico no fundo.")
-	tabuleiro.materializar_fantasma()
+	tabuleiro.fixar_manualmente()
 	_verificar(jogo.pecas_posicionadas == 1 and tabuleiro.blocos_fixados.size() == 4, "A materializacao manual deve usar a posicao atual, nao a projecao. Turnos: %d; blocos: %s." % [jogo.pecas_posicionadas, tabuleiro.blocos_fixados.keys()])
 	_verificar(tabuleiro.blocos_fixados.get(Vector2i(5, 5)) == original and tabuleiro.blocos_fixados.has(Vector2i(6, 6)), "A materializacao manual deve preservar os blocos existentes e preencher os vazios.")
 	_verificar(not tabuleiro.blocos_fixados.has(Vector2i(5, 20)), "Os blocos da projecao nao podem se tornar permanentes ao materializar manualmente.")
 	_verificar_atualizada()
+
+
+# --- nova regra de queda da Fantasma ---
+
+func _teste_fantasma_com_buracos():
+	# colunas 4 e 5 cheias, com um buraco em (4,15) e outro em (5,18)
+	for y in range(12, 21):
+		for x in [4, 5]:
+			if Vector2i(x, y) not in [Vector2i(4, 15), Vector2i(5, 18)]:
+				_fixar(Vector2i(x, y))
+	_ativar(FANTASMA_O, Vector2i(5, 2))
+	var projetadas: Array[Vector2i] = tabuleiro.obter_posicoes_da_projecao()
+	_verificar_posicoes(projetadas, [Vector2i(5, 18)])
+	_verificar(tabuleiro.obter_posicao_de_aterrissagem() == Vector2i(5, 19), "A peca inteira desce ate o bloco mais fundo alcancar o buraco mais profundo.")
+	tabuleiro.cair_imediatamente(false)
+	_verificar(tabuleiro.blocos_fixados.has(Vector2i(5, 18)) and not tabuleiro.blocos_fixados.has(Vector2i(4, 15)), "A materializacao real preenche exatamente o que a projecao mostrou.")
+	_verificar_atualizada()
+
+
+func _teste_fantasma_com_espaco_acima_do_fundo():
+	# o fundo esta ocupado, mas as colunas ainda tem espaco logo acima dele
+	for posicao in [Vector2i(4, 20), Vector2i(5, 20), Vector2i(5, 19), Vector2i(6, 20)]:
+		_fixar(posicao)
+	_ativar(FANTASMA)
+	_verificar_posicoes(tabuleiro.camada_projecao.get_used_cells(), [Vector2i(4, 19), Vector2i(5, 18), Vector2i(6, 19)])
+	tabuleiro.cair_imediatamente(false)
+	_verificar(tabuleiro.blocos_fixados.size() == 7 and jogo.pecas_posicionadas == 1, "A Fantasma fixa onde ainda ha espaco vazio, nao precisa chegar ao fundo.")
+
+
+func _teste_areia_com_fantasma():
+	# efeitos combinados: a projecao filtra as celulas ocupadas E depois assenta os graos
+	var combinada := FANTASMA_O.criar_copia()
+	combinada.efeitos.append(AREIA.efeitos[0])
+	for posicao in [Vector2i(4, 20), Vector2i(4, 19)]:
+		_fixar(posicao)
+	_ativar(combinada, Vector2i(5, 3))
+	var projetadas: Array[Vector2i] = tabuleiro.obter_posicoes_da_projecao()
+	tabuleiro.cair_imediatamente(false)
+	var novas: Array[Vector2i] = []
+	for posicao in tabuleiro.blocos_fixados:
+		if posicao.x == 5:
+			novas.append(posicao)
+	_verificar_posicoes(projetadas, novas)
+	_verificar(novas.size() == 2 and tabuleiro.blocos_fixados.has(Vector2i(5, 20)) and tabuleiro.blocos_fixados.has(Vector2i(5, 19)), "Os dois graos livres da coluna 5 caem ate o fundo. Novas: %s" % [novas])
