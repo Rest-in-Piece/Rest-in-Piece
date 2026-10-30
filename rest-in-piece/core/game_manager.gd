@@ -86,6 +86,11 @@ func _ready():
 	hud.recompensa_reliquia_escolhida.connect(_on_recompensa_reliquia_escolhida)
 	hud.transicao_de_fase_concluida.connect(_avancar_para_proxima_fase)
 	
+	EfeitosDeReliquiaNoTabuleiro.instalar(tabuleiro)
+	CamadaDeEfeitosVisuais.instalar(tabuleiro, gerenciador_reliquias.obter_efeitos_visuais)
+	
+	iniciar_novo_jogo()
+	
 	iniciar_novo_jogo()
 
 

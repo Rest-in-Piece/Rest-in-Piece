@@ -15,10 +15,10 @@ extends Resource
 @export var pontos_por_bloco: int = 10
 @export var multiplicador_por_bloco: float = 1.0
 
-@export_category("Efeitos")
-## comportamentos especiais da peça, aplicados em ordem. Os efeitos são compartilhados e
-## SEM estado: reutilize os .tres de res://entities/pecas/efeitos/
+@export_category("Efeitos visuais")
 @export var efeitos: Array[EfeitoDePeca] = []
+@export var efeitos_visuais: Array[EfeitoVisual] = []
+
 
 @export_category("Tabela SRS")
 @export_enum("T", "S", "Z", "J", "L", "I", "O", "BOMBA") var tipo_peca: String
@@ -136,4 +136,7 @@ func criar_copia() -> Peca:
 	var efeitos_copiados: Array[EfeitoDePeca] = []
 	efeitos_copiados.assign(efeitos)
 	copia.efeitos = efeitos_copiados
+	var visuais_copiados: Array[EfeitoVisual] = []
+	visuais_copiados.assign(efeitos_visuais)
+	copia.efeitos_visuais = visuais_copiados
 	return copia

@@ -1,0 +1,6 @@
+[gd_resource type="Resource" script_class="EfeitoVisualVagalumes" format=3 uid="uid://bif0p0lnkmqd5"]
+
+[ext_resource type="Script" uid="uid://c3ndwhubfhhk2" path="res://assets/visual_fx/pecas/scripts/efeito_visual_vagalumes.gd" id="1_78amg"]
+
+[resource]
+script = ExtResource("1_78amg")

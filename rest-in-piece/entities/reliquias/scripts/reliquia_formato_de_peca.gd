@@ -12,3 +12,9 @@ func ao_pontuar_bloco(_contexto: ContextoPontuacao, _linha: LinhaPontuada, bloco
 	if bloco.tipo_peca in formatos_aceitos:
 		var pontos_extras: int = escolher_por_nivel(pontos_extras_por_nivel)
 		bloco.pontos += pontos_extras
+
+func obter_efeitos_visuais_para(peca: Peca) -> Array[EfeitoVisual]:
+	if peca.tipo_peca in formatos_aceitos:
+		return efeitos_visuais
+	var nenhum: Array[EfeitoVisual] = []
+	return nenhum

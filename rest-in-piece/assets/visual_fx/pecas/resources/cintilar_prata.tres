@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="EfeitoVisualCintilar" format=3 uid="uid://bgl7p1y7a6oym"]
+
+[ext_resource type="Script" uid="uid://1res82d58br8" path="res://assets/visual_fx/pecas/scripts/efeito_visual_cintilar.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+nome = "Cintilar Prata"
+cor = Color(0.85, 0.92, 1, 1)
+intensidade = 0.6

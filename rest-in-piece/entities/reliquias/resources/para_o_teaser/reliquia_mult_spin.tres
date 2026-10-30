@@ -1,5 +1,6 @@
 [gd_resource type="Resource" script_class="ReliquiaMultiplicadorSpin" format=3 uid="uid://dnlkfvxu7q45c"]
 
+[ext_resource type="Script" uid="uid://b7s2kvxrww7si" path="res://assets/visual_fx/pecas/scripts/efeito_visual.gd" id="1_1ydik"]
 [ext_resource type="Script" uid="uid://btkp103mmksgw" path="res://entities/reliquias/scripts/reliquia_mult_spin.gd" id="1_o4eeb"]
 
 [sub_resource type="CompressedTexture2D" id="CompressedTexture2D_vygui"]

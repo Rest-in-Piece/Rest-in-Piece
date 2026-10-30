@@ -13,6 +13,8 @@ var casas_hard_drop: int = 0  # casas que a peça desceu usando hard drop
 var fichas: float = 0.0
 var multiplicador: float = 1.0
 
+var posicoes_peca: Array[Vector2i] = []
+
 # peças somadas ao limite da fase por efeitos desta jogada (o GameManager aplica)
 var pecas_extras: int = 0
 

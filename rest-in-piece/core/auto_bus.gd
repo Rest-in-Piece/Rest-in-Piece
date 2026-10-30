@@ -15,6 +15,8 @@ extends Node
 # emitido quando uma relíquia contribuiu na pontuação (animação do ícone, som...)
 signal reliquia_ativada(reliquia: Reliquia)
 
+signal reliquia_afetou_blocos(reliquia: Reliquia, posicoes: Array[Vector2i])
+
 
 # --- partida ---
 

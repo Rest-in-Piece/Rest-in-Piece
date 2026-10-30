@@ -1,0 +1,37 @@
+
+EFEITOS VISUAIS DE PEÇA
+=======================
+
+Decoram peças com efeitos leves, feitos só por código. Vêm da Peca ("efeitos_visuais")
+ou de relíquias ("efeitos_visuais", que valem pra toda peça enquanto a relíquia existir).
+
+  Resource   EfeitoVisual (vfx/pecas/): base com hooks, SEM estado, um .tres por variação
+  Desenho    CamadaDeEfeitosVisuais: filha do tabuleiro, só escuta signals dele
+  Dados      ContextoVisual: posição, tamanho, fase e lados expostos de uma célula
+
+MODO (export "modo" no .tres do efeito)
+  QUEDA        só enquanto a peça cai                  ao_criar_celula, ao_celula_movida
+  FIXACAO      só no instante em que a peça trava      ao_fixar_celula
+  PERMANENTE   queda + fixação + bloco fixo            todos os hooks
+
+Pra testar o mesmo efeito em outro modo, duplique o .tres e troque o "modo".
+
+EFEITOS (vfx/pecas/recursos/)
+  Respiração  miolo que brilha e apaga devagar      Cintilar  brilho diagonal ocasional
+  Contorno    linha fina nos lados expostos         Rastro    imagens residuais ao mover
+  Impacto     clarão + poeira ao travar             Brasas    brasas subindo do topo
+
+  Vagalumes  pontos de luz que vagam e piscam      Raios     raio em zigue-zague ocasional
+  Relógio    mostrador discreto com ponteiro        Escuridão (FIXACAO) escurece do centro pra fora
+  Ondas      (FIXACAO) onda estilizada nos lados da base; "duracao" = tempo até sumir
+  Âncora / Paraquedas  penduradas na peça em queda (só enquanto cai)
+
+HOOKS DE PEÇA INTEIRA (além dos por célula)
+  ao_criar_peca(no, contexto)   peça em queda; "no" a acompanha; contexto.retangulo.size
+  ao_fixar_peca(contexto)       no instante em que trava; contexto.retangulo
+
+COMO CRIAR UM EFEITO NOVO
+  1. efeito_visual_xxx.gd (class_name, extends EfeitoVisual), só com os hooks necessários
+  2. um .tres apontando pro script (modo, cor, intensidade)
+  3. arraste o .tres pra "Efeitos Visuais" de uma Peca ou Reliquia
+Mantenha discreto: intensidade baixa, poucos nós por célula.

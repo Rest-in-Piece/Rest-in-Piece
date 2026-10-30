@@ -1,3 +1,5 @@
+
+
 # dados de UM quadradinho já fixado no tabuleiro. O tetris.gd guarda um por posição.
 # Os valores são capturados quando a peça trava: buffs dados depois à peça não alteram
 # quadradinhos que já estão no grid.
@@ -11,6 +13,7 @@ var multiplicador: float = 1.0
 # efeitos da peça que originou o bloco. Os que têm hooks de tabuleiro (areia, vidro...)
 # continuam agindo sobre ele enquanto ele estiver no grid
 var efeitos: Array[EfeitoDePeca] = []
+var efeitos_visuais: Array[EfeitoVisual] = []
 
 
 static func criar_a_partir_da_peca(peca_origem: Peca, travamento: TravamentoDePeca) -> BlocoFixado:
@@ -21,6 +24,7 @@ static func criar_a_partir_da_peca(peca_origem: Peca, travamento: TravamentoDePe
 	for efeito in peca_origem.efeitos:
 		if efeito != null:
 			bloco_fixado.efeitos.append(efeito)
+	bloco_fixado.efeitos_visuais = EfeitoVisual.combinar(peca_origem.efeitos_visuais, travamento.efeitos_visuais)
 	return bloco_fixado
 
 

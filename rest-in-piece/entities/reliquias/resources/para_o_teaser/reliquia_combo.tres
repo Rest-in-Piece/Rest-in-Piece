@@ -1,6 +1,7 @@
 [gd_resource type="Resource" script_class="ReliquiaCombo" format=3 uid="uid://bwadiqljpft21"]
 
 [ext_resource type="Script" uid="uid://djynh3fp1h2jn" path="res://entities/reliquias/scripts/reliquia_combo.gd" id="1_01lff"]
+[ext_resource type="Script" uid="uid://b7s2kvxrww7si" path="res://assets/visual_fx/pecas/scripts/efeito_visual.gd" id="1_qdhr8"]
 
 [sub_resource type="CompressedTexture2D" id="CompressedTexture2D_m2x7o"]
 load_path = "res://.godot/imported/Magic_Items_01_pack_FREE-16x16.png-15f39e7dcf3b1163351a8a2472acde2c.ctex"

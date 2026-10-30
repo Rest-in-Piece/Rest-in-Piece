@@ -87,6 +87,7 @@ sources/2 = SubResource("TileSetAtlasSource_areia")
 script = ExtResource("1_oismu")
 fases = Array[ExtResource("2_aril8")]([ExtResource("10_wlauo"), ExtResource("4_noosx"), ExtResource("5_jtwxc"), ExtResource("6_tij57")])
 reliquias_disponiveis = Array[ExtResource("3_wjvaw")]([ExtResource("8_mvxeb"), ExtResource("9_2kqy1"), ExtResource("4_kier8"), ExtResource("11_vk4ph"), ExtResource("12_qkqby"), ExtResource("5_la0xn"), ExtResource("14_jhpw1"), ExtResource("15_24u3u"), ExtResource("16_jqg6c")])
+reliquias_iniciais = Array[ExtResource("3_wjvaw")]([ExtResource("11_vk4ph")])
 som_completar_linha = Array[AudioStreamMP3]([ExtResource("17_kt7iu"), ExtResource("18_qbs7a")])
 som_passar_fase = Array[AudioStreamMP3]([ExtResource("19_kknpv")])
 

@@ -19,6 +19,9 @@ signal blocos_explodidos(linhas: Array[LinhaPontuada])
 signal peca_travada(peca: Peca, casas_hard_drop: int)
 signal peca_travando(travamento: TravamentoDePeca)
 signal blocos_quebrados(quantidade: int)
+signal peca_em_jogo_desenhada(peca: Peca, posicoes: Array[Vector2i])
+signal blocos_fixados_alterados
+
 
 @export var pecas: Array[Peca]
 @onready var camada_fantasma: TileMapLayer = $PecaFantasma
@@ -82,11 +85,8 @@ var blocos_fixados: Dictionary[Vector2i, BlocoFixado] = {}
 var casas_descidas_hard_drop: int = 0
 
 var ultima_acao_foi_rotacao: bool = false
+var posicoes_ultima_peca: Array[Vector2i] = []
 
-
-# Called when the node enters the scene tree for the first time.
-func _ready() -> void:
-	pass
 
 func _process(delta: float) -> void:
 	if not jogo_rodando:
@@ -325,16 +325,18 @@ func pode_criar_peca():
 	return true
 
 
-# Peças que atravessam blocos usam outra camada para nunca substituir os tiles fixos.
 func desenhar_peca(peca_desenho, posicao, atlas):
 	var atravessa: bool = peca.atravessa_blocos()
 	var destino: TileMapLayer = camada_fantasma if atravessa else self
 	if atravessa:
 		camada_fantasma.modulate = peca.obter_cor_visual()
+	var posicoes: Array[Vector2i] = []
 	for bloco in peca_desenho:
 		if posicao_esta_no_tabuleiro(posicao + bloco):
 			destino.set_cell(posicao + bloco, peca.id_fonte_tiles, atlas)
+			posicoes.append(posicao + bloco)
 	atualizar_projecao()
+	peca_em_jogo_desenhada.emit(peca, posicoes)
 
 func limpar_peca():
 	camada_projecao.clear()
@@ -451,6 +453,7 @@ func travar_peca():
 	var travamento := TravamentoDePeca.new()
 	travamento.peca = peca
 	travamento.casas_hard_drop = casas_descidas_hard_drop
+	travamento.posicoes_peca = obter_posicoes_da_peca_atual()
 	peca_travando.emit(travamento)
 	
 	var posicoes_registradas: Array[Vector2i] = registrar_blocos_da_peca(travamento)
@@ -460,6 +463,7 @@ func travar_peca():
 		peca.ao_travar(self, posicoes_registradas)
 		estabilizar_tabuleiro()
 	
+	blocos_fixados_alterados.emit()
 	peca_travada.emit(peca, casas_descidas_hard_drop)
 	
 	if not jogo_rodando:
@@ -486,6 +490,8 @@ func registrar_blocos_da_peca(travamento: TravamentoDePeca) -> Array[Vector2i]:
 		# peças comuns já estão desenhadas aqui; as que usam outra camada ainda não estão
 		set_cell(posicao, peca.id_fonte_tiles, peca_atlas)
 		blocos_fixados[posicao] = BlocoFixado.criar_a_partir_da_peca(peca, travamento)
+	
+	posicoes_ultima_peca = posicoes
 	return posicoes
 
 
@@ -767,6 +773,8 @@ func limpar_grid():
 	for i in range(LINHAS):
 		for j in range(COLUNAS):
 			erase_cell(Vector2i(j + 1, i + 1))
+	
+	blocos_fixados_alterados.emit()
 
 
 # único ponto de entrada pros valores de jogabilidade definidos pelo GameManager
@@ -830,7 +838,11 @@ func substituir_peca_atual(nova_peca: Peca) -> bool:
 	return false
 
 
-
+func obter_posicoes_da_peca_atual() -> Array[Vector2i]:
+	var posicoes: Array[Vector2i] = []
+	for deslocamento in peca_ativa:
+		posicoes.append(pos_atual + deslocamento)
+	return posicoes
 
 
 

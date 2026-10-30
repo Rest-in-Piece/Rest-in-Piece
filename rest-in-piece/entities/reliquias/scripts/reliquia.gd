@@ -8,10 +8,22 @@ extends Resource
 
 const NIVEL_MAXIMO: int = 3
 
+enum EfeitoDeAtivacao {
+	RELIQUIA_FLIP, RELIQUIA_PULO, RELIQUIA_BRILHO_VARREDURA, RELIQUIA_GLITCH,
+	RELIQUIA_DISSOLUCAO, RELIQUIA_CONTORNO, RELIQUIA_GLOW, RELIQUIA_AURA,
+	RELIQUIA_ONDA, RELIQUIA_FAISCAS,
+	PECA_CONTORNO, PECA_GLOW, PECA_BRILHO_VARREDURA, PECA_ONDA, PECA_FAISCAS,
+}
+
 @export var nome: String = ""
 @export_multiline var descricao: String = ""
 @export var textura: Texture2D
 @export_range(1, 3) var nivel: int = 1
+
+@export_category("Efeitos visuais")
+@export var efeitos_visuais: Array[EfeitoVisual] = []
+@export var cor_dos_efeitos: Color = Color(1.0, 0.85, 0.35)
+@export var efeitos_de_ativacao: Array[EfeitoDeAtivacao] = []
 
 
 # escolhe, numa lista com um valor por nível, o valor do nível atual.
@@ -61,3 +73,29 @@ func ao_travar_peca(_travamento: TravamentoDePeca) -> void:
 # (contexto.delta em segundos reais). Pedidos ao jogo são feitos pelos métodos do contexto
 func ao_passar_tempo(_contexto: ContextoDeTempo) -> void:
 	pass
+
+
+static func efeito_eh_da_peca(efeito: EfeitoDeAtivacao) -> bool:
+	match efeito:
+		EfeitoDeAtivacao.PECA_CONTORNO, EfeitoDeAtivacao.PECA_GLOW, \
+		EfeitoDeAtivacao.PECA_BRILHO_VARREDURA, EfeitoDeAtivacao.PECA_ONDA, \
+		EfeitoDeAtivacao.PECA_FAISCAS:
+			return true
+	return false
+
+func tem_efeitos_na_peca() -> bool:
+	for efeito in efeitos_de_ativacao:
+		if efeito_eh_da_peca(efeito):
+			return true
+	return false
+
+func obter_efeitos_na_peca() -> Array[EfeitoDeAtivacao]:
+	var efeitos: Array[EfeitoDeAtivacao] = []
+	for efeito in efeitos_de_ativacao:
+		if efeito_eh_da_peca(efeito):
+			efeitos.append(efeito)
+	return efeitos
+
+# efeitos visuais que esta relíquia dá à peça. Sobrescreva pra filtrar
+func obter_efeitos_visuais_para(_peca: Peca) -> Array[EfeitoVisual]:
+	return efeitos_visuais

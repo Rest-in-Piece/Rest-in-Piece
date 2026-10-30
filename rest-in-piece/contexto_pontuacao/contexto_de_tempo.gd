@@ -12,6 +12,8 @@ var peca_atual: Peca
 var pecas_do_saco: Array[Peca] = []
 var peca_apoiada: bool = false  # true quando a peça está encostada no chão ou em outra peça
 
+var posicoes_peca: Array[Vector2i] = []
+
 # pedidos (o GameManager aplica depois dos hooks)
 var candidatas_substituicao: Array[Peca] = []
 var reliquia_proponente: Reliquia

@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="EfeitoVisualRastro" format=3 uid="uid://diej7umqox2f8"]
+
+[ext_resource type="Script" uid="uid://cb2a6wanee6cd" path="res://assets/visual_fx/pecas/scripts/efeito_visual_rastro.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+nome = "Rastro Violeta"
+modo = 0
+cor = Color(0.7, 0.45, 1, 1)
+intensidade = 0.4

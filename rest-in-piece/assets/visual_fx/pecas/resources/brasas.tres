@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="EfeitoVisualBrasas" format=3 uid="uid://bsjbqep5jxt87"]
+
+[ext_resource type="Script" uid="uid://df801nv25njmo" path="res://assets/visual_fx/pecas/scripts/efeito_visual_brasas.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+nome = "Brasas"
+cor = Color(1, 0.5, 0.15, 1)
+intensidade = 0.8

@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="EfeitoVisualRespiracao" format=3 uid="uid://2ne04mnqc8nm"]
+
+[ext_resource type="Script" uid="uid://bk65i72yp71gw" path="res://assets/visual_fx/pecas/scripts/efeito_visual_respiracao.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+nome = "Respiração Âmbar"
+cor = Color(1, 0.72, 0.25, 1)
+intensidade = 0.6

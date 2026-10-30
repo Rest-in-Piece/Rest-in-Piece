@@ -1,5 +1,4 @@
 
-
 # guarda as relíquias do jogador e repassa os eventos do jogo pra elas, na ordem
 # em que foram adquiridas. Não sabe nada de tabuleiro nem de HUD.
 
@@ -52,6 +51,24 @@ func processar_armazenamento(peca_armazenada: Peca):
 		reliquia.ao_armazenar_peca(peca_armazenada)
 
 
+# único ponto de saída das ativações. O ícone da relíquia é sempre avisado; os quadradinhos
+# afetados só vão pro AutoBus se a relíquia tiver algum efeito visual pra eles
+func notificar_ativacao(reliquia: Reliquia, posicoes_afetadas: Array[Vector2i] = []) -> void:
+	AutoBus.reliquia_ativada.emit(reliquia)
+	
+	if posicoes_afetadas.is_empty() or not reliquia.tem_efeitos_na_peca():
+		return
+	AutoBus.reliquia_afetou_blocos.emit(reliquia, posicoes_afetadas)
+
+
+# efeitos visuais que as relíquias dão a uma peça (os da própria Peca são somados à parte)
+func obter_efeitos_visuais(peca: Peca) -> Array[EfeitoVisual]:
+	var efeitos: Array[EfeitoVisual] = []
+	for reliquia in reliquias:
+		efeitos = EfeitoVisual.combinar(efeitos, reliquia.obter_efeitos_visuais_para(peca))
+	return efeitos
+
+
 # ordem da pontuação: quadradinhos (esquerda -> direita) -> linha -> pontos da jogada -> jogada
 func processar_pontuacao(contexto: ContextoPontuacao):
 	for linha in contexto.linhas:
@@ -65,15 +82,17 @@ func processar_pontuacao(contexto: ContextoPontuacao):
 		reliquia.ao_pontuar(contexto)
 		
 		if contexto.ativou_reliquia:
-			AutoBus.reliquia_ativada.emit(reliquia)
+			notificar_ativacao(reliquia, contexto.posicoes_peca)
 
 func processar_travamento(travamento: TravamentoDePeca):
+	travamento.efeitos_visuais = obter_efeitos_visuais(travamento.peca)
+	
 	for reliquia in reliquias:
 		travamento.ativou_reliquia = false
 		reliquia.ao_travar_peca(travamento)
 		
 		if travamento.ativou_reliquia:
-			AutoBus.reliquia_ativada.emit(reliquia)
+			notificar_ativacao(reliquia, travamento.posicoes_peca)
 
 func _processar_blocos_da_linha(contexto: ContextoPontuacao, linha: LinhaPontuada):
 	for bloco in linha.blocos:
@@ -92,7 +111,11 @@ func _executar_hook_do_bloco(reliquia: Reliquia, contexto: ContextoPontuacao, li
 	
 	var alterou_bloco: bool = bloco.pontos != pontos_antes or bloco.multiplicador != multiplicador_antes
 	if alterou_bloco or contexto.ativou_reliquia:
-		AutoBus.reliquia_ativada.emit(reliquia)
+		# o quadradinho afetado é o próprio bloco
+		var posicoes: Array[Vector2i] = []
+		if reliquia.tem_efeitos_na_peca():
+			posicoes.append(bloco.posicao)
+		notificar_ativacao(reliquia, posicoes)
 
 func _processar_linha(contexto: ContextoPontuacao, linha: LinhaPontuada):
 	for reliquia in reliquias:
@@ -104,7 +127,17 @@ func _processar_linha(contexto: ContextoPontuacao, linha: LinhaPontuada):
 		
 		var alterou_linha: bool = linha.pontos != pontos_antes or linha.zerada != estava_zerada
 		if alterou_linha or contexto.ativou_reliquia:
-			AutoBus.reliquia_ativada.emit(reliquia)
+			notificar_ativacao(reliquia, _posicoes_da_linha(reliquia, linha))
+
+# os quadradinhos afetados por uma relíquia de linha são todos os da linha (esquerda -> direita)
+func _posicoes_da_linha(reliquia: Reliquia, linha: LinhaPontuada) -> Array[Vector2i]:
+	var posicoes: Array[Vector2i] = []
+	if not reliquia.tem_efeitos_na_peca():
+		return posicoes
+	
+	for bloco in linha.blocos:
+		posicoes.append(bloco.posicao)
+	return posicoes
 
 
 func processar_tempo(contexto: ContextoDeTempo):
@@ -113,4 +146,4 @@ func processar_tempo(contexto: ContextoDeTempo):
 		reliquia.ao_passar_tempo(contexto)
 		
 		if contexto.ativou_reliquia:
-			AutoBus.reliquia_ativada.emit(reliquia)
+			notificar_ativacao(reliquia, contexto.posicoes_peca)

@@ -1,8 +1,9 @@
 [gd_resource type="Resource" script_class="Peca" format=3 uid="uid://cnkvho2uyvvef"]
 
 [ext_resource type="Script" uid="uid://bpwodnk3jua2h" path="res://entities/pecas/peca.gd" id="1_y3x63"]
-[ext_resource type="Script" path="res://entities/pecas/efeitos/efeito_de_peca.gd" id="2_base"]
+[ext_resource type="Script" uid="uid://iupcfct7kksr" path="res://entities/pecas/efeitos/efeito_de_peca.gd" id="2_base"]
 [ext_resource type="Resource" path="res://entities/pecas/efeitos/efeito_fantasma.tres" id="3_efeito"]
+[ext_resource type="Script" uid="uid://b7s2kvxrww7si" path="res://assets/visual_fx/pecas/scripts/efeito_visual.gd" id="3_votln"]
 
 [resource]
 script = ExtResource("1_y3x63")

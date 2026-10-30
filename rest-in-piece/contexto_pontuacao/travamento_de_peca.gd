@@ -10,6 +10,9 @@ extends RefCounted
 var peca: Peca
 var casas_hard_drop: int = 0  # casas que a peça desceu usando hard drop
 
+var posicoes_peca: Array[Vector2i] = []
+var efeitos_visuais: Array[EfeitoVisual] = []  # vem das relíquias
+
 # bônus somados aos valores que cada quadradinho recebe da peça
 var pontos_extras_por_bloco: int = 0
 var multiplicador_extra_por_bloco: float = 0.0

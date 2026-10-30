@@ -1,5 +1,6 @@
 [gd_resource type="Resource" script_class="ReliquiaCamaleao" format=3 uid="uid://cq88sffr85rka"]
 
+[ext_resource type="Script" uid="uid://b7s2kvxrww7si" path="res://assets/visual_fx/pecas/scripts/efeito_visual.gd" id="1_2dxo8"]
 [ext_resource type="Script" uid="uid://c2hy7fbhnwdhf" path="res://entities/reliquias/scripts/reliquia_camaleao.gd" id="1_2uq76"]
 
 [sub_resource type="CompressedTexture2D" id="CompressedTexture2D_snqnn"]
