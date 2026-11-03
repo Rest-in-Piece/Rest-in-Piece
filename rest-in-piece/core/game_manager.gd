@@ -26,12 +26,15 @@ extends Node
 @export_category("Efeitos sonoros")
 @export var som_completar_linha: Array[AudioStreamMP3]
 @export var som_passar_fase: Array[AudioStreamMP3]
+## ajuste de volume de cada SFX, em dB (0 = original, negativo = mais baixo)
+@export_range(-40.0, 30.0, 0.5, "suffix:dB") var volume_completar_linha_db: float = 0.0
+@export_range(-40.0, 30.0, 0.5, "suffix:dB") var volume_passar_fase_db: float = 0.0
 
 const QUANTIDADE_DE_RECOMPENSAS: int = 3
 
 @onready var tabuleiro: TileMapLayer = $TabuleiroTileMap
 @onready var hud: CanvasLayer = %HUD
-@onready var audio: AudioStreamPlayer2D = $Audio
+@onready var sound_fx: AudioStreamPlayer2D = $SoundFX
 
 # variáveis lógicas
 var pontuacao: int = 0
@@ -227,8 +230,9 @@ func _atualizar_hud_pecas():
 
 func _on_linhas_destruidas(linhas: Array[LinhaPontuada]):
 	if not som_completar_linha.is_empty():
-		audio.stream = som_completar_linha.pick_random()
-		audio.play()
+		sound_fx.stream = som_completar_linha.pick_random()
+		sound_fx.volume_db = volume_completar_linha_db
+		sound_fx.play()
 	
 	# a pontuação é calculada em _on_peca_travada, aqui só guardamos a informação
 	linhas_pendentes.append_array(linhas)
@@ -307,8 +311,9 @@ func _on_fim_de_jogo():
 # quando o HUD avisa (transicao_de_fase_concluida)
 func _concluir_fase():
 	if not som_passar_fase.is_empty():
-		audio.stream = som_passar_fase.pick_random()
-		audio.play()
+		sound_fx.stream = som_passar_fase.pick_random()
+		sound_fx.volume_db = volume_passar_fase_db
+		sound_fx.play()
 	
 	tabuleiro.parar_jogo()
 	if indice_fase == 0 and peca_extra != null and not _peca_extra_adicionada:

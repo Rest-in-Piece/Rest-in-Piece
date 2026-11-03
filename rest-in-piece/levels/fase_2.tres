@@ -5,7 +5,8 @@
 
 [resource]
 script = ExtResource("2_gcgl6")
-meta = 800
-pecas_maximas = 30
-velocidade_inicial = 1.5
+nome = "MUDAR PRA 800 30 4 0.1"
+meta = 2500
+pecas_maximas = 60
+velocidade_inicial = 3.5
 metadata/_custom_type_script = "uid://b103p3gbf0tcp"
