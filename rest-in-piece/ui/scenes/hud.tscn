@@ -1,41 +1,20 @@
 [gd_scene format=3 uid="uid://b8dp7yalnfjlr"]
 
-[ext_resource type="Texture2D" uid="uid://cgodqahkv04eo" path="res://ui/backgrounds/Screenshot_1.png" id="1_aydmx"]
 [ext_resource type="Script" uid="uid://d0kbphkox74yp" path="res://ui/scenes/hud.gd" id="1_itb64"]
-[ext_resource type="Script" uid="uid://b3ssx4c85ix60" path="res://lista_reliquias.gd" id="3_11rbf"]
+[ext_resource type="Script" uid="uid://b3ssx4c85ix60" path="res://entities/reliquias/lista_reliquias.gd" id="3_11rbf"]
+[ext_resource type="Texture2D" uid="uid://d0en61kprdyn3" path="res://ui/backgrounds/tela_principal.png" id="4_f5nwl"]
 [ext_resource type="Script" uid="uid://dof1c2f4yw6ko" path="res://entities/reliquias/scripts/reliquia.gd" id="4_mvcki"]
-[ext_resource type="Resource" uid="uid://cq88sffr85rka" path="res://entities/reliquias/resources/para_o_teaser/reliquia_camaleao.tres" id="5_gmud1"]
-[ext_resource type="Resource" uid="uid://dnlkfvxu7q45c" path="res://entities/reliquias/resources/para_o_teaser/reliquia_mult_spin.tres" id="6_xshj6"]
-[ext_resource type="Resource" uid="uid://bwadiqljpft21" path="res://entities/reliquias/resources/para_o_teaser/reliquia_combo.tres" id="7_gmud1"]
+[ext_resource type="Resource" uid="uid://cq88sffr85rka" path="res://entities/reliquias/resources/vamos_usar/reliquia_camaleao.tres" id="5_gmud1"]
+[ext_resource type="Resource" uid="uid://dnlkfvxu7q45c" path="res://entities/reliquias/resources/vamos_usar/reliquia_mult_spin.tres" id="6_xshj6"]
+[ext_resource type="Resource" uid="uid://bwadiqljpft21" path="res://entities/reliquias/resources/vamos_usar/reliquia_combo.tres" id="7_gmud1"]
 [ext_resource type="PackedScene" uid="uid://bp5y3loag8irt" path="res://ui/scenes/painel_recompensas.tscn" id="8_ex61b"]
 [ext_resource type="Texture2D" uid="uid://chy1h8jd6be03" path="res://entities/pecas/texturas/tetrominoes.png" id="8_tiles"]
 [ext_resource type="Script" uid="uid://bwdhplobdt3o7" path="res://ui/scenes/painel_recompensas.gd" id="9_2avf4"]
 [ext_resource type="Texture2D" uid="uid://ddx0dx670dsgb" path="res://entities/pecas/texturas/bomba.png" id="9_bomba_tiles"]
 [ext_resource type="Texture2D" uid="uid://cn33xnpa65hkj" path="res://entities/pecas/texturas/areia.svg" id="10_areia_tiles"]
-[ext_resource type="Theme" path="res://ui/themes/rest_in_piece.tres" id="11_tema"]
-[ext_resource type="Script" path="res://ui/interface_partida.gd" id="12_layout"]
-[ext_resource type="Script" path="res://ui/animacao_botao.gd" id="13_botao"]
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_06g6o"]
-bg_color = Color(0.2, 0.21960784, 0.30588236, 1)
-
-[sub_resource type="Theme" id="Theme_2ktye"]
-PanelContainer/styles/panel = SubResource("StyleBoxFlat_06g6o")
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8w10v"]
-bg_color = Color(0.6, 0.6, 0.6, 0)
-border_width_left = 5
-border_width_top = 5
-border_width_right = 5
-border_width_bottom = 5
-border_color = Color(0.1052404, 0.10524044, 0.10524032, 1)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hkg3b"]
-bg_color = Color(0.2530101, 0.69875896, 0.468336, 1)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_wvnxi"]
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ibkw7"]
+[ext_resource type="Theme" uid="uid://dtqvo4n3jagms" path="res://ui/themes/rest_in_piece.tres" id="11_tema"]
+[ext_resource type="Script" uid="uid://b0gnqi5sfxjag" path="res://ui/interface_partida.gd" id="12_layout"]
+[ext_resource type="Script" uid="uid://c8x1cijnwscbn" path="res://ui/animacao_botao.gd" id="13_botao"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_7aupu"]
 texture = ExtResource("8_tiles")
@@ -72,29 +51,32 @@ sources/2 = SubResource("TileSetAtlasSource_areia")
 layer = 2
 script = ExtResource("1_itb64")
 
-[node name="FundoInterface" type="CanvasLayer" parent="."]
+[node name="FundoInterface" type="CanvasLayer" parent="." unique_id=1328817229]
 layer = -1
 
-[node name="Fundo" type="Panel" parent="FundoInterface"]
+[node name="Fundo" type="Panel" parent="FundoInterface" unique_id=1763718331]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_right = -863.0
+offset_bottom = -441.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 theme = ExtResource("11_tema")
 theme_type_variation = &"FundoInterface"
 
-[node name="MolduraTabuleiro" type="Panel" parent="FundoInterface"]
-offset_left = 703.0
+[node name="MolduraTabuleiro" type="Panel" parent="FundoInterface" unique_id=1990320532]
+offset_left = 276.74
 offset_top = 130.0
-offset_right = 1206.52
+offset_right = 780.26
 offset_bottom = 1043.12
 mouse_filter = 2
 theme = ExtResource("11_tema")
 theme_type_variation = &"MolduraTabuleiro"
 
-[node name="Composicao" type="Control" parent="."]
+[node name="Composicao" type="Control" parent="." unique_id=2078415769]
+layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -115,36 +97,34 @@ color = Color(0, 0.24313726, 0.30980393, 1)
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1432215097]
 visible = false
 modulate = Color(1, 1, 1, 0.19215687)
-position = Vector2(958.75, 537.75)
-scale = Vector2(1.7126899, 1.5640466)
-texture = ExtResource("1_aydmx")
+position = Vector2(965, 539)
+scale = Vector2(1.473, 1.344)
+texture = ExtResource("4_f5nwl")
 
-[node name="LabelFaseAtual" type="Label" parent="."]
+[node name="LabelFaseAtual" type="Label" parent="." unique_id=1990524909]
 unique_name_in_owner = true
-offset_left = 1233.0
+offset_left = 806.26
 offset_top = 62.0
-offset_right = 1505.0
+offset_right = 1078.26
 offset_bottom = 98.0
-mouse_filter = 2
 theme = ExtResource("11_tema")
 theme_type_variation = &"SecundarioPixel"
 text = "FASE 01"
 horizontal_alignment = 2
 
-[node name="LabelReliquias" type="Label" parent="."]
-offset_left = 709.0
+[node name="LabelReliquias" type="Label" parent="." unique_id=434747944]
+offset_left = 282.74
 offset_top = 10.0
-offset_right = 1200.52
+offset_right = 774.26
 offset_bottom = 34.0
-mouse_filter = 2
 theme = ExtResource("11_tema")
 theme_type_variation = &"SecundarioPixel"
 text = "RELÍQUIAS"
 
 [node name="PanelContainer" type="PanelContainer" parent="." unique_id=1195014327]
-offset_left = 709.0
+offset_left = 282.74
 offset_top = 40.0
-offset_right = 1200.52
+offset_right = 774.26
 offset_bottom = 120.0
 theme = ExtResource("11_tema")
 theme_type_variation = &"FaixaReliquias"
@@ -156,20 +136,19 @@ mouse_filter = 2
 [node name="ListaReliquias" type="HBoxContainer" parent="PanelContainer/PainelReliquias" unique_id=1518096014]
 unique_name_in_owner = true
 layout_mode = 2
-mouse_filter = 1
 theme_override_constants/separation = 8
 script = ExtResource("3_11rbf")
 reliquias_de_preview = Array[ExtResource("4_mvcki")]([ExtResource("5_gmud1"), ExtResource("6_xshj6"), ExtResource("7_gmud1")])
 
 [node name="Panel2" type="PanelContainer" parent="." unique_id=1214412996]
-offset_left = 405.0
+offset_left = -21.26001
 offset_top = 136.0
-offset_right = 677.0
+offset_right = 250.73999
 offset_bottom = 312.0
 mouse_filter = 2
 theme = ExtResource("11_tema")
 
-[node name="Conteudo" type="VBoxContainer" parent="Panel2"]
+[node name="Conteudo" type="VBoxContainer" parent="Panel2" unique_id=1861003503]
 layout_mode = 2
 mouse_filter = 2
 theme_override_constants/separation = 8
@@ -189,15 +168,15 @@ text = "0"
 vertical_alignment = 1
 clip_text = true
 
-[node name="PainelPontuacao" type="PanelContainer" parent="."]
-offset_left = 405.0
+[node name="PainelPontuacao" type="PanelContainer" parent="." unique_id=1910734780]
+offset_left = -21.26001
 offset_top = 328.0
-offset_right = 677.0
+offset_right = 250.73999
 offset_bottom = 524.0
 mouse_filter = 2
 theme = ExtResource("11_tema")
 
-[node name="Conteudo" type="VBoxContainer" parent="PainelPontuacao"]
+[node name="Conteudo" type="VBoxContainer" parent="PainelPontuacao" unique_id=1608765840]
 layout_mode = 2
 mouse_filter = 2
 theme_override_constants/separation = 8
@@ -218,14 +197,14 @@ vertical_alignment = 1
 clip_text = true
 
 [node name="Panel" type="PanelContainer" parent="." unique_id=566553705]
-offset_left = 1233.0
+offset_left = 806.26
 offset_top = 136.0
-offset_right = 1505.0
+offset_right = 1078.26
 offset_bottom = 392.0
 mouse_filter = 2
 theme = ExtResource("11_tema")
 
-[node name="Conteudo" type="VBoxContainer" parent="Panel"]
+[node name="Conteudo" type="VBoxContainer" parent="Panel" unique_id=482977199]
 layout_mode = 2
 mouse_filter = 2
 
@@ -234,18 +213,18 @@ layout_mode = 2
 theme_type_variation = &"TituloPixel"
 text = "PRÓXIMA PEÇA"
 
-[node name="AreaProximaPeca" type="Control" parent="Panel/Conteudo"]
+[node name="AreaProximaPeca" type="Control" parent="Panel/Conteudo" unique_id=286793473]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 118)
 layout_mode = 2
 size_flags_vertical = 3
 mouse_filter = 2
 
-[node name="Rodape" type="HBoxContainer" parent="Panel/Conteudo"]
+[node name="Rodape" type="HBoxContainer" parent="Panel/Conteudo" unique_id=672514780]
 layout_mode = 2
 mouse_filter = 2
 
-[node name="TituloPecas" type="Label" parent="Panel/Conteudo/Rodape"]
+[node name="TituloPecas" type="Label" parent="Panel/Conteudo/Rodape" unique_id=1746505928]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_type_variation = &"TituloPixel"
@@ -260,31 +239,31 @@ text = "0 / 50"
 horizontal_alignment = 2
 vertical_alignment = 1
 
-[node name="PainelReserva" type="PanelContainer" parent="."]
-offset_left = 1233.0
+[node name="PainelReserva" type="PanelContainer" parent="." unique_id=1866240235]
+offset_left = 806.26
 offset_top = 408.0
-offset_right = 1505.0
+offset_right = 1078.26
 offset_bottom = 584.0
 mouse_filter = 2
 theme = ExtResource("11_tema")
 
-[node name="Conteudo" type="VBoxContainer" parent="PainelReserva"]
+[node name="Conteudo" type="VBoxContainer" parent="PainelReserva" unique_id=1232025409]
 layout_mode = 2
 mouse_filter = 2
 
-[node name="TituloReserva" type="Label" parent="PainelReserva/Conteudo"]
+[node name="TituloReserva" type="Label" parent="PainelReserva/Conteudo" unique_id=99367784]
 layout_mode = 2
 theme_type_variation = &"TituloPixel"
 text = "RESERVA"
 
-[node name="AreaPecaArmazenada" type="Control" parent="PainelReserva/Conteudo"]
+[node name="AreaPecaArmazenada" type="Control" parent="PainelReserva/Conteudo" unique_id=1730134847]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 86)
 layout_mode = 2
 size_flags_vertical = 3
 mouse_filter = 2
 
-[node name="ReservaVazia" type="Label" parent="PainelReserva/Conteudo/AreaPecaArmazenada"]
+[node name="ReservaVazia" type="Label" parent="PainelReserva/Conteudo/AreaPecaArmazenada" unique_id=543889726]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
@@ -301,10 +280,10 @@ vertical_alignment = 1
 unique_name_in_owner = true
 visible = false
 custom_minimum_size = Vector2(272, 0)
-offset_left = 405.0
+offset_left = -21.26001
 offset_top = 548.0
-offset_right = 677.0
-offset_bottom = 628.0
+offset_right = 250.73999
+offset_bottom = 644.0
 mouse_filter = 2
 theme = ExtResource("11_tema")
 
@@ -326,8 +305,8 @@ autowrap_mode = 3
 [node name="LabelDescricaoReliquia" type="Label" parent="PainelInfoReliquia/Margem/Textos" unique_id=980300327]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 22
 theme_type_variation = &"TextoPixel"
+theme_override_font_sizes/font_size = 22
 autowrap_mode = 3
 
 [node name="ProximaPecaTileMap" type="TileMapLayer" parent="." unique_id=1709088603]
@@ -342,24 +321,30 @@ position = Vector2(1327.0001, 552.00006)
 scale = Vector2(0.89, 0.89)
 tile_set = SubResource("TileSet_7aupu")
 
-[node name="Veu" type="Panel" parent="."]
+[node name="Veu" type="Panel" parent="." unique_id=1913943655]
 visible = false
+offset_right = 1057.0
+offset_bottom = 639.0
 mouse_filter = 2
 theme = ExtResource("11_tema")
 theme_type_variation = &"Veu"
 
-[node name="PainelResultado" type="Panel" parent="."]
+[node name="PainelResultado" type="Panel" parent="." unique_id=547941934]
 visible = false
+offset_left = 298.5
+offset_top = 436.56
+offset_right = 758.5
+offset_bottom = 736.56
 mouse_filter = 2
 theme = ExtResource("11_tema")
 theme_type_variation = &"ModalPlano"
 
 [node name="Perdeu" type="Label" parent="." unique_id=1367725232]
 visible = false
-offset_left = 754.0
-offset_top = 426.0
-offset_right = 1166.0
-offset_bottom = 550.0
+offset_left = 322.5
+offset_top = 474.56
+offset_right = 734.5
+offset_bottom = 598.56
 theme = ExtResource("11_tema")
 theme_type_variation = &"ResultadoPixel"
 text = "Você Perdeu!"
@@ -369,10 +354,10 @@ autowrap_mode = 3
 
 [node name="Venceu" type="Label" parent="." unique_id=1163786332]
 visible = false
-offset_left = 754.0
-offset_top = 426.0
-offset_right = 1166.0
-offset_bottom = 550.0
+offset_left = 322.5
+offset_top = 474.56
+offset_right = 734.5
+offset_bottom = 598.56
 theme = ExtResource("11_tema")
 theme_type_variation = &"ResultadoPixel"
 text = "Você venceu a fase!"
@@ -382,10 +367,10 @@ autowrap_mode = 3
 
 [node name="Botão novo jogo" type="Button" parent="." unique_id=419492684]
 visible = false
-offset_left = 820.0
-offset_top = 628.0
-offset_right = 1100.0
-offset_bottom = 692.0
+offset_left = 388.5
+offset_top = 634.56
+offset_right = 668.5
+offset_bottom = 698.56
 theme = ExtResource("11_tema")
 theme_type_variation = &"PrimarioPixel"
 text = "NOVO JOGO"
@@ -394,19 +379,19 @@ script = ExtResource("13_botao")
 [node name="PainelRecompensas" parent="." unique_id=820066549 instance=ExtResource("8_ex61b")]
 unique_name_in_owner = true
 visible = false
-offset_left = 335.0
-offset_top = 220.0
-offset_right = 1585.0
-offset_bottom = 860.0
+offset_left = -96.5
+offset_top = -0.5
+offset_right = 1153.5
+offset_bottom = 639.5
 script = ExtResource("9_2avf4")
 
 [node name="LabelVocePassouDeFase" type="Label" parent="." unique_id=330233249]
 unique_name_in_owner = true
 visible = false
-offset_left = 754.0
-offset_top = 426.0
-offset_right = 1166.0
-offset_bottom = 550.0
+offset_left = 322.5
+offset_top = 474.56
+offset_right = 734.5
+offset_bottom = 598.56
 theme = ExtResource("11_tema")
 theme_type_variation = &"ResultadoPixel"
 horizontal_alignment = 1
