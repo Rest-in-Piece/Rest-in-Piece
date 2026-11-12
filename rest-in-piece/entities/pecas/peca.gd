@@ -19,6 +19,11 @@ extends Resource
 @export var efeitos: Array[EfeitoDePeca] = []
 @export var efeitos_visuais: Array[EfeitoVisual] = []
 
+@export_category("Recompensa")
+## nome do tipo especial mostrado na recompensa (ex: "Areia"). O formato é somado sozinho
+@export var nome_do_tipo_especial: String = ""
+@export_multiline var descricao: String = ""
+
 
 @export_category("Tabela SRS")
 @export_enum("T", "S", "Z", "J", "L", "I", "O", "BOMBA") var tipo_peca: String
@@ -140,3 +145,9 @@ func criar_copia() -> Peca:
 	visuais_copiados.assign(efeitos_visuais)
 	copia.efeitos_visuais = visuais_copiados
 	return copia
+
+func obter_nome_para_exibicao() -> String:
+	var base: String = nome_do_tipo_especial if nome_do_tipo_especial != "" else nome
+	if tipo_peca == "BOMBA":
+		return base
+	return "%s (%s)" % [base, tipo_peca]

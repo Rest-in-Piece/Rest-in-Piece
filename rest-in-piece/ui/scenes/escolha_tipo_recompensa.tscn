@@ -1,0 +1,62 @@
+[gd_scene format=3 uid="uid://d3ybes8wxy1kb"]
+
+[ext_resource type="Script" uid="uid://w46dmws6yr51" path="res://ui/scenes/escolha_tipo_recompensa.gd" id="1_script"]
+[ext_resource type="Theme" uid="uid://dtqvo4n3jagms" path="res://ui/themes/rest_in_piece.tres" id="2_tema"]
+[ext_resource type="Script" uid="uid://c8x1cijnwscbn" path="res://ui/animacao_botao.gd" id="3_botao"]
+
+[node name="EscolhaTipoRecompensa" type="Control" unique_id=1139615054]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_tema")
+script = ExtResource("1_script")
+
+[node name="Centro" type="CenterContainer" parent="." unique_id=721508735]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Painel" type="PanelContainer" parent="Centro" unique_id=587346031]
+layout_mode = 2
+theme_type_variation = &"Modal"
+
+[node name="Conteudo" type="VBoxContainer" parent="Centro/Painel" unique_id=1472459229]
+layout_mode = 2
+theme_override_constants/separation = 32
+
+[node name="Titulo" type="Label" parent="Centro/Painel/Conteudo" unique_id=1866729580]
+layout_mode = 2
+theme_type_variation = &"TituloClaro"
+text = "ESCOLHA SUA RECOMPENSA"
+horizontal_alignment = 1
+
+[node name="Opcoes" type="HBoxContainer" parent="Centro/Painel/Conteudo" unique_id=1752863906]
+layout_mode = 2
+theme_override_constants/separation = 32
+
+[node name="BotaoReliquia" type="Button" parent="Centro/Painel/Conteudo/Opcoes" unique_id=694326433]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(360, 240)
+layout_mode = 2
+text = "RELÍQUIA
+
+Um efeito passivo que altera a pontuação ou as regras"
+autowrap_mode = 3
+script = ExtResource("3_botao")
+
+[node name="BotaoPecas" type="Button" parent="Centro/Painel/Conteudo/Opcoes" unique_id=1370147246]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(360, 240)
+layout_mode = 2
+text = "PEÇAS
+
+Duas peças especiais para a sua bolsa"
+autowrap_mode = 3
+script = ExtResource("3_botao")

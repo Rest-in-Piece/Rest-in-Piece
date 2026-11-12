@@ -9,6 +9,8 @@
 script = ExtResource("1_y3x63")
 nome = "Fantasma_j"
 efeitos = Array[ExtResource("2_base")]([ExtResource("3_efeito")])
+nome_do_tipo_especial = "Fantasma"
+descricao = "Atravessa blocos. Pode ser posicionada na posição atual apertando \"F\""
 tipo_peca = "J"
 angulo_0 = Array[Vector2i]([Vector2i(-1, -1), Vector2i(-1, 0), Vector2i(0, 0), Vector2i(1, 0)])
 angulo_90 = Array[Vector2i]([Vector2i(0, 1), Vector2i(0, 0), Vector2i(0, -1), Vector2i(1, -1)])

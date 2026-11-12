@@ -11,10 +11,8 @@ var _hud: CanvasLayer
 func _ready() -> void:
 	_hud = get_parent() as CanvasLayer
 	get_viewport().size_changed.connect(_organizar)
-	for nome in ["Perdeu", "Venceu", "LabelVocePassouDeFase", "PainelRecompensas"]:
-		_hud.get_node(nome).visibility_changed.connect(_sincronizar_modal)
 	_organizar.call_deferred()
-	_sincronizar_modal.call_deferred()
+	sincronizar_modal.call_deferred()
 
 
 func _organizar() -> void:
@@ -47,12 +45,13 @@ func _organizar() -> void:
 	_definir_rect("Veu", Vector2.ZERO, tela)
 	var centro := origem + tamanho / 2.0
 	_definir_rect("PainelResultado", centro - Vector2(230, 150), Vector2(460, 300))
+	_definir_rect("Botão novo jogo", centro + Vector2(-140, 48), Vector2(280, 64))
 	for nome in ["Perdeu", "Venceu", "LabelVocePassouDeFase"]:
 		_definir_rect(nome, centro - Vector2(206, 112), Vector2(412, 124))
-	_definir_rect("Botão novo jogo", centro + Vector2(-140, 48), Vector2(280, 64))
 	var recompensas: Control = _hud.get_node("PainelRecompensas")
 	recompensas.size = Vector2(1250, 640)
 	recompensas.position = tela / 2.0 - recompensas.size / 2.0
+	
 	if not Engine.is_editor_hint():
 		_hud.centralizar_previas()
 		_hud.ajustar_valores_numericos()
@@ -64,11 +63,16 @@ func _definir_rect(caminho: String, posicao: Vector2, dimensoes: Vector2) -> voi
 	controle.size = dimensoes
 
 
-func _sincronizar_modal() -> void:
+func sincronizar_modal() -> void:
 	if _hud == null:
 		return
+	print("sincronizar_modal | Perdeu: ", _hud.get_node("Perdeu").visible,
+			" | Venceu: ", _hud.get_node("Venceu").visible,
+			" | Transicao: ", _hud.get_node("LabelVocePassouDeFase").visible)
 	var resultado: bool = _hud.get_node("Perdeu").visible or _hud.get_node("Venceu").visible
 	var transicao: bool = _hud.get_node("LabelVocePassouDeFase").visible
-	var recompensa: bool = _hud.get_node("PainelRecompensas").visible
+	var recompensa: bool = _hud.get_node("PainelRecompensas").visible \
+		or _hud.get_node("EscolhaTipoRecompensa").visible \
+		or _hud.get_node("PainelRecompensasPecas").visible
 	_hud.get_node("Veu").visible = resultado or transicao or recompensa
 	_hud.get_node("PainelResultado").visible = resultado or transicao

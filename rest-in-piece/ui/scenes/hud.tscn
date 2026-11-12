@@ -15,6 +15,8 @@
 [ext_resource type="Theme" uid="uid://dtqvo4n3jagms" path="res://ui/themes/rest_in_piece.tres" id="11_tema"]
 [ext_resource type="Script" uid="uid://b0gnqi5sfxjag" path="res://ui/interface_partida.gd" id="12_layout"]
 [ext_resource type="Script" uid="uid://c8x1cijnwscbn" path="res://ui/animacao_botao.gd" id="13_botao"]
+[ext_resource type="PackedScene" uid="uid://d3ybes8wxy1kb" path="res://ui/scenes/escolha_tipo_recompensa.tscn" id="16_x4d27"]
+[ext_resource type="PackedScene" uid="uid://b80rqqaqh8q74" path="res://ui/scenes/painel_recompensas_pecas.tscn" id="17_bsvi0"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_7aupu"]
 texture = ExtResource("8_tiles")
@@ -59,7 +61,7 @@ anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_right = -863.0
-offset_bottom = -441.0
+offset_bottom = -465.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
@@ -324,7 +326,7 @@ tile_set = SubResource("TileSet_7aupu")
 [node name="Veu" type="Panel" parent="." unique_id=1913943655]
 visible = false
 offset_right = 1057.0
-offset_bottom = 639.0
+offset_bottom = 615.0
 mouse_filter = 2
 theme = ExtResource("11_tema")
 theme_type_variation = &"Veu"
@@ -380,10 +382,18 @@ script = ExtResource("13_botao")
 unique_name_in_owner = true
 visible = false
 offset_left = -96.5
-offset_top = -0.5
+offset_top = -12.5
 offset_right = 1153.5
-offset_bottom = 639.5
+offset_bottom = 627.5
 script = ExtResource("9_2avf4")
+
+[node name="EscolhaTipoRecompensa" parent="." unique_id=1139615054 instance=ExtResource("16_x4d27")]
+unique_name_in_owner = true
+visible = false
+
+[node name="PainelRecompensasPecas" parent="." unique_id=1917107851 instance=ExtResource("17_bsvi0")]
+unique_name_in_owner = true
+visible = false
 
 [node name="LabelVocePassouDeFase" type="Label" parent="." unique_id=330233249]
 unique_name_in_owner = true

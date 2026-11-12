@@ -30,7 +30,15 @@ extends Node
 @export_range(-40.0, 30.0, 0.5, "suffix:dB") var volume_completar_linha_db: float = 0.0
 @export_range(-40.0, 30.0, 0.5, "suffix:dB") var volume_passar_fase_db: float = 0.0
 
+@export_category("Recompensa de peças")
+## Tipos especiais que podem aparecer na recompensa de peças. Arraste peças especiais
+## modelo (ex: peca_areia_l.tres): só os efeitos e o visual são aproveitados, o formato é sorteado
+@export var tipos_especiais_de_peca: Array[Peca]
+
+
 const QUANTIDADE_DE_RECOMPENSAS: int = 3
+const QUANTIDADE_DE_MENUS_DE_PECAS: int = 2
+const PECAS_POR_MENU: int = 3
 
 @onready var tabuleiro: TileMapLayer = $TabuleiroTileMap
 @onready var hud: CanvasLayer = %HUD
@@ -88,6 +96,7 @@ func _ready():
 	hud.solicitou_novo_jogo.connect(iniciar_novo_jogo)
 	hud.recompensa_reliquia_escolhida.connect(_on_recompensa_reliquia_escolhida)
 	hud.transicao_de_fase_concluida.connect(_avancar_para_proxima_fase)
+	hud.recompensa_pecas_escolhidas.connect(_on_recompensa_pecas_escolhidas)
 	
 	EfeitosDeReliquiaNoTabuleiro.instalar(tabuleiro)
 	CamadaDeEfeitosVisuais.instalar(tabuleiro, gerenciador_reliquias.obter_efeitos_visuais)
@@ -322,7 +331,8 @@ func _concluir_fase():
 	AutoBus.fase_concluida.emit(pontuacao)
 	
 	if _existe_proxima_fase():
-		hud.mostrar_vitoria_da_fase(_obter_nome_da_fase(), _obter_reliquias_de_recompensa())
+		hud.mostrar_vitoria_da_fase(_obter_nome_da_fase(), _obter_reliquias_de_recompensa(),
+				_obter_ofertas_de_pecas(), tabuleiro.tile_set)
 	else:
 		hud.mostrar_vitoria_final(_obter_nome_da_fase())
 
@@ -385,3 +395,74 @@ func _perder_partida():
 	tabuleiro.parar_jogo()
 	hud.mostrar_tela_derrota()
 	AutoBus.partida_perdida.emit(pontuacao)
+
+
+# um array de peças por menu. Vazio (sem a recompensa) se faltar tipo especial ou formato
+func _obter_ofertas_de_pecas() -> Array[Array]:
+	var ofertas: Array[Array] = []
+	var formatos: Array[Peca] = _obter_formatos_comuns()
+	var tipos: Array[Peca] = []
+	for candidato in tipos_especiais_de_peca:
+		if candidato != null:
+			tipos.append(candidato)
+	
+	if formatos.is_empty() or tipos.is_empty():
+		push_warning("recompensa de peças: preencha 'tipos_especiais_de_peca'. A recompensa não será oferecida")
+		return ofertas
+	
+	for _menu in range(QUANTIDADE_DE_MENUS_DE_PECAS):
+		var pecas: Array[Peca] = []
+		var combinacoes_usadas: Array[String] = []
+		var tentativas: int = 0
+		while pecas.size() < PECAS_POR_MENU:
+			var tipo: Peca = tipos.pick_random()
+			var formato: Peca = formatos.pick_random()
+			var combinacao: String = "%s_%s" % [tipo.resource_path, formato.tipo_peca]
+			tentativas += 1
+			# evita repetir a mesma combinação no menu (com poucas combinações, aceita repetir)
+			if combinacao in combinacoes_usadas and tentativas < 30:
+				continue
+			combinacoes_usadas.append(combinacao)
+			pecas.append(_criar_peca_de_recompensa(tipo, formato))
+		ofertas.append(pecas)
+	return ofertas
+
+
+# formatos = peças comuns (sem efeitos) de "pecas" do tabuleiro, uma por tipo
+func _obter_formatos_comuns() -> Array[Peca]:
+	var formatos: Array[Peca] = []
+	var vistos: Dictionary = {}
+	for peca in tabuleiro.pecas:
+		if peca == null or not peca.efeitos.is_empty() or peca.tipo_peca == "BOMBA":
+			continue
+		if vistos.has(peca.tipo_peca):
+			continue
+		vistos[peca.tipo_peca] = true
+		formatos.append(peca)
+	return formatos
+
+
+# o tipo especial dá efeitos e visual; o formato dá tipo_peca e os ângulos
+func _criar_peca_de_recompensa(tipo_especial: Peca, formato: Peca) -> Peca:
+	var peca: Peca = tipo_especial.criar_copia()
+	if tipo_especial.tipo_peca == "BOMBA":
+		return peca  # a bomba tem formato próprio
+	
+	peca.tipo_peca = formato.tipo_peca
+	peca.tabela_srs = "AUTO"
+	peca.angulo_0 = _copiar_forma(formato.angulo_0)
+	peca.angulo_90 = _copiar_forma(formato.angulo_90)
+	peca.angulo_180 = _copiar_forma(formato.angulo_180)
+	peca.angulo_270 = _copiar_forma(formato.angulo_270)
+	return peca
+
+
+func _copiar_forma(origem: Array[Vector2i]) -> Array[Vector2i]:
+	var copia: Array[Vector2i] = []
+	copia.assign(origem)
+	return copia
+
+
+func _on_recompensa_pecas_escolhidas(pecas: Array[Peca]) -> void:
+	for peca in pecas:
+		adicionar_peca_a_bolsa(peca)

@@ -11,6 +11,8 @@ signal solicitou_novo_jogo
 signal recompensa_reliquia_escolhida(reliquia: Reliquia)
 # as animações de vitória e de recompensa terminaram: o GameManager pode iniciar a próxima fase
 signal transicao_de_fase_concluida
+# o jogador confirmou a recompensa de peças (menus pulados não entram na lista)
+signal recompensa_pecas_escolhidas(pecas: Array[Peca])
 
 const FORMATO_TEXTO_FASE_VENCIDA: String = "%s concluída!"
 const DURACAO_ENTRADA_LABEL: float = 0.45
@@ -37,6 +39,14 @@ const PAUSA_APOS_VOO_RELIQUIA: float = 0.35
 @onready var area_peca_armazenada: Control = %AreaPecaArmazenada
 @onready var reserva_vazia: Label = %ReservaVazia
 @onready var label_fase_atual: Label = %LabelFaseAtual
+@onready var escolha_tipo_recompensa: EscolhaTipoRecompensa = %EscolhaTipoRecompensa
+@onready var painel_recompensas_pecas: PainelRecompensasPecas = %PainelRecompensasPecas
+@onready var composicao: Control = $Composicao
+
+# o que a fase oferece, guardado até o jogador escolher o tipo de recompensa
+var _reliquias_oferecidas: Array[Reliquia] = []
+var _ofertas_de_pecas: Array[Array] = []
+var _tile_set_pecas: TileSet
 
 
 func _ready() -> void:
@@ -50,6 +60,8 @@ func _ready() -> void:
 	area_peca_armazenada.resized.connect(centralizar_previas)
 	label_pontuacao.resized.connect(ajustar_valores_numericos)
 	label_meta.resized.connect(ajustar_valores_numericos)
+	escolha_tipo_recompensa.tipo_escolhido.connect(_on_tipo_recompensa_escolhido)
+	painel_recompensas_pecas.confirmado.connect(_on_pecas_confirmadas)
 
 func _on_botao_novo_jogo_pressed():
 	solicitou_novo_jogo.emit()
@@ -75,23 +87,38 @@ func esconder_telas_de_fim():
 	label_fase_vencida.hide()
 	painel_recompensas.esconder()
 	botao_novo_jogo.hide()
+	escolha_tipo_recompensa.esconder()
+	painel_recompensas_pecas.esconder()
+	_sincronizar_modal()
 
 func mostrar_tela_derrota():
 	label_perdeu.show()
 	botao_novo_jogo.show()
+	_sincronizar_modal()
 
 
 # fase vencida, com próxima fase: label animado e, em seguida, a tela de recompensas.
 # O fluxo continua quando o jogador escolhe (ver _on_reliquia_escolhida_no_painel)
-func mostrar_vitoria_da_fase(nome_da_fase: String, reliquias_oferecidas: Array[Reliquia]) -> void:
+func mostrar_vitoria_da_fase(nome_da_fase: String, reliquias_oferecidas: Array[Reliquia],
+		ofertas_de_pecas: Array[Array], tile_set_pecas: TileSet) -> void:
 	await _animar_label_fase_vencida(nome_da_fase)
 	
-	# sem nada pra oferecer, segue direto pra próxima fase
-	if reliquias_oferecidas.is_empty():
-		transicao_de_fase_concluida.emit()
-		return
+	_reliquias_oferecidas = reliquias_oferecidas
+	_ofertas_de_pecas = ofertas_de_pecas
+	_tile_set_pecas = tile_set_pecas
 	
-	await painel_recompensas.exibir_reliquias(reliquias_oferecidas)
+	var tem_reliquias: bool = not reliquias_oferecidas.is_empty()
+	var tem_pecas: bool = not ofertas_de_pecas.is_empty()
+	
+	if not tem_reliquias and not tem_pecas:
+		transicao_de_fase_concluida.emit()
+	elif tem_reliquias and tem_pecas:
+		escolha_tipo_recompensa.exibir()
+	elif tem_reliquias:
+		painel_recompensas.exibir_reliquias(reliquias_oferecidas)
+	else:
+		painel_recompensas_pecas.exibir(ofertas_de_pecas, tile_set_pecas)
+	_sincronizar_modal()
 
 
 # última fase: não existe próxima, então só oferece recomeçar
@@ -99,6 +126,7 @@ func mostrar_vitoria_final(nome_da_fase: String) -> void:
 	await _animar_label_fase_vencida(nome_da_fase)
 	label_venceu.show()
 	botao_novo_jogo.show()
+	_sincronizar_modal()
 
 
 func _animar_label_fase_vencida(nome_da_fase: String) -> void:
@@ -106,6 +134,7 @@ func _animar_label_fase_vencida(nome_da_fase: String) -> void:
 	label_fase_vencida.modulate.a = 0.0
 	label_fase_vencida.scale = Vector2(0.6, 0.6)
 	label_fase_vencida.show()
+	_sincronizar_modal()
 	label_fase_vencida.pivot_offset = label_fase_vencida.size / 2.0
 	
 	var tween := create_tween()
@@ -117,6 +146,7 @@ func _animar_label_fase_vencida(nome_da_fase: String) -> void:
 	await tween.finished
 	
 	label_fase_vencida.hide()
+	_sincronizar_modal()
 
 
 func _on_reliquia_escolhida_no_painel(reliquia: Reliquia, textura_origem: TextureRect) -> void:
@@ -133,6 +163,7 @@ func _on_reliquia_escolhida_no_painel(reliquia: Reliquia, textura_origem: Textur
 	
 	await get_tree().create_timer(PAUSA_APOS_VOO_RELIQUIA).timeout
 	await painel_recompensas.ocultar_com_animacao()
+	_sincronizar_modal()
 	transicao_de_fase_concluida.emit()
 
 
@@ -238,3 +269,25 @@ func ajustar_valores_numericos() -> void:
 		while tamanho > 24 and fonte.get_string_size(label.text, HORIZONTAL_ALIGNMENT_LEFT, -1, tamanho).x > label.size.x:
 			tamanho -= 2
 		label.add_theme_font_size_override("font_size", tamanho)
+
+
+func _on_tipo_recompensa_escolhido(tipo: EscolhaTipoRecompensa.Tipo) -> void:
+	await escolha_tipo_recompensa.ocultar_com_animacao()
+	match tipo:
+		EscolhaTipoRecompensa.Tipo.RELIQUIA:
+			painel_recompensas.exibir_reliquias(_reliquias_oferecidas)
+		EscolhaTipoRecompensa.Tipo.PECAS:
+			painel_recompensas_pecas.exibir(_ofertas_de_pecas, _tile_set_pecas)
+	_sincronizar_modal()
+
+
+func _on_pecas_confirmadas(pecas_escolhidas: Array[Peca]) -> void:
+	recompensa_pecas_escolhidas.emit(pecas_escolhidas)
+	await painel_recompensas_pecas.ocultar_com_animacao()
+	_sincronizar_modal()
+	transicao_de_fase_concluida.emit()
+
+
+# liga/desliga o véu e o painel de resultado. Chamado sempre que uma tela muda de visibilidade
+func _sincronizar_modal() -> void:
+	composicao.sincronizar_modal()

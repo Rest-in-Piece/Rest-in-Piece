@@ -10,15 +10,21 @@ extends Control
 
 signal escolhido(cartao: RecompensaCard)
 
+## desmarque nos cards cuja escolha pode ser trocada depois (recompensa de peças)
+@export var desabilitar_ao_escolher: bool = true
+
 const ESCALA_HOVER: Vector2 = Vector2(1.06, 1.06)
 const CLAREAR_FUNDO_HOVER: float = 0.15
+const DURACAO_SELECAO: float = 0.15
 const DURACAO_HOVER: float = 0.12
 const DURACAO_ESMAECER: float = 0.2
 const OPACIDADE_ESMAECIDA: float = 0.3
 
 var reliquia: Reliquia
+var peca: Peca
 var habilitado: bool = false
 
+var _tween_selecao: Tween
 var _tween_hover: Tween
 var _cor_fundo_normal: Color
 var _cor_fundo_hover: Color
@@ -27,11 +33,12 @@ var _cor_fundo_hover: Color
 @onready var textura: TextureRect = find_child("Textura*", true, false) as TextureRect
 @onready var nome: Label = find_child("Nome*", true, false) as Label
 @onready var descricao: Label = find_child("Descricao*", true, false) as Label
+@onready var selecao: Control = find_child("Selecao*", true, false) as Control
 
 
 func _ready() -> void:
-	assert(fundo != null and textura != null and nome != null and descricao != null,
-			"RecompensaCard precisa dos filhos Fundo*, Textura*, Nome* e Descricao*")
+	assert(fundo != null and textura != null and nome != null and descricao != null and selecao != null,
+			"RecompensaCard precisa dos filhos Fundo*, Textura*, Nome*, Descricao* e Selecao")
 	
 	_cor_fundo_normal = fundo.color
 	_cor_fundo_hover = fundo.color.lightened(CLAREAR_FUNDO_HOVER)
@@ -48,18 +55,73 @@ func _ready() -> void:
 
 func configurar(nova_reliquia: Reliquia) -> void:
 	reliquia = nova_reliquia
+	peca = null
 	nome.text = reliquia.nome
 	descricao.text = reliquia.descricao
 	textura.texture = reliquia.textura
-	
-	# volta ao estado inicial (o card pode ter sido esmaecido ou ter ficado com hover)
+	textura.self_modulate = Color.WHITE
+	_reiniciar_estado()
+
+
+func configurar_peca(nova_peca: Peca, tile_set: TileSet) -> void:
+	peca = nova_peca
+	reliquia = null
+	nome.text = peca.obter_nome_para_exibicao()
+	descricao.text = peca.descricao
+	textura.texture = _criar_textura_da_peca(peca, tile_set)
+	textura.self_modulate = peca.obter_cor_visual()
+	_reiniciar_estado()
+
+
+# volta ao estado inicial (o card pode ter sido esmaecido, selecionado ou ter ficado com hover)
+func _reiniciar_estado() -> void:
 	if _tween_hover != null and _tween_hover.is_valid():
 		_tween_hover.kill()
+	if _tween_selecao != null and _tween_selecao.is_valid():
+		_tween_selecao.kill()
 	scale = Vector2.ONE
 	modulate.a = 1.0
 	textura.modulate.a = 1.0
 	fundo.color = _cor_fundo_normal
+	selecao.hide()
+	selecao.modulate.a = 0.0
 	habilitado = false
+
+
+func definir_selecionado(ativo: bool) -> void:
+	if _tween_selecao != null and _tween_selecao.is_valid():
+		_tween_selecao.kill()
+	selecao.show()
+	_tween_selecao = create_tween()
+	_tween_selecao.tween_property(selecao, "modulate:a", 1.0 if ativo else 0.0, DURACAO_SELECAO)
+	if not ativo:
+		_tween_selecao.tween_callback(selecao.hide)
+
+
+# junta os blocos do ângulo 0 numa única imagem (recortando o tile da peça no atlas), então o
+# TextureRect centraliza e escala sozinho, sem posicionar nada por código
+func _criar_textura_da_peca(peca_alvo: Peca, tile_set: TileSet) -> Texture2D:
+	var fonte := tile_set.get_source(peca_alvo.id_fonte_tiles) as TileSetAtlasSource
+	if fonte == null or peca_alvo.angulo_0.is_empty():
+		return null
+	
+	var atlas: Image = fonte.texture.get_image()
+	if atlas.is_compressed():
+		atlas.decompress()
+	var regiao: Rect2i = fonte.get_tile_texture_region(peca_alvo.coords_no_atlas)
+	
+	var minimo: Vector2i = peca_alvo.angulo_0[0]
+	var maximo: Vector2i = peca_alvo.angulo_0[0]
+	for celula in peca_alvo.angulo_0:
+		minimo = Vector2i(mini(minimo.x, celula.x), mini(minimo.y, celula.y))
+		maximo = Vector2i(maxi(maximo.x, celula.x), maxi(maximo.y, celula.y))
+	var tamanho_em_celulas: Vector2i = maximo - minimo + Vector2i.ONE
+	
+	var imagem := Image.create(tamanho_em_celulas.x * regiao.size.x,
+			tamanho_em_celulas.y * regiao.size.y, false, atlas.get_format())
+	for celula in peca_alvo.angulo_0:
+		imagem.blit_rect(atlas, regiao, (celula - minimo) * regiao.size)
+	return ImageTexture.create_from_image(imagem)
 
 
 func habilitar() -> void:
@@ -113,5 +175,6 @@ func _on_gui_input(evento: InputEvent) -> void:
 	
 	var clique := evento as InputEventMouseButton
 	if clique != null and clique.pressed and clique.button_index == MOUSE_BUTTON_LEFT:
-		habilitado = false
+		if desabilitar_ao_escolher:
+			habilitado = false
 		escolhido.emit(self)
