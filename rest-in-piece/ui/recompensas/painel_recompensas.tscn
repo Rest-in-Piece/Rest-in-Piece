@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://bp5y3loag8irt"]
 
-[ext_resource type="PackedScene" uid="uid://mwk0m1csaiof" path="res://ui/scenes/recompensa_card.tscn" id="1_tx8t6"]
+[ext_resource type="PackedScene" uid="uid://mwk0m1csaiof" path="res://ui/recompensas/recompensa_card.tscn" id="1_tx8t6"]
 [ext_resource type="Theme" uid="uid://dtqvo4n3jagms" path="res://ui/themes/rest_in_piece.tres" id="2_tema"]
 
 [node name="PainelRecompensas" type="PanelContainer" unique_id=820066549]

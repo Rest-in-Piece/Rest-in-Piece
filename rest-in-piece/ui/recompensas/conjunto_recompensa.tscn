@@ -1,0 +1,96 @@
+[gd_scene format=3 uid="uid://bkprlg5e2jn3n"]
+
+[ext_resource type="Script" uid="uid://dpx46c7m4fwii" path="res://ui/recompensas/conjunto_recompensa.gd" id="1_script"]
+[ext_resource type="Theme" uid="uid://dtqvo4n3jagms" path="res://ui/themes/rest_in_piece.tres" id="2_tema"]
+[ext_resource type="Script" uid="uid://k6asf7ft8ksw" path="res://ui/cor_paleta.gd" id="3_cor"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_selecao"]
+bg_color = Color(0.8, 0.14901961, 0.28627452, 0.18)
+border_width_left = 6
+border_width_top = 6
+border_width_right = 6
+border_width_bottom = 6
+border_color = Color(0.8, 0.14901961, 0.28627452, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[node name="ConjuntoRecompensa" type="Control" unique_id=1526116097]
+custom_minimum_size = Vector2(360, 560)
+layout_mode = 3
+anchors_preset = 0
+size_flags_horizontal = 3
+theme = ExtResource("2_tema")
+script = ExtResource("1_script")
+
+[node name="Fundo" type="ColorRect" parent="." unique_id=1573728938]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.2, 0.219608, 0.305882, 1)
+script = ExtResource("3_cor")
+cor_da_paleta = &"ardosia"
+
+[node name="Margem" type="MarginContainer" parent="." unique_id=63700168]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="Conteudo" type="VBoxContainer" parent="Margem" unique_id=1046622378]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Titulo" type="Label" parent="Margem/Conteudo" unique_id=441550372]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"TituloClaro"
+text = "Tipo"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="Pecas" type="HBoxContainer" parent="Margem/Conteudo" unique_id=320205621]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 140)
+layout_mode = 2
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="Divisor" type="ColorRect" parent="Margem/Conteudo" unique_id=1094048721]
+custom_minimum_size = Vector2(0, 3)
+layout_mode = 2
+color = Color(0.8, 0.14902, 0.286275, 1)
+script = ExtResource("3_cor")
+
+[node name="Descricao" type="Label" parent="Margem/Conteudo" unique_id=967443567]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+theme_type_variation = &"Claro"
+theme_override_font_sizes/font_size = 22
+text = "Descrição do efeito"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="Selecao" type="Panel" parent="." unique_id=409735962]
+visible = false
+modulate = Color(1, 1, 1, 0)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_selecao")

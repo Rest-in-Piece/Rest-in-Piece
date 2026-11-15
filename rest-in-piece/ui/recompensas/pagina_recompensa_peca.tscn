@@ -1,0 +1,131 @@
+[gd_scene format=3 uid="uid://cohbmfec1axsp"]
+
+[ext_resource type="PackedScene" uid="uid://mwk0m1csaiof" path="res://ui/recompensas/recompensa_card.tscn" id="2_card"]
+[ext_resource type="Theme" uid="uid://dtqvo4n3jagms" path="res://ui/themes/rest_in_piece.tres" id="3_tema"]
+[ext_resource type="Script" uid="uid://c8x1cijnwscbn" path="res://ui/animacao_botao.gd" id="4_botao"]
+
+[sub_resource type="GDScript" id="GDScript_utm7j"]
+script/source = "
+
+# um menu de recompensa de peças: 3 cards + \"Pular\". Guarda a escolha, mas não adiciona nada
+# à bolsa (isso só acontece quando o painel confirma).
+
+class_name PaginaRecompensaPecas
+extends Control
+
+signal selecao_alterada
+
+@onready var container_cartoes: Container = %Cartoes
+@onready var botao_pular: Button = %BotaoPular
+
+var cartoes: Array[RecompensaCard] = []
+var peca_selecionada: Peca = null  # nula com \"Pular\" marcado ou sem escolha
+
+
+func _ready() -> void:
+	for filho in container_cartoes.get_children():
+		var cartao := filho as RecompensaCard
+		if cartao == null:
+			continue
+		cartoes.append(cartao)
+		cartao.escolhido.connect(_on_cartao_escolhido)
+	botao_pular.toggled.connect(_on_pular_alternado)
+
+
+func exibir(pecas: Array, tile_set: TileSet) -> void:
+	peca_selecionada = null
+	botao_pular.set_pressed_no_signal(false)
+	for i in range(cartoes.size()):
+		var tem_peca: bool = i < pecas.size()
+		cartoes[i].visible = tem_peca
+		if tem_peca:
+			cartoes[i].configurar_peca(pecas[i], tile_set)
+
+
+func habilitar() -> void:
+	for cartao in cartoes:
+		cartao.habilitar()
+
+
+func tem_selecao() -> bool:
+	return peca_selecionada != null or botao_pular.button_pressed
+
+
+# nula quando o jogador pulou
+func obter_peca_escolhida() -> Peca:
+	return peca_selecionada
+
+
+func _on_cartao_escolhido(cartao_escolhido: RecompensaCard) -> void:
+	peca_selecionada = cartao_escolhido.peca
+	botao_pular.set_pressed_no_signal(false)
+	for cartao in cartoes:
+		cartao.definir_selecionado(cartao == cartao_escolhido)
+	selecao_alterada.emit()
+
+
+func _on_pular_alternado(ativo: bool) -> void:
+	if ativo:
+		peca_selecionada = null
+		for cartao in cartoes:
+			cartao.definir_selecionado(false)
+	selecao_alterada.emit()
+"
+
+[node name="PaginaRecompensaPecas" type="Control" unique_id=250258435]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme = ExtResource("3_tema")
+script = SubResource("GDScript_utm7j")
+
+[node name="Margem" type="MarginContainer" parent="." unique_id=220024185]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 24
+
+[node name="Conteudo" type="VBoxContainer" parent="Margem" unique_id=2071330714]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 24
+
+[node name="Cartoes" type="HBoxContainer" parent="Margem/Conteudo" unique_id=28995653]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+theme_override_constants/separation = 24
+alignment = 1
+
+[node name="Peca1" parent="Margem/Conteudo/Cartoes" unique_id=422222860 instance=ExtResource("2_card")]
+layout_mode = 2
+desabilitar_ao_escolher = false
+
+[node name="Peca2" parent="Margem/Conteudo/Cartoes" unique_id=1168108286 instance=ExtResource("2_card")]
+layout_mode = 2
+desabilitar_ao_escolher = false
+
+[node name="Peca3" parent="Margem/Conteudo/Cartoes" unique_id=905338453 instance=ExtResource("2_card")]
+layout_mode = 2
+desabilitar_ao_escolher = false
+
+[node name="BotaoPular" type="Button" parent="Margem/Conteudo" unique_id=1364826382]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(280, 0)
+layout_mode = 2
+size_flags_horizontal = 4
+toggle_mode = true
+text = "PULAR"
+script = ExtResource("4_botao")

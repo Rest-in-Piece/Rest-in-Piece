@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="EfeitoVisualOndasBase" format=3 uid="uid://dps1vtfxnhtlk"]
+
+[ext_resource type="Script" uid="uid://cjfsxrdafo72q" path="res://assets/visual_fx/pecas/scripts/novos/efeito_visual_pulso_base.gd" id="1_jbbq8"]
+
+[resource]
+script = ExtResource("1_jbbq8")
+intensidade = 0.3
+metadata/_custom_type_script = "uid://cjfsxrdafo72q"

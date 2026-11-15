@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://mwk0m1csaiof"]
 
-[ext_resource type="Script" uid="uid://bq3oo5vgb5ibe" path="res://ui/scenes/recompensa_card.gd" id="1_562l8"]
+[ext_resource type="Script" uid="uid://bq3oo5vgb5ibe" path="res://ui/recompensas/recompensa_card.gd" id="1_562l8"]
 [ext_resource type="Theme" uid="uid://dtqvo4n3jagms" path="res://ui/themes/rest_in_piece.tres" id="3_tema"]
 [ext_resource type="Script" uid="uid://k6asf7ft8ksw" path="res://ui/cor_paleta.gd" id="4_cor"]
 
@@ -60,6 +60,7 @@ offset_left = 24.0
 offset_top = 24.0
 offset_right = -24.0
 offset_bottom = 92.0
+grow_horizontal = 2
 theme_type_variation = &"TituloClaro"
 text = "Nome da relíquia"
 horizontal_alignment = 1
@@ -74,6 +75,7 @@ offset_left = 24.0
 offset_top = 272.0
 offset_right = -24.0
 offset_bottom = 476.0
+grow_horizontal = 2
 theme_type_variation = &"Claro"
 theme_override_font_sizes/font_size = 22
 text = "Descrição descrição descrição descrição descrição descrição descrição descrição descrição descrição descrição descrição descrição Descrição descrição descrição descrição descrição descrição descrição descrição descrição descrição descrição descrição descrição Descrição descrição descrição descrição descrição descrição descrição descrição descrição descrição descrição descrição descrição"
@@ -89,11 +91,13 @@ anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_top = -3.0
+grow_horizontal = 2
+grow_vertical = 0
 mouse_filter = 2
 color = Color(0.8, 0.14902, 0.286275, 1)
 script = ExtResource("4_cor")
 
-[node name="Selecao" type="Panel" parent="."]
+[node name="Selecao" type="Panel" parent="." unique_id=1856961692]
 visible = false
 modulate = Color(1, 1, 1, 0)
 layout_mode = 1

@@ -1,0 +1,141 @@
+[gd_scene format=3 uid="uid://b80rqqaqh8q74"]
+
+[ext_resource type="Script" uid="uid://jm3ra65h2x2" path="res://ui/recompensas/painel_recompensas_pecas.gd" id="1_script"]
+[ext_resource type="PackedScene" uid="uid://bkprlg5e2jn3n" path="res://ui/recompensas/conjunto_recompensa.tscn" id="2_conjunto"]
+[ext_resource type="Theme" uid="uid://dtqvo4n3jagms" path="res://ui/themes/rest_in_piece.tres" id="3_tema"]
+[ext_resource type="Script" uid="uid://c8x1cijnwscbn" path="res://ui/animacao_botao.gd" id="4_botao"]
+
+[node name="PainelRecompensasPecas" type="Control" unique_id=1917107851]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("3_tema")
+script = ExtResource("1_script")
+
+[node name="Centro" type="CenterContainer" parent="." unique_id=1026046941]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Conteudo" type="VBoxContainer" parent="Centro" unique_id=1726495517]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 16
+
+[node name="LabelTitulo" type="Label" parent="Centro/Conteudo" unique_id=883200341]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"TituloClaro"
+text = "ESCOLHA UM CONJUNTO"
+horizontal_alignment = 1
+
+[node name="AreaTelas" type="Control" parent="Centro/Conteudo" unique_id=1608816996]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(1160, 620)
+clip_contents = true
+layout_mode = 2
+mouse_filter = 2
+
+[node name="TelaConjuntos" type="Control" parent="Centro/Conteudo/AreaTelas" unique_id=415955937]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Conjuntos" type="HBoxContainer" parent="Centro/Conteudo/AreaTelas/TelaConjuntos" unique_id=1611939053]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/separation = 24
+alignment = 1
+
+[node name="ConjuntoRecompensa" parent="Centro/Conteudo/AreaTelas/TelaConjuntos/Conjuntos" unique_id=1526116097 instance=ExtResource("2_conjunto")]
+layout_mode = 2
+
+[node name="ConjuntoRecompensa2" parent="Centro/Conteudo/AreaTelas/TelaConjuntos/Conjuntos" unique_id=2063931194 instance=ExtResource("2_conjunto")]
+layout_mode = 2
+
+[node name="ConjuntoRecompensa3" parent="Centro/Conteudo/AreaTelas/TelaConjuntos/Conjuntos" unique_id=537246051 instance=ExtResource("2_conjunto")]
+layout_mode = 2
+
+[node name="TelaRemover" type="Control" parent="Centro/Conteudo/AreaTelas" unique_id=1209563280]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Rolagem" type="ScrollContainer" parent="Centro/Conteudo/AreaTelas/TelaRemover" unique_id=1946778096]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+horizontal_scroll_mode = 0
+
+[node name="GradeBolsa" type="GridContainer" parent="Centro/Conteudo/AreaTelas/TelaRemover/Rolagem" unique_id=760601337]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 6
+theme_override_constants/h_separation = 12
+theme_override_constants/v_separation = 12
+columns = 6
+
+[node name="Rodape" type="HBoxContainer" parent="Centro/Conteudo" unique_id=101873848]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 24
+alignment = 1
+
+[node name="BotaoPular" type="Button" parent="Centro/Conteudo/Rodape" unique_id=2102109013]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(260, 64)
+layout_mode = 2
+toggle_mode = true
+text = "PULAR"
+script = ExtResource("4_botao")
+
+[node name="BotaoRemover" type="Button" parent="Centro/Conteudo/Rodape" unique_id=1204939643]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(260, 64)
+layout_mode = 2
+text = "REMOVER PEÇA"
+script = ExtResource("4_botao")
+
+[node name="BotaoVoltar" type="Button" parent="Centro/Conteudo/Rodape" unique_id=273374297]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(260, 64)
+layout_mode = 2
+text = "VOLTAR"
+script = ExtResource("4_botao")
+
+[node name="BotaoConfirmar" type="Button" parent="Centro/Conteudo/Rodape" unique_id=1284779065]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(320, 64)
+layout_mode = 2
+theme_type_variation = &"PrimarioPixel"
+disabled = true
+text = "CONFIRMAR"
+script = ExtResource("4_botao")

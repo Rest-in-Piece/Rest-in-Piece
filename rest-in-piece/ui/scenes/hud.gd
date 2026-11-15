@@ -11,8 +11,10 @@ signal solicitou_novo_jogo
 signal recompensa_reliquia_escolhida(reliquia: Reliquia)
 # as animações de vitória e de recompensa terminaram: o GameManager pode iniciar a próxima fase
 signal transicao_de_fase_concluida
-# o jogador confirmou a recompensa de peças (menus pulados não entram na lista)
-signal recompensa_pecas_escolhidas(pecas: Array[Peca])
+# o jogador confirmou um conjunto de peças (lista vazia = pulou)
+signal recompensa_conjunto_escolhido(pecas: Array[Peca])
+# o jogador confirmou a remoção de uma peça da bolsa
+signal recompensa_peca_removida(peca: Peca)
 
 const FORMATO_TEXTO_FASE_VENCIDA: String = "%s concluída!"
 const DURACAO_ENTRADA_LABEL: float = 0.45
@@ -45,7 +47,8 @@ const PAUSA_APOS_VOO_RELIQUIA: float = 0.35
 
 # o que a fase oferece, guardado até o jogador escolher o tipo de recompensa
 var _reliquias_oferecidas: Array[Reliquia] = []
-var _ofertas_de_pecas: Array[Array] = []
+var _conjuntos_oferecidos: Array[ConjuntoDePecas] = []
+var _bolsa_atual: Array[Peca] = []
 var _tile_set_pecas: TileSet
 
 
@@ -61,7 +64,8 @@ func _ready() -> void:
 	label_pontuacao.resized.connect(ajustar_valores_numericos)
 	label_meta.resized.connect(ajustar_valores_numericos)
 	escolha_tipo_recompensa.tipo_escolhido.connect(_on_tipo_recompensa_escolhido)
-	painel_recompensas_pecas.confirmado.connect(_on_pecas_confirmadas)
+	painel_recompensas_pecas.conjunto_confirmado.connect(_on_conjunto_confirmado)
+	painel_recompensas_pecas.remocao_confirmada.connect(_on_remocao_confirmada)
 
 func _on_botao_novo_jogo_pressed():
 	solicitou_novo_jogo.emit()
@@ -100,15 +104,16 @@ func mostrar_tela_derrota():
 # fase vencida, com próxima fase: label animado e, em seguida, a tela de recompensas.
 # O fluxo continua quando o jogador escolhe (ver _on_reliquia_escolhida_no_painel)
 func mostrar_vitoria_da_fase(nome_da_fase: String, reliquias_oferecidas: Array[Reliquia],
-		ofertas_de_pecas: Array[Array], tile_set_pecas: TileSet) -> void:
+		conjuntos: Array[ConjuntoDePecas], bolsa: Array[Peca], tile_set_pecas: TileSet) -> void:
 	await _animar_label_fase_vencida(nome_da_fase)
 	
 	_reliquias_oferecidas = reliquias_oferecidas
-	_ofertas_de_pecas = ofertas_de_pecas
+	_conjuntos_oferecidos = conjuntos
+	_bolsa_atual = bolsa
 	_tile_set_pecas = tile_set_pecas
 	
 	var tem_reliquias: bool = not reliquias_oferecidas.is_empty()
-	var tem_pecas: bool = not ofertas_de_pecas.is_empty()
+	var tem_pecas: bool = not conjuntos.is_empty()
 	
 	if not tem_reliquias and not tem_pecas:
 		transicao_de_fase_concluida.emit()
@@ -117,7 +122,7 @@ func mostrar_vitoria_da_fase(nome_da_fase: String, reliquias_oferecidas: Array[R
 	elif tem_reliquias:
 		painel_recompensas.exibir_reliquias(reliquias_oferecidas)
 	else:
-		painel_recompensas_pecas.exibir(ofertas_de_pecas, tile_set_pecas)
+		painel_recompensas_pecas.exibir(conjuntos, bolsa, tile_set_pecas)
 	_sincronizar_modal()
 
 
@@ -277,12 +282,21 @@ func _on_tipo_recompensa_escolhido(tipo: EscolhaTipoRecompensa.Tipo) -> void:
 		EscolhaTipoRecompensa.Tipo.RELIQUIA:
 			painel_recompensas.exibir_reliquias(_reliquias_oferecidas)
 		EscolhaTipoRecompensa.Tipo.PECAS:
-			painel_recompensas_pecas.exibir(_ofertas_de_pecas, _tile_set_pecas)
+			painel_recompensas_pecas.exibir(_conjuntos_oferecidos, _bolsa_atual, _tile_set_pecas)
 	_sincronizar_modal()
 
 
-func _on_pecas_confirmadas(pecas_escolhidas: Array[Peca]) -> void:
-	recompensa_pecas_escolhidas.emit(pecas_escolhidas)
+func _on_conjunto_confirmado(pecas: Array[Peca]) -> void:
+	recompensa_conjunto_escolhido.emit(pecas)
+	await _encerrar_recompensa_de_pecas()
+
+
+func _on_remocao_confirmada(peca: Peca) -> void:
+	recompensa_peca_removida.emit(peca)
+	await _encerrar_recompensa_de_pecas()
+
+
+func _encerrar_recompensa_de_pecas() -> void:
 	await painel_recompensas_pecas.ocultar_com_animacao()
 	_sincronizar_modal()
 	transicao_de_fase_concluida.emit()

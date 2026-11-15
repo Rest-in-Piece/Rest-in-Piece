@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://d3ybes8wxy1kb"]
 
-[ext_resource type="Script" uid="uid://w46dmws6yr51" path="res://ui/scenes/escolha_tipo_recompensa.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://w46dmws6yr51" path="res://ui/recompensas/escolha_tipo_recompensa.gd" id="1_script"]
 [ext_resource type="Theme" uid="uid://dtqvo4n3jagms" path="res://ui/themes/rest_in_piece.tres" id="2_tema"]
 [ext_resource type="Script" uid="uid://c8x1cijnwscbn" path="res://ui/animacao_botao.gd" id="3_botao"]
 
@@ -57,6 +57,6 @@ custom_minimum_size = Vector2(360, 240)
 layout_mode = 2
 text = "PEÇAS
 
-Duas peças especiais para a sua bolsa"
+Escolha um entre três conjuntos de peças especiais, ou remova uma peça da bolsa"
 autowrap_mode = 3
 script = ExtResource("3_botao")

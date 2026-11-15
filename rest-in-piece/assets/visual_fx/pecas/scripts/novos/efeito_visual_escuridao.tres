@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="EfeitoVisualEscuridao" format=3 uid="uid://cagp08hmwofc7"]
+
+[ext_resource type="Script" uid="uid://c4iifsgvcqf0t" path="res://assets/visual_fx/pecas/scripts/novos/efeito_visual_escuridao.gd" id="1_6vjl6"]
+
+[resource]
+script = ExtResource("1_6vjl6")
+duracao = 0.4
+tempo_dissipacao = 0.2
+nome = "Escuridão"
+cor = Color(0.3680513, 0.20411697, 0.6098415, 1)
+intensidade = 0.3
+metadata/_custom_type_script = "uid://c4iifsgvcqf0t"

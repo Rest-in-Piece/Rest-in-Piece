@@ -15,14 +15,6 @@ extends Node
 ## relíquias que o jogador já começa a partida (útil pra testar no editor)
 @export var reliquias_iniciais: Array[Reliquia]
 
-@export_category("Pecas adicionais")
-## Uma peca de cada lista e adicionada ao saco no inicio da partida.
-@export var pecas_sorteaveis: Array[Peca]
-@export var pecas_sorteaveis_2: Array[Peca]
-@export var pecas_sorteaveis_3: Array[Peca]
-## Adicionada uma unica vez, depois de concluir a primeira fase.
-@export var peca_extra: Peca
-
 @export_category("Efeitos sonoros")
 @export var som_completar_linha: Array[AudioStreamMP3]
 @export var som_passar_fase: Array[AudioStreamMP3]
@@ -32,13 +24,16 @@ extends Node
 
 @export_category("Recompensa de peças")
 ## Tipos especiais que podem aparecer na recompensa de peças. Arraste peças especiais
-## modelo (ex: peca_areia_l.tres): só os efeitos e o visual são aproveitados, o formato é sorteado
+## modelo (ex: peca_areia_l.tres): só os efeitos e o visual são aproveitados, o formato é sorteado.
+## Cada conjunto oferecido é de UM tipo, então tipos repetidos (mesmo nome) contam como um só
 @export var tipos_especiais_de_peca: Array[Peca]
 
 
 const QUANTIDADE_DE_RECOMPENSAS: int = 3
-const QUANTIDADE_DE_MENUS_DE_PECAS: int = 2
-const PECAS_POR_MENU: int = 3
+const QUANTIDADE_DE_CONJUNTOS: int = 3
+const PECAS_POR_CONJUNTO: int = 3
+## a bolsa inicial tem N cópias de cada formato comum (I, J, L, O, S, T, Z) e nada além disso
+const COPIAS_INICIAIS_POR_FORMATO: int = 2
 
 @onready var tabuleiro: TileMapLayer = $TabuleiroTileMap
 @onready var hud: CanvasLayer = %HUD
@@ -64,8 +59,6 @@ var regras_atuais: RegrasJogo
 var bolsa_de_pecas: Array[Peca] = []
 # a bolsa depois de as relíquias alterarem uma cópia (de onde o tabuleiro sorteia)
 var pecas_do_saco_atual: Array[Peca] = []
-
-var _peca_extra_adicionada: bool = false
 
 var peca_armazenada: Peca
 
@@ -96,12 +89,11 @@ func _ready():
 	hud.solicitou_novo_jogo.connect(iniciar_novo_jogo)
 	hud.recompensa_reliquia_escolhida.connect(_on_recompensa_reliquia_escolhida)
 	hud.transicao_de_fase_concluida.connect(_avancar_para_proxima_fase)
-	hud.recompensa_pecas_escolhidas.connect(_on_recompensa_pecas_escolhidas)
+	hud.recompensa_conjunto_escolhido.connect(_on_recompensa_conjunto_escolhido)
+	hud.recompensa_peca_removida.connect(_on_recompensa_peca_removida)
 	
 	EfeitosDeReliquiaNoTabuleiro.instalar(tabuleiro)
 	CamadaDeEfeitosVisuais.instalar(tabuleiro, gerenciador_reliquias.obter_efeitos_visuais)
-	
-	iniciar_novo_jogo()
 	
 	iniciar_novo_jogo()
 
@@ -131,18 +123,18 @@ func _aplicar_substituicao_de_peca(contexto: ContextoDeTempo):
 			return
 
 
-# começa uma PARTIDA do zero: volta pra primeira fase e reseta bolsa de peças e relíquias
+# começa uma PARTIDA do zero: volta pra primeira fase e reseta bolsa de peças e relíquias.
+# A bolsa inicial tem só peças comuns: COPIAS_INICIAIS_POR_FORMATO de cada formato
 func iniciar_novo_jogo():
 	indice_fase = 0
-	_peca_extra_adicionada = false
 	
 	# a bolsa precisa ser resetada antes das relíquias, que disparam o recálculo
 	bolsa_de_pecas.clear()
-	for peca_inicial in tabuleiro.pecas:
-		bolsa_de_pecas.append(peca_inicial.criar_copia())
+	for formato in _obter_formatos_comuns():
+		for i in range(COPIAS_INICIAIS_POR_FORMATO):
+			bolsa_de_pecas.append(formato.criar_copia())
 	
 	gerenciador_reliquias.limpar()
-	adicionar_pecas_aleatorias_ao_saco()
 	for reliquia in reliquias_iniciais:
 		gerenciador_reliquias.adquirir(reliquia)
 	
@@ -204,22 +196,24 @@ func _aplicar_regras():
 	_atualizar_hud_pecas()
 
 
-func adicionar_pecas_aleatorias_ao_saco():
-	# AQUI TEMPORÁRIO
-	for grupo in [pecas_sorteaveis, pecas_sorteaveis_2, pecas_sorteaveis_3]:
-		var candidatas: Array[Peca] = []
-		for candidata in grupo:
-			if candidata != null:
-				candidatas.append(candidata)
-		if not candidatas.is_empty():
-			adicionar_peca_a_bolsa(candidatas.pick_random())
-
-
 # usada por recompensas de fim de batalha e lojas. Cada cópia é uma peça independente
 func adicionar_peca_a_bolsa(peca: Peca, copias: int = 1):
 	for i in range(copias):
 		bolsa_de_pecas.append(peca.criar_copia())
 	_aplicar_regras()
+
+
+# remove PERMANENTEMENTE uma peça da bolsa (a instância exata, não "uma igual").
+# Retorna false se a peça não está na bolsa
+func remover_peca_da_bolsa(peca: Peca) -> bool:
+	var indice: int = bolsa_de_pecas.find(peca)
+	if indice == -1:
+		push_warning("remover_peca_da_bolsa: a peça não está na bolsa")
+		return false
+	
+	bolsa_de_pecas.remove_at(indice)
+	_aplicar_regras()
+	return true
 
 
 # usada por recompensas e lojas. Retorna false se o limite de relíquias foi atingido
@@ -325,14 +319,13 @@ func _concluir_fase():
 		sound_fx.play()
 	
 	tabuleiro.parar_jogo()
-	if indice_fase == 0 and peca_extra != null and not _peca_extra_adicionada:
-		_peca_extra_adicionada = true
-		adicionar_peca_a_bolsa(peca_extra)
 	AutoBus.fase_concluida.emit(pontuacao)
 	
 	if _existe_proxima_fase():
+		# a bolsa vai como cópia rasa do array: as instâncias são as mesmas, então o HUD
+		# devolve a peça escolhida pra remoção e ela é encontrada em remover_peca_da_bolsa
 		hud.mostrar_vitoria_da_fase(_obter_nome_da_fase(), _obter_reliquias_de_recompensa(),
-				_obter_ofertas_de_pecas(), tabuleiro.tile_set)
+				_obter_conjuntos_de_pecas(), bolsa_de_pecas.duplicate(), tabuleiro.tile_set)
 	else:
 		hud.mostrar_vitoria_final(_obter_nome_da_fase())
 
@@ -397,35 +390,53 @@ func _perder_partida():
 	AutoBus.partida_perdida.emit(pontuacao)
 
 
-# um array de peças por menu. Vazio (sem a recompensa) se faltar tipo especial ou formato
-func _obter_ofertas_de_pecas() -> Array[Array]:
-	var ofertas: Array[Array] = []
+# ---------- recompensa de peças ----------
+
+# até QUANTIDADE_DE_CONJUNTOS conjuntos, cada um de um tipo especial DIFERENTE. Vazio se
+# faltar tipo especial ou formato (a recompensa de peças não é oferecida)
+func _obter_conjuntos_de_pecas() -> Array[ConjuntoDePecas]:
+	var conjuntos: Array[ConjuntoDePecas] = []
 	var formatos: Array[Peca] = _obter_formatos_comuns()
+	
+	# um modelo por tipo (pelo nome do tipo especial), sem vazios
 	var tipos: Array[Peca] = []
+	var nomes_vistos: Dictionary = {}
 	for candidato in tipos_especiais_de_peca:
-		if candidato != null:
-			tipos.append(candidato)
+		if candidato == null:
+			continue
+		var chave: String = candidato.nome_do_tipo_especial if candidato.nome_do_tipo_especial != "" else candidato.nome
+		if nomes_vistos.has(chave):
+			continue
+		nomes_vistos[chave] = true
+		tipos.append(candidato)
 	
 	if formatos.is_empty() or tipos.is_empty():
 		push_warning("recompensa de peças: preencha 'tipos_especiais_de_peca'. A recompensa não será oferecida")
-		return ofertas
+		return conjuntos
 	
-	for _menu in range(QUANTIDADE_DE_MENUS_DE_PECAS):
-		var pecas: Array[Peca] = []
-		var combinacoes_usadas: Array[String] = []
-		var tentativas: int = 0
-		while pecas.size() < PECAS_POR_MENU:
-			var tipo: Peca = tipos.pick_random()
-			var formato: Peca = formatos.pick_random()
-			var combinacao: String = "%s_%s" % [tipo.resource_path, formato.tipo_peca]
-			tentativas += 1
-			# evita repetir a mesma combinação no menu (com poucas combinações, aceita repetir)
-			if combinacao in combinacoes_usadas and tentativas < 30:
-				continue
-			combinacoes_usadas.append(combinacao)
-			pecas.append(_criar_peca_de_recompensa(tipo, formato))
-		ofertas.append(pecas)
-	return ofertas
+	tipos.shuffle()
+	for i in range(mini(QUANTIDADE_DE_CONJUNTOS, tipos.size())):
+		conjuntos.append(_criar_conjunto(tipos[i], formatos))
+	return conjuntos
+
+
+# um conjunto = o tipo especial em PECAS_POR_CONJUNTO formatos diferentes sorteados
+func _criar_conjunto(tipo_especial: Peca, formatos: Array[Peca]) -> ConjuntoDePecas:
+	var conjunto := ConjuntoDePecas.new()
+	conjunto.nome_do_tipo = tipo_especial.nome_do_tipo_especial if tipo_especial.nome_do_tipo_especial != "" else tipo_especial.nome
+	conjunto.descricao = tipo_especial.descricao
+	
+	# a bomba tem formato próprio: o conjunto é de bombas iguais
+	if tipo_especial.tipo_peca == "BOMBA":
+		for i in range(PECAS_POR_CONJUNTO):
+			conjunto.pecas.append(tipo_especial.criar_copia())
+		return conjunto
+	
+	var sorteados: Array[Peca] = formatos.duplicate()
+	sorteados.shuffle()
+	for i in range(mini(PECAS_POR_CONJUNTO, sorteados.size())):
+		conjunto.pecas.append(_criar_peca_de_recompensa(tipo_especial, sorteados[i]))
+	return conjunto
 
 
 # formatos = peças comuns (sem efeitos) de "pecas" do tabuleiro, uma por tipo
@@ -463,6 +474,11 @@ func _copiar_forma(origem: Array[Vector2i]) -> Array[Vector2i]:
 	return copia
 
 
-func _on_recompensa_pecas_escolhidas(pecas: Array[Peca]) -> void:
+# lista vazia = o jogador pulou a recompensa
+func _on_recompensa_conjunto_escolhido(pecas: Array[Peca]) -> void:
 	for peca in pecas:
 		adicionar_peca_a_bolsa(peca)
+
+
+func _on_recompensa_peca_removida(peca: Peca) -> void:
+	remover_peca_da_bolsa(peca)
