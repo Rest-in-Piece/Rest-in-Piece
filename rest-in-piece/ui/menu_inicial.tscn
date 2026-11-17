@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://cwd6oh7y5dpvi" path="res://ui/menu_inicial.gd" id="1_a2ua6"]
 [ext_resource type="Theme" uid="uid://dtqvo4n3jagms" path="res://ui/themes/rest_in_piece.tres" id="2_tema"]
 [ext_resource type="Script" uid="uid://c8x1cijnwscbn" path="res://ui/animacao_botao.gd" id="3_animacao"]
+[ext_resource type="PackedScene" path="res://ui/scenes/tela_controles.tscn" id="4_controles"]
 
 [node name="MenuInicial" type="Control" unique_id=1435540006]
 layout_mode = 3
@@ -72,6 +73,12 @@ script = ExtResource("3_animacao")
 custom_minimum_size = Vector2(0, 64)
 layout_mode = 2
 text = "Configurações"
+script = ExtResource("3_animacao")
+
+[node name="Controles" type="Button" parent="Menu/ContainerBotoes"]
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+text = "Controles"
 script = ExtResource("3_animacao")
 
 [node name="Creditos" type="Button" parent="Menu/ContainerBotoes" unique_id=1933205961]
@@ -186,5 +193,7 @@ Equipe de Design:
 - Otavio
 - Paulo"
 autowrap_mode = 3
+
+[node name="TelaControles" parent="." instance=ExtResource("4_controles")]
 
 [connection signal="pressed" from="Creditos/ContainerCreditos/Titulo/FecharCreditos" to="." method="_quando_botao_fechar_creditos_pressionado"]

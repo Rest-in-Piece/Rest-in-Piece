@@ -6,14 +6,19 @@ const CAMINHO_MENU_PRINCIPAL: String = "res://ui/menu_inicial.tscn"
 @onready var aviso: Label = $AvisoPausa
 @onready var tela_pausa: Control = $TelaPausa
 @onready var botao_retomar: Button = %RetomarJogo
+@onready var botao_controles: Button = %Controles
 @onready var botao_menu: Button = %VoltarAoMenu
 @onready var botao_sair: Button = %SairDoJogo
+@onready var centro_pausa: Control = $TelaPausa/Centro
+@onready var tela_controles: Control = $TelaPausa/TelaControles
 
 
 func _ready() -> void:
 	botao_retomar.pressed.connect(retomar_jogo)
+	botao_controles.pressed.connect(mostrar_controles)
 	botao_menu.pressed.connect(voltar_ao_menu)
 	botao_sair.pressed.connect(sair_do_jogo)
+	tela_controles.fechou.connect(_quando_controles_fechados)
 
 
 func _process(_delta: float) -> void:
@@ -23,7 +28,9 @@ func _process(_delta: float) -> void:
 func _input(event: InputEvent) -> void:
 	if not event.is_action_pressed("pausar"):
 		return
-	if tela_pausa.visible:
+	if tela_controles.visible:
+		tela_controles.fechar()
+	elif tela_pausa.visible:
 		retomar_jogo()
 	elif tabuleiro.jogo_rodando and not get_tree().paused:
 		pausar_jogo()
@@ -45,8 +52,22 @@ func pausar_jogo() -> void:
 func retomar_jogo() -> void:
 	if not tela_pausa.visible:
 		return
+	if tela_controles.visible:
+		tela_controles.fechar()
 	tela_pausa.hide()
 	get_tree().paused = false
+
+
+func mostrar_controles() -> void:
+	if not tela_pausa.visible:
+		return
+	centro_pausa.hide()
+	tela_controles.abrir()
+
+
+func _quando_controles_fechados() -> void:
+	centro_pausa.show()
+	botao_controles.grab_focus()
 
 
 func voltar_ao_menu() -> void:

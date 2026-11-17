@@ -1,0 +1,97 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://ui/scenes/tela_controles.gd" id="1_controles"]
+[ext_resource type="Theme" path="res://ui/themes/rest_in_piece.tres" id="2_tema"]
+[ext_resource type="Script" path="res://ui/animacao_botao.gd" id="3_animacao"]
+
+[node name="TelaControles" type="Control"]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_tema")
+script = ExtResource("1_controles")
+
+[node name="Veu" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0.08, 0.12, 0.94)
+
+[node name="Painel" type="PanelContainer" parent="."]
+layout_mode = 0
+offset_left = 400.0
+offset_top = 80.0
+offset_right = 1520.0
+offset_bottom = 1000.0
+theme_type_variation = &"Modal"
+
+[node name="Conteudo" type="VBoxContainer" parent="Painel"]
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="Titulo" type="Label" parent="Painel/Conteudo"]
+layout_mode = 2
+theme_type_variation = &"ResultadoPixel"
+theme_override_font_sizes/font_size = 40
+text = "CONTROLES"
+
+[node name="Subtitulo" type="Label" parent="Painel/Conteudo"]
+layout_mode = 2
+theme_type_variation = &"SecundarioPixel"
+text = "TECLADO E MOUSE"
+
+[node name="Cabecalho" type="HBoxContainer" parent="Painel/Conteudo"]
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="Acao" type="Label" parent="Painel/Conteudo/Cabecalho"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"TituloClaro"
+theme_override_font_sizes/font_size = 20
+text = "AÇÃO"
+
+[node name="Teclas" type="Label" parent="Painel/Conteudo/Cabecalho"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"TituloClaro"
+theme_override_font_sizes/font_size = 20
+text = "TECLAS"
+
+[node name="Rolagem" type="ScrollContainer" parent="Painel/Conteudo"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="ListaComandos" type="VBoxContainer" parent="Painel/Conteudo/Rolagem"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="Rodape" type="HBoxContainer" parent="Painel/Conteudo"]
+layout_mode = 2
+
+[node name="AtalhoVoltar" type="Label" parent="Painel/Conteudo/Rodape"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"Secundario"
+theme_override_font_sizes/font_size = 18
+text = "Esc para voltar"
+
+[node name="Voltar" type="Button" parent="Painel/Conteudo/Rodape"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(220, 64)
+layout_mode = 2
+theme_type_variation = &"PrimarioPixel"
+text = "VOLTAR"
+script = ExtResource("3_animacao")

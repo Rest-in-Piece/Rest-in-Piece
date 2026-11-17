@@ -3,6 +3,7 @@
 [ext_resource type="Script" path="res://ui/scenes/menu_pause.gd" id="1_pause"]
 [ext_resource type="Theme" path="res://ui/themes/rest_in_piece.tres" id="2_tema"]
 [ext_resource type="Script" path="res://ui/animacao_botao.gd" id="3_animacao"]
+[ext_resource type="PackedScene" path="res://ui/scenes/tela_controles.tscn" id="4_controles"]
 
 [node name="MenuPause" type="CanvasLayer"]
 process_mode = 3
@@ -79,6 +80,13 @@ theme_type_variation = &"PrimarioPixel"
 text = "RETOMAR JOGO"
 script = ExtResource("3_animacao")
 
+[node name="Controles" type="Button" parent="TelaPausa/Centro/Painel/Conteudo"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+text = "CONTROLES"
+script = ExtResource("3_animacao")
+
 [node name="VoltarAoMenu" type="Button" parent="TelaPausa/Centro/Painel/Conteudo"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 64)
@@ -99,3 +107,6 @@ theme_type_variation = &"Secundario"
 theme_override_font_sizes/font_size = 18
 text = "Esc também retoma a partida"
 horizontal_alignment = 1
+
+[node name="TelaControles" parent="TelaPausa" instance=ExtResource("4_controles")]
+layout_mode = 1
