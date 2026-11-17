@@ -53,6 +53,7 @@
 [ext_resource type="Resource" uid="uid://b6pl1uk4oajat" path="res://entities/pecas/peca_fantasma_z.tres" id="41_o3x0j"]
 [ext_resource type="AudioStream" uid="uid://cq3a5v3404b88" path="res://assets/audio/sound_track/2 Coral Reef/Week 26 - Seaside CORAL REEF.ogg" id="52_kknpv"]
 [ext_resource type="Script" uid="uid://b6glre0wt30xj" path="res://core/musica_dinamica.gd" id="53_8ropk"]
+[ext_resource type="PackedScene" path="res://ui/scenes/menu_pause.tscn" id="54_pause"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_uppkp"]
 texture = ExtResource("1_uppkp")
@@ -98,6 +99,8 @@ tipos_especiais_de_peca = Array[ExtResource("9_kier8")]([ExtResource("33_2kqy1")
 
 [node name="HUD" parent="." unique_id=1894945411 instance=ExtResource("3_yo8nm")]
 unique_name_in_owner = true
+
+[node name="MenuPause" parent="." instance=ExtResource("54_pause")]
 
 [node name="TabuleiroTileMap" type="TileMapLayer" parent="." unique_id=1250284640]
 z_index = 2

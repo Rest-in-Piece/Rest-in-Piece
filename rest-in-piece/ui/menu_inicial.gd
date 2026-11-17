@@ -10,7 +10,7 @@ func _ready() -> void:
 func _quando_botao_menu_precionado(_botao: Button) -> void:
 	match _botao.name:
 		"NovoJogo":
-			pass
+			get_tree().change_scene_to_file("res://core/tetris.tscn")
 		"Inventario":
 			pass
 		"AbrirPacote":

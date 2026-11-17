@@ -1,0 +1,101 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://ui/scenes/menu_pause.gd" id="1_pause"]
+[ext_resource type="Theme" path="res://ui/themes/rest_in_piece.tres" id="2_tema"]
+[ext_resource type="Script" path="res://ui/animacao_botao.gd" id="3_animacao"]
+
+[node name="MenuPause" type="CanvasLayer"]
+process_mode = 3
+layer = 10
+script = ExtResource("1_pause")
+
+[node name="AvisoPausa" type="Label" parent="."]
+offset_left = 24.0
+offset_top = 20.0
+offset_right = 420.0
+offset_bottom = 48.0
+mouse_filter = 2
+theme = ExtResource("2_tema")
+theme_type_variation = &"SecundarioPixel"
+theme_override_colors/font_color = Color(0.98, 0.98, 0.99, 0.45)
+theme_override_font_sizes/font_size = 18
+text = "Aperte Esc para pausar"
+
+[node name="TelaPausa" type="Control" parent="."]
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_tema")
+
+[node name="Veu" type="ColorRect" parent="TelaPausa"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0.08, 0.12, 0.8)
+
+[node name="Centro" type="CenterContainer" parent="TelaPausa"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Painel" type="PanelContainer" parent="TelaPausa/Centro"]
+custom_minimum_size = Vector2(520, 0)
+layout_mode = 2
+theme_type_variation = &"Modal"
+
+[node name="Conteudo" type="VBoxContainer" parent="TelaPausa/Centro/Painel"]
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="Titulo" type="Label" parent="TelaPausa/Centro/Painel/Conteudo"]
+layout_mode = 2
+theme_type_variation = &"ResultadoPixel"
+theme_override_font_sizes/font_size = 40
+text = "JOGO PAUSADO"
+horizontal_alignment = 1
+
+[node name="Subtitulo" type="Label" parent="TelaPausa/Centro/Painel/Conteudo"]
+layout_mode = 2
+theme_type_variation = &"Secundario"
+text = "Respire. Sua próxima jogada pode esperar."
+horizontal_alignment = 1
+
+[node name="RetomarJogo" type="Button" parent="TelaPausa/Centro/Painel/Conteudo"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+theme_type_variation = &"PrimarioPixel"
+text = "RETOMAR JOGO"
+script = ExtResource("3_animacao")
+
+[node name="VoltarAoMenu" type="Button" parent="TelaPausa/Centro/Painel/Conteudo"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+text = "VOLTAR AO MENU PRINCIPAL"
+script = ExtResource("3_animacao")
+
+[node name="SairDoJogo" type="Button" parent="TelaPausa/Centro/Painel/Conteudo"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+text = "SAIR DO JOGO"
+script = ExtResource("3_animacao")
+
+[node name="AtalhoRetomar" type="Label" parent="TelaPausa/Centro/Painel/Conteudo"]
+layout_mode = 2
+theme_type_variation = &"Secundario"
+theme_override_font_sizes/font_size = 18
+text = "Esc também retoma a partida"
+horizontal_alignment = 1

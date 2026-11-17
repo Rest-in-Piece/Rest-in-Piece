@@ -1,12 +1,10 @@
 [gd_scene format=3 uid="uid://0hqj4af7wstw"]
 
-[ext_resource type="Script" path="res://ui/menu_inicial.gd" id="1_a2ua6"]
-[ext_resource type="Theme" path="res://ui/themes/rest_in_piece.tres" id="2_tema"]
-[ext_resource type="Script" path="res://ui/animacao_botao.gd" id="3_animacao"]
+[ext_resource type="Script" uid="uid://cwd6oh7y5dpvi" path="res://ui/menu_inicial.gd" id="1_a2ua6"]
+[ext_resource type="Theme" uid="uid://dtqvo4n3jagms" path="res://ui/themes/rest_in_piece.tres" id="2_tema"]
+[ext_resource type="Script" uid="uid://c8x1cijnwscbn" path="res://ui/animacao_botao.gd" id="3_animacao"]
 
-[sub_resource type="SystemFont" id="SystemFont_p2vmo"]
-
-[node name="MenuInicial" type="Control"]
+[node name="MenuInicial" type="Control" unique_id=1435540006]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -16,7 +14,7 @@ grow_vertical = 2
 theme = ExtResource("2_tema")
 script = ExtResource("1_a2ua6")
 
-[node name="Fundo" type="Panel" parent="."]
+[node name="Fundo" type="Panel" parent="." unique_id=832597369]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -26,7 +24,7 @@ grow_vertical = 2
 mouse_filter = 2
 theme_type_variation = &"FundoInterface"
 
-[node name="Menu" type="Control" parent="."]
+[node name="Menu" type="Control" parent="." unique_id=2130368488]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -34,8 +32,9 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Titulo" type="Label" parent="Menu"]
+[node name="Titulo" type="Label" parent="Menu" unique_id=109011709]
 layout_mode = 1
+anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
@@ -49,8 +48,9 @@ text = "Rest in Piece"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="ContainerBotoes" type="VBoxContainer" parent="Menu"]
+[node name="ContainerBotoes" type="VBoxContainer" parent="Menu" unique_id=2021728150]
 layout_mode = 1
+anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
@@ -61,50 +61,39 @@ offset_right = 260.0
 offset_bottom = 252.0
 theme_override_constants/separation = 12
 
-[node name="NovoJogo" type="Button" parent="Menu/ContainerBotoes"]
+[node name="NovoJogo" type="Button" parent="Menu/ContainerBotoes" unique_id=1611514081]
 custom_minimum_size = Vector2(0, 64)
 layout_mode = 2
 theme_type_variation = &"Primario"
 text = "Novo Jogo"
 script = ExtResource("3_animacao")
 
-[node name="Inventario" type="Button" parent="Menu/ContainerBotoes"]
-custom_minimum_size = Vector2(0, 64)
-layout_mode = 2
-text = "Inventario"
-script = ExtResource("3_animacao")
-
-[node name="AbrirPacote" type="Button" parent="Menu/ContainerBotoes"]
-custom_minimum_size = Vector2(0, 64)
-layout_mode = 2
-text = "Abrir Pacote"
-script = ExtResource("3_animacao")
-
-[node name="Configuraçoes" type="Button" parent="Menu/ContainerBotoes"]
+[node name="Configuraçoes" type="Button" parent="Menu/ContainerBotoes" unique_id=2048110154]
 custom_minimum_size = Vector2(0, 64)
 layout_mode = 2
 text = "Configurações"
 script = ExtResource("3_animacao")
 
-[node name="Creditos" type="Button" parent="Menu/ContainerBotoes"]
+[node name="Creditos" type="Button" parent="Menu/ContainerBotoes" unique_id=1933205961]
 custom_minimum_size = Vector2(0, 64)
 layout_mode = 2
 text = "Créditos"
 script = ExtResource("3_animacao")
 
-[node name="Margem" type="Control" parent="Menu/ContainerBotoes"]
+[node name="Margem" type="Control" parent="Menu/ContainerBotoes" unique_id=1717331725]
 custom_minimum_size = Vector2(0, 8)
 layout_mode = 2
 mouse_filter = 2
 
-[node name="Sair" type="Button" parent="Menu/ContainerBotoes"]
+[node name="Sair" type="Button" parent="Menu/ContainerBotoes" unique_id=2075057129]
 custom_minimum_size = Vector2(0, 64)
 layout_mode = 2
 text = "Sair"
 script = ExtResource("3_animacao")
 
-[node name="Versao" type="Label" parent="Menu"]
+[node name="Versao" type="Label" parent="Menu" unique_id=1008858179]
 layout_mode = 1
+anchors_preset = 7
 anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
@@ -117,7 +106,7 @@ theme_type_variation = &"Secundario"
 text = "versão 0.1"
 horizontal_alignment = 1
 
-[node name="Creditos" type="Control" parent="."]
+[node name="Creditos" type="Control" parent="." unique_id=2003602067]
 visible = false
 layout_mode = 1
 anchors_preset = 15
@@ -126,8 +115,9 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="ContainerCreditos" type="VBoxContainer" parent="Creditos"]
+[node name="ContainerCreditos" type="VBoxContainer" parent="Creditos" unique_id=1782861291]
 layout_mode = 1
+anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
@@ -138,7 +128,7 @@ offset_right = 380.0
 offset_bottom = 400.0
 theme_override_constants/separation = 24
 
-[node name="Titulo" type="Label" parent="Creditos/ContainerCreditos"]
+[node name="Titulo" type="Label" parent="Creditos/ContainerCreditos" unique_id=52615767]
 custom_minimum_size = Vector2(0, 80)
 layout_mode = 2
 theme_type_variation = &"Resultado"
@@ -146,8 +136,9 @@ text = "Créditos"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="FecharCreditos" type="Button" parent="Creditos/ContainerCreditos/Titulo"]
+[node name="FecharCreditos" type="Button" parent="Creditos/ContainerCreditos/Titulo" unique_id=1561569100]
 layout_mode = 1
+anchors_preset = 6
 anchor_left = 1.0
 anchor_top = 0.5
 anchor_right = 1.0
@@ -155,20 +146,20 @@ anchor_bottom = 0.5
 offset_left = -56.0
 offset_top = -28.0
 offset_bottom = 28.0
-text = "X"
 tooltip_text = "Fechar créditos"
+text = "X"
 script = ExtResource("3_animacao")
 
-[node name="PanelContainer" type="PanelContainer" parent="Creditos/ContainerCreditos"]
+[node name="PanelContainer" type="PanelContainer" parent="Creditos/ContainerCreditos" unique_id=1690827385]
 custom_minimum_size = Vector2(760, 640)
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="Pivo" type="Control" parent="Creditos/ContainerCreditos/PanelContainer"]
+[node name="Pivo" type="Control" parent="Creditos/ContainerCreditos/PanelContainer" unique_id=915011053]
 layout_mode = 2
 mouse_filter = 2
 
-[node name="ScrollContainer" type="ScrollContainer" parent="Creditos/ContainerCreditos/PanelContainer/Pivo"]
+[node name="ScrollContainer" type="ScrollContainer" parent="Creditos/ContainerCreditos/PanelContainer/Pivo" unique_id=865435096]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -177,7 +168,7 @@ grow_horizontal = 2
 grow_vertical = 2
 horizontal_scroll_mode = 0
 
-[node name="Creditos" type="Label" parent="Creditos/ContainerCreditos/PanelContainer/Pivo/ScrollContainer"]
+[node name="Creditos" type="Label" parent="Creditos/ContainerCreditos/PanelContainer/Pivo/ScrollContainer" unique_id=420308345]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Equipe de Programação:
