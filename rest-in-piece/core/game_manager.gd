@@ -124,15 +124,17 @@ func _aplicar_substituicao_de_peca(contexto: ContextoDeTempo):
 
 
 # começa uma PARTIDA do zero: volta pra primeira fase e reseta bolsa de peças e relíquias.
-# A bolsa inicial tem só peças comuns: COPIAS_INICIAIS_POR_FORMATO de cada formato
+# A bolsa inicial é EXATAMENTE a lista "pecas" exportada no tetris.gd (TabuleiroTileMap):
+# cada elemento vira uma cópia na bolsa, então repetir um .tres lá = mais cópias
 func iniciar_novo_jogo():
 	indice_fase = 0
 	
 	# a bolsa precisa ser resetada antes das relíquias, que disparam o recálculo
 	bolsa_de_pecas.clear()
-	for formato in _obter_formatos_comuns():
-		for i in range(COPIAS_INICIAIS_POR_FORMATO):
-			bolsa_de_pecas.append(formato.criar_copia())
+	for peca_inicial in tabuleiro.pecas.pecas:
+		if peca_inicial == null:  # slot vazio no inspetor
+			continue
+		bolsa_de_pecas.append(peca_inicial.criar_copia())
 	
 	gerenciador_reliquias.limpar()
 	for reliquia in reliquias_iniciais:
@@ -443,7 +445,7 @@ func _criar_conjunto(tipo_especial: Peca, formatos: Array[Peca]) -> ConjuntoDePe
 func _obter_formatos_comuns() -> Array[Peca]:
 	var formatos: Array[Peca] = []
 	var vistos: Dictionary = {}
-	for peca in tabuleiro.pecas:
+	for peca in tabuleiro.pecas.pecas:
 		if peca == null or not peca.efeitos.is_empty() or peca.tipo_peca == "BOMBA":
 			continue
 		if vistos.has(peca.tipo_peca):

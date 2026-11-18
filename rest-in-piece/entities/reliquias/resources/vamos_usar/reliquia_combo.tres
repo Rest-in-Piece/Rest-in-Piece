@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://djynh3fp1h2jn" path="res://entities/reliquias/scripts/reliquia_combo.gd" id="1_01lff"]
 [ext_resource type="Script" uid="uid://b7s2kvxrww7si" path="res://assets/visual_fx/pecas/scripts/efeito_visual.gd" id="1_qdhr8"]
-[ext_resource type="Resource" uid="uid://cagp08hmwofc7" path="res://assets/visual_fx/pecas/scripts/novos/efeito_visual_escuridao.tres" id="2_cj7ro"]
+[ext_resource type="Resource" uid="uid://dps1vtfxnhtlk" path="res://assets/visual_fx/pecas/scripts/novos/efeito_visual_onda_sonica.tres" id="10_cd1pb"]
 
 [sub_resource type="CompressedTexture2D" id="CompressedTexture2D_m2x7o"]
 load_path = "res://.godot/imported/Magic_Items_01_pack_FREE-16x16.png-15f39e7dcf3b1163351a8a2472acde2c.ctex"
@@ -16,5 +16,6 @@ script = ExtResource("1_01lff")
 nome = "Gauntlets"
 descricao = "A cada vez consecutiva que posiciona uma peça que pontua, aumenta em 0.25 o multiplicador"
 textura = SubResource("AtlasTexture_ie40m")
-efeitos_visuais = Array[ExtResource("1_qdhr8")]([ExtResource("2_cj7ro")])
+efeitos_visuais = Array[ExtResource("1_qdhr8")]([ExtResource("10_cd1pb")])
+cor_dos_efeitos = Color(0.8396866, 0.84840095, 1, 1)
 metadata/_custom_type_script = "uid://djynh3fp1h2jn"

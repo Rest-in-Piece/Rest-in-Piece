@@ -23,7 +23,7 @@ signal peca_em_jogo_desenhada(peca: Peca, posicoes: Array[Vector2i])
 signal blocos_fixados_alterados
 
 
-@export var pecas: Array[Peca]
+@export var pecas: PecasIniciais
 @onready var camada_fantasma: TileMapLayer = $PecaFantasma
 @onready var camada_projecao: TileMapLayer = $ProjecaoPeca
 

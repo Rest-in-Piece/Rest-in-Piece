@@ -2,17 +2,11 @@
 
 [ext_resource type="Script" uid="uid://b7s2kvxrww7si" path="res://assets/visual_fx/pecas/scripts/efeito_visual.gd" id="1_2dxo8"]
 [ext_resource type="Script" uid="uid://c2hy7fbhnwdhf" path="res://entities/reliquias/scripts/reliquia_camaleao.gd" id="1_2uq76"]
-
-[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_snqnn"]
-load_path = "res://.godot/imported/Magic_Items_01_pack_FREE-16x16.png-15f39e7dcf3b1163351a8a2472acde2c.ctex"
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_3736k"]
-atlas = SubResource("CompressedTexture2D_snqnn")
-region = Rect2(64, 32, 16, 16)
+[ext_resource type="Texture2D" uid="uid://cloqih0pbk0n5" path="res://entities/reliquias/texturas/usar/Portal1.png" id="3_6rtnr"]
 
 [resource]
 script = ExtResource("1_2uq76")
 nome = "Colar da Transformação"
 descricao = "A cada 3 segundos, a peça atual se transforma em outra aleatória do saco e recebe 5 pontos extras"
-textura = SubResource("AtlasTexture_3736k")
+textura = ExtResource("3_6rtnr")
 metadata/_custom_type_script = "uid://c2hy7fbhnwdhf"

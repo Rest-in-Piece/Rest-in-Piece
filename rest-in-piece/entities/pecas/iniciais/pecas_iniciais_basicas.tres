@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="PecasIniciais" format=3 uid="uid://up55awb1u8a6"]
+
+[ext_resource type="Script" uid="uid://bpwodnk3jua2h" path="res://entities/pecas/peca.gd" id="1_xv3a4"]
+[ext_resource type="Script" uid="uid://cr7j46vgd4b62" path="res://entities/pecas/iniciais/lista_pecas_iniciais.gd" id="2_qbca5"]
+[ext_resource type="Resource" uid="uid://dguon0fxwequy" path="res://entities/pecas/peca_i.tres" id="14_rkkbs"]
+[ext_resource type="Resource" uid="uid://dfd5rsig2m2sk" path="res://entities/pecas/peca_j.tres" id="15_ga16t"]
+[ext_resource type="Resource" uid="uid://c688au05wdx4w" path="res://entities/pecas/peca_l.tres" id="16_ni62q"]
+[ext_resource type="Resource" uid="uid://ckbdb2osctv1d" path="res://entities/pecas/peca_o.tres" id="17_x7f2u"]
+[ext_resource type="Resource" uid="uid://cc5u8vixjh3jd" path="res://entities/pecas/peca_s.tres" id="18_sfvgf"]
+[ext_resource type="Resource" uid="uid://b3gt607mbqwgt" path="res://entities/pecas/peca_t.tres" id="19_wvsnb"]
+[ext_resource type="Resource" uid="uid://c08uth3g2u3jr" path="res://entities/pecas/peca_z.tres" id="27_brcon"]
+
+[resource]
+script = ExtResource("2_qbca5")
+pecas = Array[ExtResource("1_xv3a4")]([ExtResource("14_rkkbs"), ExtResource("15_ga16t"), ExtResource("16_ni62q"), ExtResource("17_x7f2u"), ExtResource("18_sfvgf"), ExtResource("19_wvsnb"), ExtResource("27_brcon")])
+metadata/_custom_type_script = "uid://cr7j46vgd4b62"

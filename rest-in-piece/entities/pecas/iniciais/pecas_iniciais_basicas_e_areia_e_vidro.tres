@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="PecasIniciais" format=3 uid="uid://byl3fdfuio1u0"]
+
+[ext_resource type="Script" uid="uid://bpwodnk3jua2h" path="res://entities/pecas/peca.gd" id="1_5ybxp"]
+[ext_resource type="Resource" uid="uid://dguon0fxwequy" path="res://entities/pecas/peca_i.tres" id="2_yfq6n"]
+[ext_resource type="Resource" uid="uid://dfd5rsig2m2sk" path="res://entities/pecas/peca_j.tres" id="3_hsgf0"]
+[ext_resource type="Resource" uid="uid://c688au05wdx4w" path="res://entities/pecas/peca_l.tres" id="4_2nqu3"]
+[ext_resource type="Resource" uid="uid://ckbdb2osctv1d" path="res://entities/pecas/peca_o.tres" id="5_d688e"]
+[ext_resource type="Resource" uid="uid://cc5u8vixjh3jd" path="res://entities/pecas/peca_s.tres" id="6_e8g4f"]
+[ext_resource type="Resource" uid="uid://b3gt607mbqwgt" path="res://entities/pecas/peca_t.tres" id="7_2e5s6"]
+[ext_resource type="Resource" uid="uid://c08uth3g2u3jr" path="res://entities/pecas/peca_z.tres" id="8_jf76l"]
+[ext_resource type="Script" uid="uid://cr7j46vgd4b62" path="res://entities/pecas/iniciais/lista_pecas_iniciais.gd" id="9_2lr3v"]
+[ext_resource type="Resource" uid="uid://bo4axfoyhkolh" path="res://entities/pecas/peca_areia_j.tres" id="9_7xobv"]
+[ext_resource type="Resource" uid="uid://4n65y11lei8v" path="res://entities/pecas/peca_areia_l.tres" id="10_o8hr0"]
+[ext_resource type="Resource" uid="uid://bprgixrwd7rqt" path="res://entities/pecas/peca_areia_o.tres" id="11_ia4aj"]
+[ext_resource type="Resource" uid="uid://bl12c7b4jkiqr" path="res://entities/pecas/peca_areia_s.tres" id="12_6dg8t"]
+[ext_resource type="Resource" uid="uid://pcr1vjpmb36" path="res://entities/pecas/peca_areia_t.tres" id="13_o2jve"]
+[ext_resource type="Resource" uid="uid://gfb14ldcmiph" path="res://entities/pecas/peca_areia_z.tres" id="14_0yq85"]
+[ext_resource type="Resource" uid="uid://l02b6fdwtjps" path="res://entities/pecas/peca_vidro_i.tres" id="15_woncj"]
+[ext_resource type="Resource" uid="uid://h880f1iuhun8" path="res://entities/pecas/peca_vidro_j.tres" id="16_e81hx"]
+[ext_resource type="Resource" uid="uid://brl4o8rx0wu4t" path="res://entities/pecas/peca_vidro_l.tres" id="17_4c5db"]
+
+[resource]
+script = ExtResource("9_2lr3v")
+pecas = Array[ExtResource("1_5ybxp")]([ExtResource("2_yfq6n"), ExtResource("3_hsgf0"), ExtResource("4_2nqu3"), ExtResource("5_d688e"), ExtResource("6_e8g4f"), ExtResource("7_2e5s6"), ExtResource("8_jf76l"), ExtResource("9_7xobv"), ExtResource("10_o8hr0"), ExtResource("11_ia4aj"), ExtResource("12_6dg8t"), ExtResource("13_o2jve"), ExtResource("14_0yq85"), ExtResource("15_woncj"), ExtResource("16_e81hx"), ExtResource("17_4c5db")])
+metadata/_custom_type_script = "uid://cr7j46vgd4b62"

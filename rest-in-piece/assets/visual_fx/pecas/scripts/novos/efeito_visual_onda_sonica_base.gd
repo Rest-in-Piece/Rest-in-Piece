@@ -1,6 +1,6 @@
 
 
-class_name EfeitoVisualPulsoBase
+class_name EfeitoVisualOndaSonica
 extends EfeitoVisual
 
 @export var duracao: float = 0.45

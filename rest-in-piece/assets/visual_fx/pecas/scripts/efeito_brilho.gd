@@ -1,6 +1,6 @@
 
 # "o miolo da célula brilha e apaga devagar, como uma respiração"
-class_name EfeitoVisualRespiracao
+class_name EfeitoBrilho
 extends EfeitoVisual
 
 ## segundos de um ciclo completo
